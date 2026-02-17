@@ -1,0 +1,111 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+@theme {
+  --color-background: var(--bg-color);
+  --color-surface: var(--surface-color);
+  --color-primary: #10B981;
+  --color-secondary: #8B5CF6;
+  --color-accent: #F59E0B;
+  --font-outfit: "Outfit", sans-serif;
+}
+
+:root {
+  --bg-color: #f8fafc;
+  --surface-color: #ffffff;
+  --text-main: #0f172a;
+  --text-placeholder: rgba(15, 23, 42, 0.35);
+  --border-color: rgba(0, 0, 0, 0.05);
+  --key-bg: rgba(0, 0, 0, 0.03);
+  --key-active: rgba(0, 0, 0, 0.08);
+}
+
+.dark {
+  --bg-color: #050505;
+  --surface-color: #111113;
+  --text-main: rgba(255, 255, 255, 0.95);
+  --text-placeholder: rgba(255, 255, 255, 0.25);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --key-bg: rgba(255, 255, 255, 0.03);
+  --key-active: rgba(255, 255, 255, 0.08);
+}
+
+@layer base {
+  body {
+    @apply bg-background text-white font-outfit antialiased selection:bg-primary/30 relative min-h-screen transition-colors duration-500;
+    color: var(--text-main);
+  }
+
+  body::before {
+    content: "";
+    @apply fixed inset-0 -z-10 opacity-10 blur-[130px] pointer-events-none;
+    background:
+      radial-gradient(circle at 10% 10%, var(--color-primary) 0%, transparent 40%),
+      radial-gradient(circle at 90% 90%, var(--color-secondary) 0%, transparent 40%);
+  }
+
+  .dark body::before {
+    @apply opacity-30;
+  }
+}
+
+@utility glass-card {
+  @apply backdrop-blur-3xl border rounded-[2.5rem] transition-all duration-500;
+  background-color: var(--surface-color);
+  border-color: var(--border-color);
+}
+
+@utility input-zen {
+  @apply w-full bg-transparent border-none font-black focus:outline-none transition-all tracking-tighter cursor-default;
+  color: var(--text-main);
+}
+
+.input-zen::placeholder {
+  color: var(--text-placeholder);
+  opacity: 1;
+}
+
+@utility label-zen {
+  @apply text-[9px] font-black uppercase tracking-[0.4em] opacity-30 mb-3 block;
+}
+
+@utility key-cap {
+  @apply h-16 flex items-center justify-center rounded-2xl text-xl font-black transition-all active:scale-90 border border-transparent;
+  background-color: var(--key-bg);
+}
+
+.key-cap:active {
+  background-color: var(--key-active);
+  border-color: var(--border-color);
+}
+
+/* Hide Scrollbar */
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary/20 rounded-full;
+}
+
+/* SEO & Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

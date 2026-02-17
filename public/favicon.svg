@@ -1,0 +1,25 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad_k_bold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#14D194;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#10B981;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow_k" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.5"/>
+      <feOffset dx="1" dy="1" result="offsetblur"/>
+      <feComponentTransfer><feFuncA type="linear" slope="0.3"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  
+  <rect width="128" height="128" rx="32" fill="#050505"/>
+  
+  <g filter="url(#shadow_k)">
+    <!-- Bold Modern K -->
+    <path d="M38 32V96M38 64 L74 32M56 64L88 96" stroke="url(#grad_k_bold)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+    
+    <!-- Refresh Icon Circular Arrows (Integrated on the right side) -->
+    <circle cx="85" cy="64" r="18" fill="#050505" stroke="#10B981" stroke-width="4"/>
+    <path d="M78 58C80 55 83 54 85 54C88 54 91 55 93 58L97 54M92 70C90 73 87 74 85 74C82 74 79 73 77 70L73 74" stroke="#10B981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
