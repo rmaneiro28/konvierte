@@ -80,7 +80,7 @@ export const fetchRates = async (): Promise<Partial<RatesState>> => {
             },
         };
     } catch (error) {
-        console.error("Error fetching rates from DolarApi:", error);
+        // console.error("Error fetching rates from DolarApi:", error);
         throw error;
     }
 };

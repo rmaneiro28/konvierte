@@ -10,7 +10,7 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'apple-touch-icon.png', 'mask-icon.svg'],
+      includeAssets: ['favicon.svg'],
       manifest: {
         name: 'Konvierte | Calculadora de Divisas',
         short_name: 'Konvierte',
@@ -38,4 +38,18 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    target: 'esnext',
+    minify: 'terser',
+    cssMinify: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-ui': ['framer-motion', 'lucide-react'],
+          'vendor-utils': ['mathjs', 'html2canvas', 'sonner']
+        }
+      }
+    }
+  }
 })
