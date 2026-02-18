@@ -10,16 +10,23 @@ import { Toaster, toast } from 'sonner';
 import { useCalculator } from './hooks/useCalculator';
 import { useRatesManager } from './hooks/useRatesManager';
 import { formatCurrency } from './utils/formatters';
-import { SVG_FLAGS } from './assets/flags';
 
 // --- Componentes UI Auxiliares ---
 
 const Flag = React.memo(({ code, className = "w-4 h-4" }: { code: string; className?: string }) => {
   const [error, setError] = useState(false);
+  const [FallbackSvg, setFallbackSvg] = useState<React.ReactNode>(null);
   const flagCode = code.toLowerCase();
 
   // Mapeo simple de códigos a los nombres de FlagCDN
   const flagUrl = `https://flagcdn.com/${flagCode === 'us' ? 'us' : flagCode === 've' ? 've' : flagCode === 'eu' ? 'eu' : 'un'}.svg`;
+
+  const handleError = async () => {
+    setError(true);
+    // Carga dinámica del fallback SVG solo cuando sea necesario
+    const { SVG_FLAGS } = await import('./assets/flags');
+    setFallbackSvg(SVG_FLAGS[flagCode] || null);
+  };
 
   return (
     <div className={`${className} rounded-full overflow-hidden flex-shrink-0 bg-white/10 border border-white/10 flex items-center justify-center relative`}>
@@ -28,10 +35,10 @@ const Flag = React.memo(({ code, className = "w-4 h-4" }: { code: string; classN
           src={flagUrl}
           alt={code}
           className="w-full h-full object-cover"
-          onError={() => setError(true)}
+          onError={handleError}
         />
       ) : (
-        SVG_FLAGS[flagCode] || (
+        FallbackSvg || (
           <div className="w-full h-full bg-primary/20 flex items-center justify-center text-[8px] font-black uppercase tracking-tighter">?</div>
         )
       )}
@@ -492,10 +499,10 @@ function App() {
                   return (
                     <button key={id} onClick={() => selectRate(id)}
                       aria-label={`Seleccionar tasa ${data.name}`}
-                      className={`flex-shrink-0 px-5 py-3 rounded-2xl border transition-all duration-300 flex items-center gap-3 ${activeSource === id ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'bg-white/5 border-transparent text-primary dark:text-primary hover:bg-white/10'}`}>
+                      className={`flex-shrink-0 px-5 py-3 rounded-2xl border transition-colors duration-300 flex items-center gap-3 ${activeSource === id ? 'bg-primary border-primary text-white shadow-xl shadow-primary/20' : 'bg-white/5 border-transparent text-primary dark:text-primary hover:bg-white/10'}`}>
                       <Flag code={data.flag} />
                       <div>
-                        <span className={`block text-[8px] font-black uppercase tracking-widest mb-0.5 ${activeSource === id ? 'opacity-90' : 'opacity-80'}`}>{data.name}</span>
+                        <span className={`block text-[8px] font-black uppercase tracking-widest mb-0.5 ${activeSource === id ? 'text-white' : ''}`}>{data.name}</span>
                         <span className="text-sm font-black">{formatCurrency(data.price)}</span>
                       </div>
                     </button>
@@ -685,8 +692,8 @@ function App() {
 
               <div style={{ marginBottom: '45px' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '15px' }}>
-                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '4px solid rgba(16, 185, 129, 0.2)', marginBottom: '12px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111' }}>
-                    {SVG_FLAGS[(lastEdited === 'USD' ? 've' : (allRates[activeSource]?.flag || 'us')).toLowerCase()]}
+                  <div style={{ width: '48px', height: '48px', borderRadius: '50%', border: '4px solid rgba(16, 185, 129, 0.2)', marginBottom: '12px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', flexShrink: 0 }}>
+                    <img src={`https://flagcdn.com/${(lastEdited === 'USD' ? 've' : (allRates[activeSource]?.flag || 'us')).toLowerCase()}.svg`} alt="flag" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   </div>
                   <span style={{ fontSize: '10px', fontWeight: 800, color: 'white', opacity: 0.6, textTransform: 'uppercase', letterSpacing: '0.4em', display: 'block' }}>
                     {lastEdited === 'USD' ? 'Monto en Bolívares' : 'Monto en Dólares'}
@@ -702,8 +709,8 @@ function App() {
 
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', padding: '20px 30px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '32px' }}>
                 <div style={{ textAlign: 'left', display: 'flex', alignItems: 'center', gap: '15px' }}>
-                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111' }}>
-                    {SVG_FLAGS[(lastEdited === 'USD' ? (allRates[activeSource]?.flag || 'us') : 've').toLowerCase()]}
+                  <div style={{ width: '28px', height: '28px', borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', flexShrink: 0 }}>
+                    <img src={`https://flagcdn.com/${(lastEdited === 'USD' ? (allRates[activeSource]?.flag || 'us') : 've').toLowerCase()}.svg`} alt="flag" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                   </div>
                   <div>
                     <p style={{ fontSize: '9px', fontWeight: 900, color: 'white', opacity: 0.6, textTransform: 'uppercase', margin: '0 0 4px 0', letterSpacing: '0.1em' }}>
@@ -723,8 +730,8 @@ function App() {
                     Tasa del día ({allRates[activeSource]?.name.split(' ')[0]})
                   </p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111' }}>
-                      {SVG_FLAGS[(allRates[activeSource]?.flag || 'us').toLowerCase()]}
+                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#111', flexShrink: 0 }}>
+                      <img src={`https://flagcdn.com/${(allRates[activeSource]?.flag || 'us').toLowerCase()}.svg`} alt="flag" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                     </div>
                     <p style={{ fontSize: '24px', fontWeight: 900, color: 'white', margin: 0 }}>{formatCurrency(activeRateValue)}</p>
                   </div>
