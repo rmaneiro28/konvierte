@@ -13,8 +13,11 @@ import { ActionButtons } from './components/ActionButtons';
 import { VirtualKeyboard } from './components/VirtualKeyboard';
 import { ShareModal } from './components/ShareModal';
 import { ShareTemplate } from './components/ShareTemplate';
+import { PaymentMethodsModal } from './components/PaymentMethodsModal';
+import { usePaymentMethods } from './hooks/usePaymentMethods';
 import { RateItem } from './components/RateItem';
 import { RateSelector } from './components/RateSelector';
+
 
 // Carga perezosa del componente pesado de Ajustes
 const SettingsModal = React.lazy(() => import('./components/SettingsModal'));
@@ -22,6 +25,17 @@ const SettingsModal = React.lazy(() => import('./components/SettingsModal'));
 function App() {
 
   const shareTemplateRef = useRef<HTMLDivElement>(null);
+
+  // Payment Methods
+  const {
+    methods: paymentMethods,
+    addMethod,
+    removeMethod,
+    validatePhone,
+    formatPhoneNumber
+  } = usePaymentMethods();
+  const [isPaymentMethodsOpen, setIsPaymentMethodsOpen] = useState(false);
+  const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
 
   // --- Theme State ---
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -142,10 +156,21 @@ function App() {
   // --- Lógica de Compartir ---
   const shareAsText = async () => {
     try {
-      const text = `📊 *Konvierte - Reporte*\n\n` +
+      let text = `📊 *Konvierte - Reporte*\n\n` +
         `💵 ${inputUSD} USD = ${inputVES} VES\n` +
-        `📈 Ref: ${allRates[activeSource]?.name} @ ${formatCurrency(activeRateValue)}\n\n` +
-        `✨ Calculado con Konvierte`;
+        `📈 Ref: ${allRates[activeSource]?.name} @ ${formatCurrency(activeRateValue)}`;
+
+      if (selectedPaymentMethodId) {
+        const pm = paymentMethods.find((m) => m.id === selectedPaymentMethodId);
+        if (pm) {
+          text += `\n\n💳 *Pago Móvil*\n` +
+            `Banco: ${pm.bank}\n` +
+            `Cédula: ${pm.idNumber}\n` +
+            `Teléfono: ${pm.phoneNumber}`;
+        }
+      }
+
+      text += `\n\n✨ Calculado con Konvierte`;
 
       if (navigator.share && window.isSecureContext) {
         await navigator.share({ title: 'Konvierte', text });
@@ -168,66 +193,84 @@ function App() {
     }
   };
 
-  const shareAsImage = async () => {
+  const shareAsImage = async (mode: 'share' | 'download' = 'share') => {
     if (!shareTemplateRef.current) {
       toast.error('Error: Plantilla no lista');
       return;
     }
 
     setSharing(true);
-    toast.info('Generando widget...');
+    const toastId = toast.loading('Generando imagen...');
 
     try {
-      await new Promise(r => setTimeout(r, 100));
+      // Pequeña pausa para asegurar renderizado
+      await new Promise(r => setTimeout(r, 200));
 
-      // Importación dinámica de html2canvas para optimizar el bundle inicial
       const html2canvas = (await import('html2canvas')).default;
-
       const canvas = await html2canvas(shareTemplateRef.current, {
         backgroundColor: '#050505',
-        scale: 3,
+        scale: 2, // Escala reducida para asegurar estabilidad en móviles
         useCORS: true,
         logging: false,
-        width: 500,
-        height: 500,
       });
 
-      const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, 'image/png', 1.0));
+      canvas.toBlob(async (blob) => {
+        if (!blob) throw new Error('Error al generar archivo de imagen');
 
-      if (blob && navigator.share && window.isSecureContext) {
-        try {
-          const file = new File([blob], 'konvierte.png', { type: 'image/png' });
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        if (mode === 'download') {
+          triggerDownload(canvas);
+          toast.success('Imagen guardada', { id: toastId });
+          setIsShareOpen(false);
+          return;
+        }
+
+        const file = new File([blob], 'konvierte-capture.png', { type: 'image/png' });
+
+        if (navigator.share) {
+          try {
             await navigator.share({
               files: [file],
-              title: 'Reporte Konvierte',
-              text: `Calculado al cambio: ${formatCurrency(activeRateValue)}`
+              title: 'Konvierte',
+              text: ` 💵 ${inputUSD || '1'} USD = ${inputVES || formatCurrency(activeRateValue)} Bs.`
             });
-            toast.success('¡Compartido con éxito!');
-          } else {
-            throw new Error('Navigator share files not supported');
+            toast.success('¡Compartido!', { id: toastId });
+          } catch (error: any) {
+            if (error.name === 'AbortError') {
+              toast.dismiss(toastId);
+            } else {
+              console.error('Error al compartir:', error);
+              triggerDownload(canvas);
+              toast.info('Imagen descargada (No se pudo abrir el menú compartir)', { id: toastId });
+            }
           }
-        } catch (err) {
-          const link = document.createElement('a');
-          link.download = `konvierte-${Date.now()}.png`;
-          link.href = canvas.toDataURL('image/png');
-          link.click();
-          toast.success('Imagen guardada');
+        } else {
+          // Fallback descarga explícito
+          triggerDownload(canvas);
+
+          if (!window.isSecureContext) {
+            toast.info('Imagen descargada. (Compartir requiere HTTPS)', { id: toastId });
+          } else {
+            toast.info('Imagen descargada. (Tu dispositivo no soporta compartir nativo)', { id: toastId });
+          }
         }
-      } else {
-        const link = document.createElement('a');
-        link.download = `konvierte-${Date.now()}.png`;
-        link.href = canvas.toDataURL('image/png');
-        link.click();
-        toast.info(window.isSecureContext ? 'Imagen descargada' : 'HTTP detectado: Descargando');
-      }
+      }, 'image/png');
+
       setIsShareOpen(false);
     } catch (e) {
       console.error(e);
-      toast.error('Error al generar imagen');
+      toast.error('Error al generar imagen', { id: toastId });
     } finally {
       setSharing(false);
     }
+  };
+
+  const triggerDownload = (canvas: HTMLCanvasElement) => {
+    const link = document.createElement('a');
+    link.download = `konvierte-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // --- Previsualización de Fórmula ---
@@ -319,6 +362,7 @@ function App() {
           setTheme={setTheme}
           setIsShareOpen={setIsShareOpen}
           setIsConfigOpen={setIsConfigOpen}
+          setIsPaymentMethodsOpen={setIsPaymentMethodsOpen}
         />
 
         <main className="relative z-10 w-full overflow-hidden">
@@ -405,6 +449,9 @@ function App() {
             shareAsText={shareAsText}
             shareAsImage={shareAsImage}
             sharing={sharing}
+            paymentMethods={paymentMethods}
+            selectedPaymentMethodId={selectedPaymentMethodId}
+            onSelectPaymentMethod={setSelectedPaymentMethodId}
           />
         </AnimatePresence>
 
@@ -433,6 +480,16 @@ function App() {
           )}
         </AnimatePresence>
 
+        <PaymentMethodsModal
+          isOpen={isPaymentMethodsOpen}
+          onClose={() => setIsPaymentMethodsOpen(false)}
+          methods={paymentMethods}
+          addMethod={addMethod}
+          removeMethod={removeMethod}
+          validatePhone={validatePhone}
+          formatPhoneNumber={formatPhoneNumber}
+        />
+
         {/* 🖼️ Plantilla de Captura (Oculta del Usuario) */}
         <ShareTemplate
           lastEdited={lastEdited}
@@ -442,6 +499,7 @@ function App() {
           allRates={allRates}
           activeSource={activeSource}
           templateRef={shareTemplateRef}
+          paymentMethod={paymentMethods.find(m => m.id === selectedPaymentMethodId)}
         />
       </div>
     </LazyMotion >
