@@ -21,7 +21,7 @@ import { RateItem } from './components/RateItem';
 const SettingsModal = React.lazy(() => import('./components/SettingsModal'));
 
 function App() {
-  const screenshotRef = useRef<HTMLDivElement>(null);
+
   const shareTemplateRef = useRef<HTMLDivElement>(null);
 
   // --- Theme State ---
