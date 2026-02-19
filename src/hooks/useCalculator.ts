@@ -70,6 +70,16 @@ export const useCalculator = (activeRateValue: number) => {
         setIsInverse(prev => !prev);
     }, []);
 
+    const setFixedAmount = useCallback((val: string, type: 'USD' | 'VES') => {
+        const cleanVal = val.replace(/\./g, '').replace(',', '.');
+        if (type === 'USD') setInputUSD(val);
+        else setInputVES(val);
+
+        setFocusedInput(null);
+        setLastEdited(type);
+        updateCalculation(cleanVal, type, activeRateValue);
+    }, [activeRateValue, updateCalculation]);
+
     return {
         inputUSD,
         setInputUSD,
@@ -87,6 +97,7 @@ export const useCalculator = (activeRateValue: number) => {
         handleInputFocus,
         handleReset,
         handleSwapCurrencies,
-        updateCalculation
+        updateCalculation,
+        setFixedAmount
     };
 };
