@@ -141,7 +141,7 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                             <div className="flex flex-col gap-4 relative z-10">
                                 <div className="flex items-start justify-between">
                                     <div>
-                                        <span className="text-[9px] font-black uppercase tracking-widest block mb-1" style={{ color: '#10B981' }}>
+                                        <span className="text-[11px] font-black uppercase tracking-widest block mb-1" style={{ color: '#10B981' }}>
                                             Pago Móvil
                                         </span>
                                         <div className="flex items-center gap-2">
@@ -153,30 +153,30 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                                                     crossOrigin="anonymous"
                                                 />
                                             )}
-                                            <span className="text-lg font-black text-white block leading-tight" style={{ color: '#ffffff' }}>
+                                            <span className="text-2xl font-black text-white block leading-tight" style={{ color: '#ffffff' }}>
                                                 {paymentMethod.bank}
                                             </span>
                                         </div>
                                     </div>
-                                    <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-[#10B981]/10 text-[#10B981]" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}>
+                                    <span className="text-xs font-black px-4 py-1.5 rounded-full bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}>
                                         {paymentMethod.alias}
                                     </span>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <span className="text-[9px] font-bold uppercase tracking-widest block mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                                        <span className="text-[11px] font-black uppercase tracking-widest block mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
                                             Cédula / RIF
                                         </span>
-                                        <span className="text-sm font-mono font-bold" style={{ color: '#ffffff' }}>
+                                        <span className="text-xl font-mono font-black" style={{ color: '#ffffff' }}>
                                             {paymentMethod.idNumber}
                                         </span>
                                     </div>
                                     <div className="text-right">
-                                        <span className="text-[9px] font-bold uppercase tracking-widest block mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                                        <span className="text-[11px] font-black uppercase tracking-widest block mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
                                             Teléfono
                                         </span>
-                                        <span className="text-sm font-mono font-bold" style={{ color: '#ffffff' }}>
+                                        <span className="text-xl font-mono font-black" style={{ color: '#ffffff' }}>
                                             {paymentMethod.phoneNumber}
                                         </span>
                                     </div>
@@ -184,6 +184,12 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                             </div>
                         </div>
                     )}
+                    {/* Footer Promo */}
+                    <div className="mt-4 text-center opacity-30">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em]" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                            WWW.KONVIERTE.APP
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

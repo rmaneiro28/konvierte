@@ -170,7 +170,7 @@ function App() {
         }
       }
 
-      text += `\n\n✨ Calculado con Konvierte`;
+      text += `\n\n✨ Calculado con Konvierte\n🔗 https://konvierte.app/`;
 
       if (navigator.share && window.isSecureContext) {
         await navigator.share({ title: 'Konvierte', text });
@@ -231,7 +231,7 @@ function App() {
             await navigator.share({
               files: [file],
               title: 'Konvierte',
-              text: ` 💵 ${inputUSD || '1'} USD = ${inputVES || formatCurrency(activeRateValue)} Bs.`
+              text: ` 💵 ${inputUSD || '1'} USD = ${inputVES || formatCurrency(activeRateValue)} Bs.\n✨ Calculado con Konvierte\n🔗 https://konvierte.app/`
             });
             toast.success('¡Compartido!', { id: toastId });
           } catch (error: any) {
