@@ -1,8 +1,8 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 
 // Generates a 1200x630 OG Image style card, or 1024x1024 app icon.
 // We'll use this ref with html2canvas.
-export const AppIconTemplate = forwardRef<HTMLDivElement>((props, ref) => {
+export const AppIconTemplate = forwardRef<HTMLDivElement>((_, ref) => {
     return (
         <div className="fixed top-0 left-[-200vw]">
             <div
