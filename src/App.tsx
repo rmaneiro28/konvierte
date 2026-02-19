@@ -20,9 +20,14 @@ import { RateSelector } from './components/RateSelector';
 
 
 // Carga perezosa del componente pesado de Ajustes
+import { AppIconTemplate } from './components/AppIconTemplate';
 const SettingsModal = React.lazy(() => import('./components/SettingsModal'));
 
 function App() {
+  if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('og') === 'true') {
+    return <AppIconTemplate isOg ref={null} />;
+  }
+
 
   const shareTemplateRef = useRef<HTMLDivElement>(null);
 
@@ -165,12 +170,12 @@ function App() {
         if (pm) {
           text += `\n\n💳 *Pago Móvil*\n` +
             `Banco: ${pm.bank}\n` +
-            `Cédula: ${pm.idNumber}\n` +
+            `Cédula: ${pm.documentType || 'V'}-${pm.idNumber.replace(/^[VEJPGvejpg]-?/, '')}\n` +
             `Teléfono: ${pm.phoneNumber}`;
         }
       }
 
-      text += `\n\n✨ Calculado con Konvierte\n🔗 https://konvierte.app/`;
+      text += `\n\n✨ Calculado con Konvierte\n🔗 https://konvierte.vercel.app/`;
 
       if (navigator.share && window.isSecureContext) {
         await navigator.share({ title: 'Konvierte', text });
@@ -231,7 +236,7 @@ function App() {
             await navigator.share({
               files: [file],
               title: 'Konvierte',
-              text: ` 💵 ${inputUSD || '1'} USD = ${inputVES || formatCurrency(activeRateValue)} Bs.\n✨ Calculado con Konvierte\n🔗 https://konvierte.app/`
+              text: ` 💵 ${inputUSD || '1'} USD = ${inputVES || formatCurrency(activeRateValue)} Bs.\n✨ Calculado con Konvierte\n🔗 https://konvierte.vercel.app/`
             });
             toast.success('¡Compartido!', { id: toastId });
           } catch (error: any) {
@@ -320,7 +325,7 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!focusedInput) return;
-      if (isConfigOpen || isShareOpen) return;
+      if (isConfigOpen || isShareOpen || isPaymentMethodsOpen) return;
 
       const key = e.key;
       if (/^[0-9]$/.test(key)) onKeyPress(key);
@@ -330,7 +335,7 @@ function App() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [focusedInput, isConfigOpen, isShareOpen, onKeyPress]);
+  }, [focusedInput, isConfigOpen, isShareOpen, isPaymentMethodsOpen, onKeyPress]);
 
   return (
     <LazyMotion features={domAnimation}>
@@ -365,22 +370,22 @@ function App() {
           setIsPaymentMethodsOpen={setIsPaymentMethodsOpen}
         />
 
-        <main className="relative z-10 w-full overflow-hidden">
+        <main className="relative z-10 w-full overflow-hidden flex flex-col md:grid md:grid-cols-2 md:grid-rows-[auto_auto] md:content-center md:items-start md:h-[calc(100vh-80px)] md:px-8 md:gap-6 max-w-4xl mx-auto">
           {/* Pull to Refresh Indicator */}
           <motion.div
             style={{ y: pullY, opacity: pullOpacity, rotate: pullRotate }}
-            className="fixed top-20 left-1/2 -ml-4 w-9 h-9 flex items-center justify-center z-[60] bg-surface border border-primary/20 rounded-full shadow-lg text-primary pointer-events-none"
+            className="fixed top-20 left-1/2 -ml-4 w-9 h-9 flex items-center justify-center z-[60] bg-surface border border-primary/20 rounded-full shadow-lg text-primary pointer-events-none md:hidden"
           >
             <RotateCw size={16} className={rates.loading ? 'animate-spin' : ''} />
           </motion.div>
 
+          {/* LEFT COLUMN: Calculator Inputs */}
           <motion.div
             onPan={handlePan}
             onPanEnd={handlePanEnd}
-            className={`flex-1 flex flex-col w-full max-w-xl mx-auto px-6 pt-12 h-full justify-center gap-1 transition-all duration-300`}
+            className={`flex-1 flex flex-col w-full max-w-xl mx-auto px-6 pt-12 md:pt-0 h-full justify-center gap-1 transition-all duration-300 md:col-start-1 md:row-start-2 md:w-full md:max-w-lg md:mx-auto md:h-auto`}
           >
-
-            {/* Calculadora Zen (Inputs Secundarios) - Ahora Hero Section Interactiva */}
+            {/* Calculadora Zen (Inputs Secundarios) */}
             <HeroSection
               focusedInput={focusedInput}
               inputUSD={inputUSD}
@@ -397,49 +402,108 @@ function App() {
               lastEdited={lastEdited}
             />
 
-            {/* Botones de Acción (Reset/Actualizar) */}
-            <ActionButtons
-              handleReset={handleReset}
-              loadRates={loadRates}
-              isLoading={!!rates.loading}
-            />
+            {/* Mobile-Only Controls */}
+            <div className="md:hidden w-full flex flex-col gap-4">
+              <ActionButtons
+                handleReset={handleReset}
+                loadRates={loadRates}
+                isLoading={!!rates.loading}
+              />
 
-            {/* Selector de Tasas */}
-            <RateSelector
-              ratesOrder={ratesOrder}
-              allRates={allRates}
-              activeSource={activeSource}
-              selectRate={selectRate}
-            />
-            {/* Fecha de Actualización */}
-            <div className="text-center pt-4 opacity-40">
-              <p className="text-[10px] font-medium">
-                Actualizado: {(() => {
+              <RateSelector
+                ratesOrder={ratesOrder}
+                allRates={allRates}
+                activeSource={activeSource}
+                selectRate={selectRate}
+              />
+
+              {/* Fecha de Actualización Mobile */}
+              <div className="text-center pt-4 opacity-40">
+                <p className="text-[10px] font-medium">
+                  Actualizado: {(() => {
+                    const rate = (rates as any)[activeSource];
+                    if (rate?.lastUpdate) {
+                      try {
+                        return new Date(rate.lastUpdate).toLocaleString('es-VE', {
+                          day: '2-digit', month: '2-digit', year: 'numeric',
+                          hour: '2-digit', minute: '2-digit', hour12: true
+                        });
+                      } catch (e) { return '---'; }
+                    }
+                    return new Date().toLocaleDateString();
+                  })()}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* CENTER COLUMN: Rates & Actions */}
+          <div className="hidden md:flex flex-col md:flex-row md:col-span-2 md:row-start-1 w-full max-w-sm md:max-w-none h-auto bg-surface/30 backdrop-blur-xl border border-white/5 rounded-[2rem] p-6 gap-6 shadow-2xl relative overflow-hidden md:items-center">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
+
+            {/* Header */}
+            <div className="flex justify-between items-center px-1 md:flex-col md:items-start md:min-w-fit">
+              <h2 className="text-xs font-black uppercase tracking-widest opacity-40 flex items-center gap-2 whitespace-nowrap">
+                Tasas del Día
+              </h2>
+              <div className="opacity-40 text-[10px] font-medium font-mono whitespace-nowrap">
+                {(() => {
                   const rate = (rates as any)[activeSource];
                   if (rate?.lastUpdate) {
                     try {
                       return new Date(rate.lastUpdate).toLocaleString('es-VE', {
-                        day: '2-digit', month: '2-digit', year: 'numeric',
                         hour: '2-digit', minute: '2-digit', hour12: true
                       });
-                    } catch (e) { return '---'; }
+                    } catch (e) { return ''; }
                   }
-                  return new Date().toLocaleDateString();
+                  return '';
                 })()}
-              </p>
+              </div>
             </div>
 
+            {/* Rates Horizontal List */}
+            <div className="flex-1 overflow-y-auto md:overflow-y-visible md:overflow-x-auto pr-2 md:pr-0 custom-scrollbar">
+              <RateSelector
+                ratesOrder={ratesOrder}
+                allRates={allRates}
+                activeSource={activeSource}
+                selectRate={selectRate}
+                className="grid grid-cols-1 gap-3 overflow-visible px-0 md:flex md:flex-row md:gap-4 md:items-center"
+              />
+            </div>
 
-            {/* Footer Removed / Minimized */}
-          </motion.div>
+            {/* Actions */}
+            <ActionButtons
+              handleReset={handleReset}
+              loadRates={loadRates}
+              isLoading={!!rates.loading}
+              className="my-0 w-full grid grid-cols-2 gap-3 md:w-auto md:flex md:flex-col md:gap-2 md:min-w-fit"
+            />
+          </div>
+
+          {/* RIGHT COLUMN: Keypad */}
+          <div className="hidden md:flex flex-col w-full max-w-[320px] md:col-start-2 md:row-start-2 md:max-w-lg md:w-full md:mx-auto md:justify-center">
+            <div className="bg-surface/30 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-6 shadow-2xl w-full">
+              <VirtualKeyboard
+                isOpen={true}
+                onKeyPress={onKeyPress}
+                onClose={() => { }}
+                variant="embedded"
+                className="bg-transparent border-none shadow-none p-0 w-full"
+              />
+            </div>
+          </div>
         </main>
 
-        {/* Teclado Virtual Zen - SIEMPRE DISPONIBLE */}
-        <VirtualKeyboard
-          isOpen={true}
-          onKeyPress={onKeyPress}
-          onClose={() => { }} // Disabled close
-        />
+        {/* Teclado Virtual Mobile - Solo visible en mobile */}
+        <div className="md:hidden">
+          <VirtualKeyboard
+            isOpen={true}
+            onKeyPress={onKeyPress}
+            onClose={() => { }}
+            variant="fixed"
+          />
+        </div>
 
         {/* Modals */}
         <AnimatePresence>

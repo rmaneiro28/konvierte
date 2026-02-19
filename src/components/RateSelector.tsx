@@ -1,18 +1,19 @@
-
 import React from 'react';
 import { Flag } from './ui/Flag';
 import { formatCurrency } from '../utils/formatters';
+import { twMerge } from 'tailwind-merge';
 
 interface RateSelectorProps {
     ratesOrder: string[];
     allRates: any;
     activeSource: string;
     selectRate: (id: string) => void;
+    className?: string;
 }
 
-export const RateSelector: React.FC<RateSelectorProps> = ({ ratesOrder, allRates, activeSource, selectRate }) => {
+export const RateSelector: React.FC<RateSelectorProps> = ({ ratesOrder, allRates, activeSource, selectRate, className }) => {
     return (
-        <section className="flex gap-3 overflow-x-auto no-scrollbar py-0.5 mb-0">
+        <section className={twMerge("flex gap-3 overflow-x-auto no-scrollbar py-0.5 mb-0", className)}>
             {ratesOrder.map((id) => {
                 const data = allRates[id];
                 if (!data) return null;

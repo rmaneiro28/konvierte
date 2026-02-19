@@ -8,6 +8,7 @@ export interface PaymentMethod {
     bank: string;
     idNumber: string;
     phoneNumber: string;
+    documentType?: string; // V, J, E, P, G
     bankCode?: string;
     bankLogo?: string;
     bankColor?: string;
@@ -39,6 +40,7 @@ export const usePaymentMethods = () => {
         const newMethod = {
             ...method,
             id: Date.now().toString(36) + Math.random().toString(36).substring(2),
+            documentType: method.documentType || 'V',
             bankCode: bankData?.code,
             bankLogo: bankData?.logo,
             bankColor: bankData?.color
@@ -61,7 +63,7 @@ export const usePaymentMethods = () => {
 
         const validPrefixes = ['412', '414', '424', '416', '426', '422'];
 
-        if (num.length !== 10) return false;
+        if (num.length < 10 || num.length > 11) return false;
         if (!validPrefixes.includes(num.substring(0, 3))) return false;
 
         return true;
@@ -74,9 +76,9 @@ export const usePaymentMethods = () => {
         if (num.startsWith('58')) num = num.substring(2);
         if (num.startsWith('0')) num = num.substring(1);
 
-        if (num.length !== 10) return phone;
+        if (num.length < 10) return phone;
 
-        return `0${num.substring(0, 3)}-${num.substring(3)}`;
+        return `+58-${num.substring(0, 3)}-${num.substring(3, 6)}-${num.substring(6)}`;
     };
 
     const formatToInternational = (phone: string) => {

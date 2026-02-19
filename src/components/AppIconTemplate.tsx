@@ -2,12 +2,20 @@ import { forwardRef } from 'react';
 
 // Generates a 1200x630 OG Image style card, or 1024x1024 app icon.
 // We'll use this ref with html2canvas.
-export const AppIconTemplate = forwardRef<HTMLDivElement>((_, ref) => {
+export const AppIconTemplate = forwardRef<HTMLDivElement, { isOg?: boolean }>(({ isOg }, ref) => {
+    const containerClasses = isOg
+        ? "relative w-[1200px] h-[630px] flex items-center justify-center bg-[#050505] overflow-hidden"
+        : "w-[1024px] h-[1024px] relative flex items-center justify-center bg-[#050505] overflow-hidden";
+
+    const wrapperClasses = isOg
+        ? "w-screen h-screen flex items-center justify-center bg-black"
+        : "fixed top-0 left-[-200vw]";
+
     return (
-        <div className="fixed top-0 left-[-200vw]">
+        <div className={wrapperClasses}>
             <div
                 ref={ref}
-                className="w-[1024px] h-[1024px] relative flex items-center justify-center bg-[#050505] overflow-hidden"
+                className={containerClasses}
                 style={{ fontFamily: 'Outfit, sans-serif' }}
             >
                 {/* Background Ambient Glow */}

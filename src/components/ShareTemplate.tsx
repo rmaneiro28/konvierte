@@ -169,7 +169,7 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                                             Cédula / RIF
                                         </span>
                                         <span className="text-xl font-mono font-black" style={{ color: '#ffffff' }}>
-                                            {paymentMethod.idNumber}
+                                            {paymentMethod.documentType || 'V'}-{paymentMethod.idNumber.replace(/^[VEJPGvejpg]-?/, '')}
                                         </span>
                                     </div>
                                     <div className="text-right">
@@ -187,7 +187,7 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                     {/* Footer Promo */}
                     <div className="mt-4 text-center opacity-30">
                         <span className="text-[10px] font-black uppercase tracking-[0.3em]" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                            WWW.KONVIERTE.APP
+                            KONVIERTE.VERCEL.APP
                         </span>
                     </div>
                 </div>

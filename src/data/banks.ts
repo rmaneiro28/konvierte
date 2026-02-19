@@ -21,7 +21,7 @@ export const VENEZUELA_BANKS: Bank[] = [
     {
         code: '0105',
         name: 'Banco Mercantil',
-        logo: 'https://upload.wikimedia.org/wikipedia/commons/6/69/Banco_Mercantil_%28Venezuela%29_logo.svg',
+        logo: 'https://reportecatolicolaico.com/wp-content/uploads/2025/07/logo-mercantil.png',
         color: '#005596'
     },
     {

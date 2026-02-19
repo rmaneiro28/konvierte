@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Wallet, Plus, Trash2, Smartphone, Building2, User, ChevronDown } from 'lucide-react';
+
+import { X, Wallet, Plus, Trash2, Building2, User, ChevronDown } from 'lucide-react';
 import type { PaymentMethod } from '../hooks/usePaymentMethods';
 import { VENEZUELA_BANKS } from '../data/banks';
 
@@ -30,6 +31,8 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
     const [bank, setBank] = useState('');
     const [idNumber, setIdNumber] = useState('');
     const [phone, setPhone] = useState('');
+    const [documentType, setDocumentType] = useState('V');
+    const docTypes = ['V', 'J', 'E', 'P', 'G'];
 
     const handleSave = () => {
         if (!alias || !bank || !idNumber || !phone) return;
@@ -43,7 +46,8 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
             alias,
             bank,
             idNumber,
-            phoneNumber: formatPhoneNumber(phone)
+            phoneNumber: formatPhoneNumber(phone),
+            documentType
         });
 
         // Reset form
@@ -51,12 +55,39 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
         setBank('');
         setIdNumber('');
         setPhone('');
+        setDocumentType('V');
         setIsAdding(false);
     };
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;
-        if (val.length <= 15) setPhone(val);
+        let val = e.target.value.replace(/\D/g, ''); // Strip non-digits
+
+        // Handle leading 58 (country code paste) or 0 (local prefix)
+        if (val.startsWith('58')) val = val.substring(2);
+        if (val.startsWith('0')) val = val.substring(1);
+
+        let formatted = '';
+        if (val.length > 0) {
+            formatted = '+58-';
+            if (val.length > 0) formatted += val.substring(0, 3);
+            if (val.length > 3) formatted += '-' + val.substring(3, 6);
+            if (val.length > 6) formatted += '-' + val.substring(6, 11);
+        }
+        setPhone(formatted);
+    };
+
+    const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let val = e.target.value.replace(/\D/g, '');
+        const maxLen = (documentType === 'V' || documentType === 'E') ? 8 : 10;
+
+        if (val.length > maxLen) val = val.substring(0, maxLen);
+
+        // Format with thousands separator
+        if (val.length > 0) {
+            val = val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        setIdNumber(val);
     };
 
     return (
@@ -113,6 +144,7 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
                                             <input
                                                 value={alias}
                                                 onChange={e => setAlias(e.target.value)}
+                                                onKeyDown={(e) => e.stopPropagation()}
                                                 placeholder="Alias (ej: Pago Móvil Personal)"
                                                 className="w-full bg-black/20 border border-white/5 rounded-xl py-3 pl-10 pr-4 text-xs font-bold outline-none focus:border-primary/50 transition-colors placeholder:font-medium placeholder:opacity-30"
                                             />
@@ -124,34 +156,53 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
                                             <select
                                                 value={bank}
                                                 onChange={e => setBank(e.target.value)}
+                                                onKeyDown={(e) => e.stopPropagation()}
                                                 className="w-full bg-black/20 border border-white/5 rounded-xl py-3 pl-10 pr-10 text-xs font-bold outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer text-white/90"
                                             >
                                                 <option value="" disabled className="bg-zinc-900 text-white/50">Seleccionar Banco</option>
                                                 {VENEZUELA_BANKS.map(b => (
                                                     <option key={b.code} value={b.name} className="bg-zinc-900 text-white">
-                                                        {b.name}
+                                                        {b.code} - {b.name}
                                                     </option>
                                                 ))}
                                             </select>
                                         </div>
 
-                                        <div className="flex gap-3">
+                                        <div className="flex gap-2">
+                                            {/* Document Type Selector */}
+                                            <div className="relative w-20">
+                                                <select
+                                                    value={documentType}
+                                                    onChange={e => setDocumentType(e.target.value)}
+                                                    onKeyDown={(e) => e.stopPropagation()}
+                                                    className="w-full bg-black/20 border border-white/5 rounded-xl py-3 px-2 text-center text-xs font-bold outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer text-white/90"
+                                                >
+                                                    {docTypes.map(t => <option key={t} value={t} className="bg-zinc-900">{t}</option>)}
+                                                </select>
+                                                <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none"><ChevronDown size={10} /></div>
+                                            </div>
+
                                             <input
                                                 value={idNumber}
-                                                onChange={e => setIdNumber(e.target.value)}
+                                                onChange={handleIdChange}
+                                                onKeyDown={(e) => e.stopPropagation()}
                                                 placeholder="C.I. / RIF"
-                                                className="w-1/2 bg-black/20 border border-white/5 rounded-xl py-3 px-4 text-xs font-bold outline-none focus:border-primary/50 transition-colors placeholder:font-medium placeholder:opacity-30"
+                                                className="flex-1 bg-black/20 border border-white/5 rounded-xl py-3 px-4 text-xs font-bold outline-none focus:border-primary/50 transition-colors placeholder:font-medium placeholder:opacity-30"
                                             />
-                                            <div className="relative w-1/2">
-                                                <span className="absolute left-3 top-1/2 -translate-y-1/2 opacity-30"><Smartphone size={14} /></span>
-                                                <input
-                                                    value={phone}
-                                                    onChange={handlePhoneChange}
-                                                    placeholder="0412..."
-                                                    type="tel"
-                                                    className="w-full bg-black/20 border border-white/5 rounded-xl py-3 pl-9 pr-4 text-xs font-bold outline-none focus:border-primary/50 transition-colors placeholder:font-medium placeholder:opacity-30"
-                                                />
-                                            </div>
+                                        </div>
+
+                                        <div className="relative w-full">
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none opacity-80">
+                                                <img src="https://flagcdn.com/ve.svg" alt="VE" className="w-4 h-3 object-cover rounded-[2px]" />
+                                            </span>
+                                            <input
+                                                value={phone}
+                                                onChange={handlePhoneChange}
+                                                onKeyDown={(e) => e.stopPropagation()}
+                                                placeholder="+58-412-123-4567"
+                                                type="tel"
+                                                className="w-full bg-black/20 border border-white/5 rounded-xl py-3 pl-10 pr-4 text-xs font-bold outline-none focus:border-primary/50 transition-colors placeholder:font-medium placeholder:opacity-30"
+                                            />
                                         </div>
                                     </div>
 
@@ -199,7 +250,7 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
                                         <div className="space-y-2">
                                             <div className="flex justify-between items-center py-2 border-b border-white/5 last:border-0 last:pb-0">
                                                 <span className="text-[10px] font-bold opacity-40 uppercase">ID / RIF</span>
-                                                <span className="text-xs font-mono font-bold">{method.idNumber}</span>
+                                                <span className="text-xs font-mono font-bold">{method.documentType || 'V'}-{method.idNumber.replace(/^[VEJPGvejpg]-?/, '')}</span>
                                             </div>
                                             <div className="flex justify-between items-center py-2 border-b border-white/5 last:border-0 last:pb-0">
                                                 <span className="text-[10px] font-bold opacity-40 uppercase">Teléfono</span>
