@@ -32,39 +32,57 @@ export const useCalculator = (activeRateValue: number) => {
     const onKeyPress = useCallback((key: string) => {
         if (!focusedInput) return;
 
-        const currentVal = focusedInput === 'USD' ? inputUSD : inputVES;
+        let currentVal = focusedInput === 'USD' ? inputUSD : inputVES;
         const setter = focusedInput === 'USD' ? setInputUSD : setInputVES;
+
         let newVal = currentVal;
 
-        if (key === 'DELETE') {
-            newVal = currentVal.length <= 1 ? '' : currentVal.slice(0, -1);
-        } else if (key === ',' || key === '.') {
-            if (!currentVal.includes(',') && !currentVal.includes('.')) {
-                newVal = (currentVal === '' ? '0' : currentVal) + ',';
+        if (isInitialState) {
+            if (key === 'DELETE') {
+                newVal = '';
+            } else if (key === ',' || key === '.') {
+                newVal = '0,';
+            } else {
+                newVal = key;
             }
+            setIsInitialState(false);
         } else {
-            newVal = currentVal + key;
+            if (key === 'DELETE') {
+                newVal = currentVal.length <= 1 ? '' : currentVal.slice(0, -1);
+            } else if (key === ',' || key === '.') {
+                if (!currentVal.includes(',') && !currentVal.includes('.')) {
+                    newVal = (currentVal === '' ? '0' : currentVal) + ',';
+                }
+            } else {
+                newVal = currentVal + key;
+            }
         }
 
         setter(newVal);
         updateCalculation(newVal, focusedInput, activeRateValue);
-    }, [focusedInput, inputUSD, inputVES, activeRateValue, updateCalculation]);
+
+    }, [focusedInput, inputUSD, inputVES, activeRateValue, isInitialState, updateCalculation]);
 
     const handleInputFocus = useCallback((type: 'USD' | 'VES') => {
         setFocusedInput(type);
         setLastEdited(type);
-        setInputUSD('');
-        setInputVES('');
-        setIsInitialState(false);
+        setIsInitialState(true);
     }, []);
 
     const handleReset = useCallback(() => {
         setInputUSD('1');
-        setInputVES('');
+
+        // Recalcular VES para 1 USD
+        if (activeRateValue > 0) {
+            setInputVES(formatCurrency(activeRateValue));
+        } else {
+            setInputVES('');
+        }
+
         setLastEdited('USD');
         setIsInitialState(true);
-        setFocusedInput(null);
-    }, []);
+        setFocusedInput('USD');
+    }, [activeRateValue]);
 
     const handleSwapCurrencies = useCallback(() => {
         setIsInverse(prev => !prev);

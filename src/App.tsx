@@ -9,13 +9,12 @@ import { formatCurrency } from './utils/formatters';
 
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
-import { RateSelector } from './components/RateSelector';
-import { CalculatorInputs } from './components/CalculatorInputs';
 import { ActionButtons } from './components/ActionButtons';
 import { VirtualKeyboard } from './components/VirtualKeyboard';
 import { ShareModal } from './components/ShareModal';
 import { ShareTemplate } from './components/ShareTemplate';
 import { RateItem } from './components/RateItem';
+import { RateSelector } from './components/RateSelector';
 
 // Carga perezosa del componente pesado de Ajustes
 const SettingsModal = React.lazy(() => import('./components/SettingsModal'));
@@ -120,6 +119,11 @@ function App() {
       updateCalculation('1', 'USD', activeRateValue);
     }
   }, [rates.bcv_usd, activeSource, activeRateValue, updateCalculation, inputUSD, inputVES]);
+
+  // Force default focus on USD on mount
+  useEffect(() => {
+    setFocusedInput('USD');
+  }, []);
 
   // --- Handlers específicos de UI ---
   const handleReset = () => {
@@ -249,6 +253,8 @@ function App() {
   }, [newRateFormula, rates]);
 
   // --- Efectos de Teclado y Click Externo ---
+  // REMOVED: Click outside logic to keep keyboard fixed
+  /*
   useEffect(() => {
     const handleOutsideClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -257,6 +263,8 @@ function App() {
     if (focusedInput) document.addEventListener('mousedown', handleOutsideClick);
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, [focusedInput, setFocusedInput]);
+  */
+
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -286,7 +294,7 @@ function App() {
       <div className={`h-screen w-full overflow-hidden flex flex-col relative bg-background`}>
         {/* Notificaciones Sonner */}
         <Toaster
-          position="top-center"
+          position="top-right"
           expand={false}
           richColors
           theme={theme}
@@ -296,7 +304,11 @@ function App() {
               borderColor: 'var(--border-color)',
               color: 'var(--text-main)',
               fontFamily: 'Outfit, sans-serif',
-              marginTop: '60px'
+              fontSize: '12px',
+              padding: '12px',
+              width: 'auto',
+              minWidth: '200px',
+              maxWidth: '300px',
             }
           }}
         />
@@ -321,17 +333,24 @@ function App() {
           <motion.div
             onPan={handlePan}
             onPanEnd={handlePanEnd}
-            className={`flex-1 flex flex-col w-full max-w-xl mx-auto px-6 pt-16 h-full justify-start gap-4 transition-all duration-300 ${focusedInput ? 'pb-[340px]' : 'pb-4'}`}
+            className={`flex-1 flex flex-col w-full max-w-xl mx-auto px-6 pt-12 h-full justify-center gap-1 transition-all duration-300`}
           >
 
+            {/* Calculadora Zen (Inputs Secundarios) - Ahora Hero Section Interactiva */}
             <HeroSection
               focusedInput={focusedInput}
               inputUSD={inputUSD}
               inputVES={inputVES}
-              lastEdited={lastEdited}
+              handleInputFocus={handleInputFocus}
+              handleSwapCurrencies={handleSwapCurrencies}
+              setFixedAmount={setFixedAmount}
+              usdInputRef={usdInputRef}
+              vesInputRef={vesInputRef}
               activeRateValue={activeRateValue}
               allRates={allRates}
               activeSource={activeSource}
+              isInverse={isInverse}
+              lastEdited={lastEdited}
             />
 
             {/* Botones de Acción (Reset/Actualizar) */}
@@ -348,32 +367,34 @@ function App() {
               activeSource={activeSource}
               selectRate={selectRate}
             />
-
-            {/* Calculadora Zen (Inputs Secundarios) */}
-            <CalculatorInputs
-              inputUSD={inputUSD}
-              inputVES={inputVES}
-              focusedInput={focusedInput}
-              handleInputFocus={handleInputFocus}
-              setFixedAmount={setFixedAmount}
-              isInverse={isInverse}
-              handleSwapCurrencies={handleSwapCurrencies}
-              allRates={allRates}
-              activeSource={activeSource}
-              usdInputRef={usdInputRef}
-              vesInputRef={vesInputRef}
-            />
+            {/* Fecha de Actualización */}
+            <div className="text-center pt-4 opacity-40">
+              <p className="text-[10px] font-medium">
+                Actualizado: {(() => {
+                  const rate = (rates as any)[activeSource];
+                  if (rate?.lastUpdate) {
+                    try {
+                      return new Date(rate.lastUpdate).toLocaleString('es-VE', {
+                        day: '2-digit', month: '2-digit', year: 'numeric',
+                        hour: '2-digit', minute: '2-digit', hour12: true
+                      });
+                    } catch (e) { return '---'; }
+                  }
+                  return new Date().toLocaleDateString();
+                })()}
+              </p>
+            </div>
 
 
             {/* Footer Removed / Minimized */}
           </motion.div>
         </main>
 
-        {/* Teclado Virtual Zen */}
+        {/* Teclado Virtual Zen - SIEMPRE DISPONIBLE */}
         <VirtualKeyboard
-          isOpen={!!focusedInput}
+          isOpen={true}
           onKeyPress={onKeyPress}
-          onClose={() => setFocusedInput(null)}
+          onClose={() => { }} // Disabled close
         />
 
         {/* Modals */}

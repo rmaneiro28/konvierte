@@ -65,8 +65,8 @@ export const useRatesManager = () => {
 
     useEffect(() => {
         loadRates();
-        const interval = setInterval(loadRates, 60000);
-        return () => clearInterval(interval);
+        // const interval = setInterval(loadRates, 60000); // ACTUALIZACIÓN MANUAL SOLICITADA
+        // return () => clearInterval(interval);
     }, [loadRates]);
 
     useEffect(() => {
@@ -108,7 +108,7 @@ export const useRatesManager = () => {
             const resolved: Record<string, { name: string; price: number; flag: string }> = {
                 bcv_usd: { name: 'Dólar BCV', price: base.bcv_usd, flag: 'us' },
                 bcv_eur: { name: 'Euro BCV', price: base.bcv_eur, flag: 'eu' },
-                binance_usd: { name: 'Paralelo', price: base.binance_usd, flag: 'us' },
+                binance_usd: { name: 'Binance', price: base.binance_usd, flag: 'us' },
             };
 
             // Solo cargar mathjs si hay tasas personalizadas

@@ -10,7 +10,7 @@ interface ActionButtonsProps {
 
 export const ActionButtons: React.FC<ActionButtonsProps> = ({ handleReset, loadRates, isLoading }) => {
     return (
-        <section className="flex justify-center gap-4 mb-2">
+        <section className="flex justify-center gap-4 my-2">
             <button
                 onClick={handleReset}
                 className="px-6 py-3 rounded-2xl bg-white/5 border border-transparent flex items-center gap-2 text-red-600 dark:text-red-400 font-bold hover:bg-red-500/5 transition-all active:scale-95 group"

@@ -80,7 +80,7 @@
 }
 
 @utility key-cap {
-  @apply h-16 flex items-center justify-center rounded-2xl text-xl font-black border border-transparent;
+  @apply h-14 flex items-center justify-center rounded-2xl text-lg font-black border border-transparent;
   background-color: var(--key-bg);
   transition: transform 150ms ease, background-color 150ms ease;
   will-change: transform;

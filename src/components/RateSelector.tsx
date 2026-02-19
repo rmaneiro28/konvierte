@@ -12,7 +12,7 @@ interface RateSelectorProps {
 
 export const RateSelector: React.FC<RateSelectorProps> = ({ ratesOrder, allRates, activeSource, selectRate }) => {
     return (
-        <section className="flex gap-3 overflow-x-auto no-scrollbar py-1 mb-2">
+        <section className="flex gap-3 overflow-x-auto no-scrollbar py-0.5 mb-0">
             {ratesOrder.map((id) => {
                 const data = allRates[id];
                 if (!data) return null;

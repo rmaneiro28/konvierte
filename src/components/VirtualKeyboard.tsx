@@ -14,16 +14,16 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({ isOpen, onKeyP
         <AnimatePresence>
             {isOpen && (
                 <motion.section initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
-                    className="fixed bottom-0 left-0 w-full z-50 bg-surface/80 backdrop-blur-3xl border-t border-border p-6 pt-4 safe-bottom virtual-keyboard shadow-[0_-20px_50px_rgba(0,0,0,0.1)]">
+                    className="fixed bottom-0 left-0 w-full z-50 bg-surface/80 backdrop-blur-3xl border-t border-border p-3 pt-2 safe-bottom virtual-keyboard shadow-[0_-20px_50px_rgba(0,0,0,0.1)]">
                     <div className="max-w-xl mx-auto">
-                        <div className="flex justify-center mb-2 pb-2">
+                        <div className="flex justify-center mb-1 pb-1">
                             <button
                                 onClick={onClose}
-                                className="w-12 h-1 bg-border rounded-full hover:bg-primary/30 transition-colors"
+                                className="w-10 h-1 bg-border rounded-full hover:bg-primary/30 transition-colors"
                                 aria-label="Cerrar teclado"
                             />
                         </div>
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-3 gap-2">
                             {[1, 2, 3, 4, 5, 6, 7, 8, 9, ',', 0, 'DELETE'].map((k) => (
                                 <button
                                     key={k}
