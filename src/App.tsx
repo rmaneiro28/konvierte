@@ -4,6 +4,9 @@ import { LazyMotion, domAnimation, AnimatePresence, useMotionValue, useTransform
 import { RotateCw } from 'lucide-react';
 
 import { useCalculator } from './hooks/useCalculator';
+import { Share } from '@capacitor/share';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Capacitor } from '@capacitor/core';
 import { useRatesManager } from './hooks/useRatesManager';
 import { formatCurrency } from './utils/formatters';
 
@@ -37,7 +40,8 @@ function App() {
     addMethod,
     removeMethod,
     validatePhone,
-    formatPhoneNumber
+    formatPhoneNumber,
+    formatCI
   } = usePaymentMethods();
   const [isPaymentMethodsOpen, setIsPaymentMethodsOpen] = useState(false);
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
@@ -170,14 +174,20 @@ function App() {
         if (pm) {
           text += `\n\n💳 *Pago Móvil*\n` +
             `Banco: ${pm.bank}\n` +
-            `Cédula: ${pm.documentType || 'V'}-${pm.idNumber.replace(/^[VEJPGvejpg]-?/, '')}\n` +
+            `Cédula: ${pm.documentType || 'V'}-${pm.idNumber}\n` +
             `Teléfono: ${pm.phoneNumber}`;
         }
       }
 
       text += `\n\n✨ Calculado con Konvierte\n🔗 https://konvierte.vercel.app/`;
 
-      if (navigator.share && window.isSecureContext) {
+      if (Capacitor.isNativePlatform()) {
+        await Share.share({
+          title: 'Konvierte',
+          text: text,
+          dialogTitle: 'Compartir reporte'
+        });
+      } else if (navigator.share && window.isSecureContext) {
         await navigator.share({ title: 'Konvierte', text });
       } else {
         const textArea = document.createElement('textarea');
@@ -194,6 +204,7 @@ function App() {
       }
       setIsShareOpen(false);
     } catch (e) {
+      console.error(e);
       toast.error('Error al compartir');
     }
   };
@@ -229,9 +240,39 @@ function App() {
           return;
         }
 
-        const file = new File([blob], 'konvierte-capture.png', { type: 'image/png' });
+        if (Capacitor.isNativePlatform()) {
+          try {
+            // En Capacitor, guardamos el archivo temporalmente y lo compartimos
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = async () => {
+              const base64data = (reader.result as string).split(',')[1];
+              const fileName = `konvierte-${Date.now()}.png`;
 
-        if (navigator.share) {
+              const savedFile = await Filesystem.writeFile({
+                path: fileName,
+                data: base64data,
+                directory: Directory.Cache
+              });
+
+              await Share.share({
+                title: 'Konvierte Capture',
+                text: `💵 ${inputUSD || '1'} USD = ${inputVES || formatCurrency(activeRateValue)} Bs.`,
+                files: [savedFile.uri],
+                dialogTitle: 'Compartir imagen'
+              });
+
+              toast.success('¡Listo!', { id: toastId });
+              setIsShareOpen(false);
+            };
+            return;
+          } catch (err) {
+            console.error('Error en share nativo:', err);
+            triggerDownload(canvas);
+            toast.info('Imagen descargada (Error en menú compartir)', { id: toastId });
+          }
+        } else if (navigator.share) {
+          const file = new File([blob], 'konvierte-capture.png', { type: 'image/png' });
           try {
             await navigator.share({
               files: [file],
@@ -243,21 +284,15 @@ function App() {
             if (error.name === 'AbortError') {
               toast.dismiss(toastId);
             } else {
-              console.error('Error al compartir:', error);
               triggerDownload(canvas);
-              toast.info('Imagen descargada (No se pudo abrir el menú compartir)', { id: toastId });
+              toast.info('Imagen descargada', { id: toastId });
             }
           }
         } else {
-          // Fallback descarga explícito
           triggerDownload(canvas);
-
-          if (!window.isSecureContext) {
-            toast.info('Imagen descargada. (Compartir requiere HTTPS)', { id: toastId });
-          } else {
-            toast.info('Imagen descargada. (Tu dispositivo no soporta compartir nativo)', { id: toastId });
-          }
+          toast.info('Imagen descargada', { id: toastId });
         }
+        setIsShareOpen(false);
       }, 'image/png');
 
       setIsShareOpen(false);
@@ -552,6 +587,7 @@ function App() {
           removeMethod={removeMethod}
           validatePhone={validatePhone}
           formatPhoneNumber={formatPhoneNumber}
+          formatCI={formatCI}
         />
 
         {/* 🖼️ Plantilla de Captura (Oculta del Usuario) */}

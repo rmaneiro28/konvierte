@@ -35,7 +35,7 @@
 
 @layer base {
   body {
-    @apply bg-background text-white font-outfit antialiased selection:bg-primary/30 relative min-h-screen;
+    @apply bg-background text-white font-outfit antialiased selection:bg-primary/30 relative min-h-screen overflow-y-hidden;
     color: var(--text-main);
     padding-top: calc(4rem + var(--safe-area-top));
     padding-bottom: var(--safe-area-bottom);

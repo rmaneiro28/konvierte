@@ -78,19 +78,12 @@ export const usePaymentMethods = () => {
 
         if (num.length < 10) return phone;
 
-        return `+58-${num.substring(0, 3)}-${num.substring(3, 6)}-${num.substring(6)}`;
+        return `+58-${num.substring(0, 3)}-${num.substring(3, 6)}-${num.substring(6, 10)}`;
     };
 
-    const formatToInternational = (phone: string) => {
-        const clean = phone.replace(/\D/g, '');
-        let num = clean;
-
-        if (num.startsWith('58')) num = num.substring(2);
-        if (num.startsWith('0')) num = num.substring(1);
-
-        if (num.length !== 10) return phone;
-
-        return `+58-${num.substring(0, 3)}-${num.substring(3, 6)}-${num.substring(6)}`;
+    const formatCI = (ci: string) => {
+        const clean = ci.replace(/\D/g, '');
+        return clean.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     };
 
     return {
@@ -99,6 +92,6 @@ export const usePaymentMethods = () => {
         removeMethod,
         validatePhone,
         formatPhoneNumber,
-        formatToInternational
+        formatCI
     };
 };

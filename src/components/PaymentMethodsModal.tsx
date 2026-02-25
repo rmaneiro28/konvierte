@@ -13,6 +13,7 @@ interface PaymentMethodsModalProps {
     removeMethod: (id: string) => void;
     validatePhone: (phone: string) => boolean;
     formatPhoneNumber: (phone: string) => string;
+    formatCI: (ci: string) => string;
 }
 
 export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
@@ -22,7 +23,8 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
     addMethod,
     removeMethod,
     validatePhone,
-    formatPhoneNumber
+    formatPhoneNumber,
+    formatCI
 }) => {
     const [isAdding, setIsAdding] = useState(false);
 
@@ -60,34 +62,28 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
     };
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let val = e.target.value.replace(/\D/g, ''); // Strip non-digits
+        let val = e.target.value.replace(/\D/g, '');
 
-        // Handle leading 58 (country code paste) or 0 (local prefix)
+        // Handle country code
         if (val.startsWith('58')) val = val.substring(2);
         if (val.startsWith('0')) val = val.substring(1);
 
+        if (val.length > 10) val = val.substring(0, 10);
+
         let formatted = '';
         if (val.length > 0) {
-            formatted = '+58-';
-            if (val.length > 0) formatted += val.substring(0, 3);
+            formatted = '+58-' + val.substring(0, 3);
             if (val.length > 3) formatted += '-' + val.substring(3, 6);
-            if (val.length > 6) formatted += '-' + val.substring(6, 11);
+            if (val.length > 6) formatted += '-' + val.substring(6, 10);
         }
         setPhone(formatted);
     };
 
     const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let val = e.target.value.replace(/\D/g, '');
+        const val = e.target.value.replace(/\D/g, '');
         const maxLen = (documentType === 'V' || documentType === 'E') ? 8 : 10;
-
-        if (val.length > maxLen) val = val.substring(0, maxLen);
-
-        // Format with thousands separator
-        if (val.length > 0) {
-            val = val.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
-
-        setIdNumber(val);
+        const trimmed = val.substring(0, maxLen);
+        setIdNumber(formatCI(trimmed));
     };
 
     return (
@@ -247,14 +243,14 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
                                             </button>
                                         </div>
 
-                                        <div className="space-y-2">
-                                            <div className="flex justify-between items-center py-2 border-b border-white/5 last:border-0 last:pb-0">
-                                                <span className="text-[10px] font-bold opacity-40 uppercase">ID / RIF</span>
-                                                <span className="text-xs font-mono font-bold">{method.documentType || 'V'}-{method.idNumber.replace(/^[VEJPGvejpg]-?/, '')}</span>
+                                        <div className="space-y-4">
+                                            <div className="flex justify-between items-center py-1">
+                                                <span className="text-[9px] font-black opacity-30 uppercase tracking-widest">Cédula / RIF</span>
+                                                <span className="text-[13px] font-black text-white/90">{method.documentType || 'V'}-{method.idNumber}</span>
                                             </div>
-                                            <div className="flex justify-between items-center py-2 border-b border-white/5 last:border-0 last:pb-0">
-                                                <span className="text-[10px] font-bold opacity-40 uppercase">Teléfono</span>
-                                                <span className="text-xs font-mono font-bold tracking-tight">{method.phoneNumber}</span>
+                                            <div className="flex justify-between items-center py-1">
+                                                <span className="text-[9px] font-black opacity-30 uppercase tracking-widest">Teléfono</span>
+                                                <span className="text-[13px] font-black text-white/90 tracking-tight">{method.phoneNumber}</span>
                                             </div>
                                         </div>
                                     </div>
