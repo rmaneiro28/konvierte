@@ -2,6 +2,7 @@ import React from 'react';
 import { Flag } from './ui/Flag';
 import { formatCurrency } from '../utils/formatters';
 import { twMerge } from 'tailwind-merge';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface RateSelectorProps {
     ratesOrder: string[];
@@ -24,7 +25,20 @@ export const RateSelector: React.FC<RateSelectorProps> = ({ ratesOrder, allRates
                         <Flag code={data.flag} />
                         <div>
                             <span className={`block text-[8px] font-black uppercase tracking-widest mb-0.5 ${activeSource === id ? 'text-white' : ''}`}>{data.name}</span>
-                            <span className="text-sm font-black">{formatCurrency(data.price)}</span>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm font-black tracking-tight">{formatCurrency(data.price)}</span>
+                                {data.change24h !== undefined && data.change24h !== 0 && (
+                                    <span className={`flex items-center gap-0.5 text-[8px] font-black ${data.change24h > 0 ? (activeSource === id ? 'text-white' : 'text-red-500') : (activeSource === id ? 'text-white/80' : 'text-primary')}`}>
+                                        {data.change24h > 0 ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+                                        {Math.abs(data.change24h).toFixed(2)}%
+                                    </span>
+                                )}
+                                {data.change24h === 0 && (
+                                    <span className={`flex items-center gap-0.5 text-[8px] font-black flex items-center justify-center opacity-50`}>
+                                        <Minus size={10} />
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     </button>
                 );

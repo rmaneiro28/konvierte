@@ -77,6 +77,23 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                     })}
                                 </Reorder.Group>
                             </div>
+                            <div className="pt-6 border-t border-black/5 dark:border-white/5">
+                                <span className="label-zen text-[9px] mb-4 block">Pruebas en el Dispositivo (APK)</span>
+                                <button
+                                    onClick={async () => {
+                                        const { sendRateUpdateNotification } = await import('../services/notificationService');
+                                        sendRateUpdateNotification({
+                                            name: 'Dólar BCV (Prueba)',
+                                            price: 52.35,
+                                            prevPrice: 51.50
+                                        });
+                                    }}
+                                    className="w-full bg-white/5 hover:bg-white/10 text-primary py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all border border-primary/20"
+                                >
+                                    Enviar Notificación Local
+                                </button>
+                                <p className="text-[8px] opacity-50 text-center mt-2 px-4 leading-relaxed font-medium">Permite comprobar si la app (Capacitor) tiene los permisos configurados correctamente para alertar cuando cambie el dólar en segundo plano o al iniciar.</p>
+                            </div>
                         </div>
                     </motion.div>
                 </motion.div>

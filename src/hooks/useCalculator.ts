@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { formatCurrency } from '../utils/formatters';
 
 export const useCalculator = (activeRateValue: number) => {
@@ -97,6 +97,13 @@ export const useCalculator = (activeRateValue: number) => {
         setLastEdited(type);
         updateCalculation(cleanVal, type, activeRateValue);
     }, [activeRateValue, updateCalculation]);
+
+    // Actualizar los inputs automáticamente cuando cambia la tasa o se aplica un histórico
+    useEffect(() => {
+        if (activeRateValue > 0) {
+            updateCalculation(lastEdited === 'USD' ? inputUSD : inputVES, lastEdited, activeRateValue);
+        }
+    }, [activeRateValue]); // Dependencias mínimas intencionales
 
     return {
         inputUSD,

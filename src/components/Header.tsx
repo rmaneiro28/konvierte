@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Sun, Moon, Share2, Settings2, Wallet } from 'lucide-react';
 

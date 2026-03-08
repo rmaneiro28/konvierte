@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchRates, type RatesState } from '../services/rateService';
+import { sendRateUpdateNotification } from '../services/notificationService';
 import { toast } from 'sonner';
 
 interface CustomRate {
@@ -10,7 +11,8 @@ interface CustomRate {
 
 export const useRatesManager = () => {
     const [rates, setRates] = useState<Partial<RatesState>>({ loading: true });
-    const [resolvedPrices, setResolvedPrices] = useState<Record<string, { name: string; price: number; flag: string }>>({});
+    const [isHistoricalMode, setIsHistoricalMode] = useState<string | null>(null);
+    const [resolvedPrices, setResolvedPrices] = useState<Record<string, { name: string; price: number; flag: string; change24h?: number }>>({});
 
     // Tasa por defecto (favorito)
     const [defaultRateId, setDefaultRateId] = useState<string>(() => {
@@ -51,15 +53,64 @@ export const useRatesManager = () => {
         }
     });
 
+    // Precios previos para detectar cambios y enviar notificaciones
+    const prevPricesRef = useRef<Record<string, number>>({});
+
     const loadRates = useCallback(async () => {
         try {
             setRates(prev => ({ ...prev, loading: true }));
             const data = await fetchRates();
             setRates({ ...data, loading: false });
+
+            // Guardar en caché para oflline
+            localStorage.setItem('konvierte_cached_rates', JSON.stringify({
+                bcv_usd: data.bcv_usd,
+                bcv_eur: data.bcv_eur,
+                binance_usd: data.binance_usd
+            }));
+
+            // --- Notificaciones al detectar cambio de tasa ---
+            type ExchangeRateKey = 'bcv_usd' | 'bcv_eur' | 'binance_usd';
+            const rateMap: Array<{ key: ExchangeRateKey; name: string }> = [
+                { key: 'bcv_usd', name: 'Dólar BCV' },
+                { key: 'bcv_eur', name: 'Euro BCV' },
+                { key: 'binance_usd', name: 'Paralelo' },
+            ];
+
+            for (const { key, name } of rateMap) {
+                const rate = data[key];
+                if (!rate || typeof (rate as any).price !== 'number') continue;
+
+                const prevPrice = prevPricesRef.current[key] ?? 0;
+                const newPrice = (rate as { price: number }).price;
+
+                // Solo notificar si ya teníamos un precio previo y cambió significativamente
+                if (prevPrice > 0 && Math.abs(newPrice - prevPrice) >= 0.01) {
+                    sendRateUpdateNotification({ name, price: newPrice, prevPrice });
+                }
+
+                prevPricesRef.current[key] = newPrice;
+            }
+
             toast.info('Tasas actualizadas');
-        } catch (err) {
+            setIsHistoricalMode(null);
+        } catch (err: any) {
             setRates(prev => ({ ...prev, loading: false }));
-            toast.error('Error al actualizar tasas');
+            if (err.message === 'API_UNAVAILABLE') {
+                toast.error('La API de tasas del BCV no está disponible temporalmente.');
+            } else {
+                toast.error('Error al actualizar tasas. Verifica tu conexión.');
+            }
+
+            // Restaurar desde caché
+            const cached = localStorage.getItem('konvierte_cached_rates');
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    setRates({ ...parsed, loading: false });
+                    toast.info('Se están mostrando las últimas tasas guardadas.');
+                } catch (e) { }
+            }
         }
     }, []);
 
@@ -105,10 +156,10 @@ export const useRatesManager = () => {
                 binance_usd: rates.binance_usd?.price || 0,
             };
 
-            const resolved: Record<string, { name: string; price: number; flag: string }> = {
-                bcv_usd: { name: 'Dólar BCV', price: base.bcv_usd, flag: 'us' },
-                bcv_eur: { name: 'Euro BCV', price: base.bcv_eur, flag: 'eu' },
-                binance_usd: { name: 'Binance', price: base.binance_usd, flag: 'us' },
+            const resolved: Record<string, { name: string; price: number; flag: string; change24h?: number }> = {
+                bcv_usd: { name: 'Dólar BCV', price: base.bcv_usd, flag: 'us', change24h: rates.bcv_usd?.change24h },
+                bcv_eur: { name: 'Euro BCV', price: base.bcv_eur, flag: 'eu', change24h: rates.bcv_eur?.change24h },
+                binance_usd: { name: 'Binance', price: base.binance_usd, flag: 'us', change24h: rates.binance_usd?.change24h },
             };
 
             // Solo cargar mathjs si hay tasas personalizadas
@@ -165,6 +216,17 @@ export const useRatesManager = () => {
         setRatesOrder(newOrder);
     }, []);
 
+    const applyHistoricalRates = useCallback((date: string, usdBCV: number, eurBCV: number, usdBinance: number) => {
+        setRates({
+            loading: false,
+            bcv_usd: { price: usdBCV, symbol: 'USD', lastUpdate: `${date}T12:00:00Z`, change24h: 0, history: [] },
+            bcv_eur: { price: eurBCV, symbol: 'EUR', lastUpdate: `${date}T12:00:00Z`, change24h: 0, history: [] },
+            binance_usd: { price: usdBinance, symbol: 'USDT', lastUpdate: `${date}T12:00:00Z`, change24h: 0, history: [] },
+        });
+        setIsHistoricalMode(date);
+        toast.info(`Tasas fijadas al ${date}`);
+    }, []);
+
     return {
         rates,
         activeSource,
@@ -177,6 +239,8 @@ export const useRatesManager = () => {
         addCustomRate,
         removeCustomRate,
         toggleDefault,
-        updateOrder
+        updateOrder,
+        applyHistoricalRates,
+        isHistoricalMode
     };
 };

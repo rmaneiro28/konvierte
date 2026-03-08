@@ -7,8 +7,10 @@ import { useCalculator } from './hooks/useCalculator';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Capacitor } from '@capacitor/core';
+import { Clipboard } from '@capacitor/clipboard';
 import { useRatesManager } from './hooks/useRatesManager';
 import { formatCurrency } from './utils/formatters';
+import { requestNotificationPermission } from './services/notificationService';
 
 import { Header } from './components/Header';
 import { HeroSection } from './components/HeroSection';
@@ -20,6 +22,7 @@ import { PaymentMethodsModal } from './components/PaymentMethodsModal';
 import { usePaymentMethods } from './hooks/usePaymentMethods';
 import { RateItem } from './components/RateItem';
 import { RateSelector } from './components/RateSelector';
+import { HistoricalRatesModal } from './components/HistoricalRatesModal';
 
 
 // Carga perezosa del componente pesado de Ajustes
@@ -39,6 +42,7 @@ function App() {
     methods: paymentMethods,
     addMethod,
     removeMethod,
+    editMethod,
     validatePhone,
     formatPhoneNumber,
     formatCI
@@ -69,7 +73,8 @@ function App() {
   const {
     rates, activeSource, setActiveSource, allRates,
     loadRates, addCustomRate, removeCustomRate,
-    ratesOrder, updateOrder, defaultRateId, toggleDefault
+    ratesOrder, updateOrder, defaultRateId, toggleDefault,
+    applyHistoricalRates, isHistoricalMode
   } = useRatesManager();
 
   const activeRateValue = allRates[activeSource]?.price || 0;
@@ -84,6 +89,7 @@ function App() {
   // --- Estados de UI locales ---
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [newRateName, setNewRateName] = useState('');
   const [newRateFormula, setNewRateFormula] = useState('');
@@ -148,6 +154,11 @@ function App() {
     setFocusedInput('USD');
   }, []);
 
+  // Solicitar permisos de notificación en plataforma nativa
+  useEffect(() => {
+    requestNotificationPermission();
+  }, []);
+
   // --- Handlers específicos de UI ---
   const handleReset = () => {
     calculatorReset();
@@ -165,21 +176,33 @@ function App() {
   // --- Lógica de Compartir ---
   const shareAsText = async () => {
     try {
-      let text = `📊 *Konvierte - Reporte*\n\n` +
-        `💵 ${inputUSD} USD = ${inputVES} VES\n` +
-        `📈 Ref: ${allRates[activeSource]?.name} @ ${formatCurrency(activeRateValue)}`;
+      let text = ``;
 
       if (selectedPaymentMethodId) {
         const pm = paymentMethods.find((m) => m.id === selectedPaymentMethodId);
         if (pm) {
-          text += `\n\n💳 *Pago Móvil*\n` +
-            `Banco: ${pm.bank}\n` +
-            `Cédula: ${pm.documentType || 'V'}-${pm.idNumber}\n` +
-            `Teléfono: ${pm.phoneNumber}`;
-        }
-      }
+          const bankCodeStr = pm.bankCode ? `${pm.bankCode} - ` : '';
 
-      text += `\n\n✨ Calculado con Konvierte\n🔗 https://konvierte.vercel.app/`;
+          let formattedPhone = pm.phoneNumber;
+          const cleanPhone = pm.phoneNumber.replace(/\D/g, '');
+          if (cleanPhone.length === 11) {
+            formattedPhone = `${cleanPhone.substring(0, 4)}-${cleanPhone.substring(4, 7)}-${cleanPhone.substring(7)}`;
+          } else if (cleanPhone.length === 10) {
+            formattedPhone = `0${cleanPhone.substring(0, 3)}-${cleanPhone.substring(3, 6)}-${cleanPhone.substring(6)}`;
+          }
+
+          text = `Banco: ${bankCodeStr}${pm.bank}\n` +
+            `Telefono: ${formattedPhone}\n` +
+            `CI: ${pm.documentType || 'V'}- ${formatCI(pm.idNumber)}\n` +
+            `Monto: ${inputVES || '0,00'} Bs.`;
+        }
+      } else {
+        // Fallback si no hay método de pago
+        text = `📊 *Konvierte - Reporte*\n\n` +
+          `💵 ${inputUSD} USD = ${inputVES} VES\n` +
+          `📈 Ref: ${allRates[activeSource]?.name} @ ${formatCurrency(activeRateValue)}` +
+          `\n\n✨ Calculado con Konvierte\n🔗 https://konvierte.vercel.app/`;
+      }
 
       if (Capacitor.isNativePlatform()) {
         await Share.share({
@@ -233,16 +256,9 @@ function App() {
       canvas.toBlob(async (blob) => {
         if (!blob) throw new Error('Error al generar archivo de imagen');
 
-        if (mode === 'download') {
-          triggerDownload(canvas);
-          toast.success('Imagen guardada', { id: toastId });
-          setIsShareOpen(false);
-          return;
-        }
-
         if (Capacitor.isNativePlatform()) {
           try {
-            // En Capacitor, guardamos el archivo temporalmente y lo compartimos
+            // Guardar imagen en Cache temporal (no requiere permisos extra)
             const reader = new FileReader();
             reader.readAsDataURL(blob);
             reader.onloadend = async () => {
@@ -255,42 +271,73 @@ function App() {
                 directory: Directory.Cache
               });
 
-              await Share.share({
-                title: 'Konvierte Capture',
-                text: `💵 ${inputUSD || '1'} USD = ${inputVES || formatCurrency(activeRateValue)} Bs.`,
-                files: [savedFile.uri],
-                dialogTitle: 'Compartir imagen'
-              });
+              if (mode === 'download') {
+                toast.info('Toca "Guardar Imagen" en el menú', { id: toastId });
+              } else {
+                toast.success('¡Listo!', { id: toastId });
+              }
 
-              toast.success('¡Listo!', { id: toastId });
-              setIsShareOpen(false);
+              try {
+                // Mostrar menú nativo donde el usuario elige Compartir o "Guardar/Descargar"
+                await Share.share({
+                  title: 'Konvierte Capture',
+                  files: [savedFile.uri],
+                  dialogTitle: mode === 'download' ? 'Guardar imagen' : 'Compartir imagen'
+                });
+                setIsShareOpen(false);
+              } catch (shareErr) {
+                console.warn('Share falló, intentando copiar...', shareErr);
+                try {
+                  await Clipboard.write({ image: `data:image/png;base64,${base64data}` });
+                  toast.success('Copiada al portapapeles', { id: toastId });
+                  setIsShareOpen(false);
+                } catch (clipErr) {
+                  console.warn('Clipboard falló, descargando...', clipErr);
+                  triggerDownload(canvas);
+                  toast.info('Imagen descargada', { id: toastId });
+                  setIsShareOpen(false);
+                }
+              }
             };
             return;
           } catch (err) {
-            console.error('Error en share nativo:', err);
-            triggerDownload(canvas);
-            toast.info('Imagen descargada (Error en menú compartir)', { id: toastId });
-          }
-        } else if (navigator.share) {
-          const file = new File([blob], 'konvierte-capture.png', { type: 'image/png' });
-          try {
-            await navigator.share({
-              files: [file],
-              title: 'Konvierte',
-              text: ` 💵 ${inputUSD || '1'} USD = ${inputVES || formatCurrency(activeRateValue)} Bs.\n✨ Calculado con Konvierte\n🔗 https://konvierte.vercel.app/`
-            });
-            toast.success('¡Compartido!', { id: toastId });
-          } catch (error: any) {
-            if (error.name === 'AbortError') {
-              toast.dismiss(toastId);
-            } else {
-              triggerDownload(canvas);
-              toast.info('Imagen descargada', { id: toastId });
+            console.error('Error en native file/share:', err);
+            try {
+              await Clipboard.write({ image: canvas.toDataURL('image/png') });
+              toast.success('Copiada al portapapeles', { id: toastId });
+            } catch (fallbackErr) {
+              toast.error('Ocurrió un error. Revisa el almacenamiento.', { id: toastId });
             }
           }
         } else {
-          triggerDownload(canvas);
-          toast.info('Imagen descargada', { id: toastId });
+          // Navegador web tradicional
+          if (mode === 'download') {
+            triggerDownload(canvas);
+            toast.success('Imagen guardada', { id: toastId });
+            setIsShareOpen(false);
+            return;
+          }
+
+          if (navigator.share) {
+            const file = new File([blob], 'konvierte-capture.png', { type: 'image/png' });
+            try {
+              await navigator.share({
+                files: [file],
+                title: 'Konvierte'
+              });
+              toast.success('¡Compartido!', { id: toastId });
+            } catch (error: any) {
+              if (error.name === 'AbortError') {
+                toast.dismiss(toastId);
+              } else {
+                triggerDownload(canvas);
+                toast.info('Imagen descargada', { id: toastId });
+              }
+            }
+          } else {
+            triggerDownload(canvas);
+            toast.info('Imagen descargada', { id: toastId });
+          }
         }
         setIsShareOpen(false);
       }, 'image/png');
@@ -406,6 +453,23 @@ function App() {
         />
 
         <main className="relative z-10 w-full overflow-hidden flex flex-col md:grid md:grid-cols-2 md:grid-rows-[auto_auto] md:content-center md:items-start md:h-[calc(100vh-80px)] md:px-8 md:gap-6 max-w-4xl mx-auto">
+          {isHistoricalMode && (
+            <div className="absolute top-2 w-full max-w-sm left-1/2 -translate-x-1/2 z-[100] px-4">
+              <div className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-4 py-2 flex items-center justify-between shadow-xl backdrop-blur-md">
+                <div className="flex items-center gap-2">
+                  <RotateCw size={14} className="animate-pulse" />
+                  <span className="text-[10px] font-black uppercase tracking-widest whitespace-nowrap">Histórico: {isHistoricalMode}</span>
+                </div>
+                <button
+                  onClick={() => loadRates()}
+                  className="bg-orange-500/20 hover:bg-orange-500/30 text-orange-300 rounded-full px-3 py-1 text-[9px] font-black uppercase tracking-widest transition-colors whitespace-nowrap"
+                >
+                  Volver a Hoy
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Pull to Refresh Indicator */}
           <motion.div
             style={{ y: pullY, opacity: pullOpacity, rotate: pullRotate }}
@@ -443,6 +507,7 @@ function App() {
                 handleReset={handleReset}
                 loadRates={loadRates}
                 isLoading={!!rates.loading}
+                setIsHistoryOpen={setIsHistoryOpen}
               />
 
               <RateSelector
@@ -512,7 +577,8 @@ function App() {
               handleReset={handleReset}
               loadRates={loadRates}
               isLoading={!!rates.loading}
-              className="my-0 w-full grid grid-cols-2 gap-3 md:w-auto md:flex md:flex-col md:gap-2 md:min-w-fit"
+              setIsHistoryOpen={setIsHistoryOpen}
+              className="my-0 w-full flex md:w-auto md:min-w-fit"
             />
           </div>
 
@@ -585,9 +651,16 @@ function App() {
           methods={paymentMethods}
           addMethod={addMethod}
           removeMethod={removeMethod}
+          editMethod={editMethod}
           validatePhone={validatePhone}
           formatPhoneNumber={formatPhoneNumber}
           formatCI={formatCI}
+        />
+
+        <HistoricalRatesModal
+          isOpen={isHistoryOpen}
+          onClose={() => setIsHistoryOpen(false)}
+          applyHistoricalRates={applyHistoricalRates}
         />
 
         {/* 🖼️ Plantilla de Captura (Oculta del Usuario) */}

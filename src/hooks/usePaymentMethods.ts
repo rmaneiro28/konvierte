@@ -12,6 +12,7 @@ export interface PaymentMethod {
     bankCode?: string;
     bankLogo?: string;
     bankColor?: string;
+    qrCode?: string;
 }
 
 const STORAGE_KEY = 'konvierte_payment_methods';
@@ -54,6 +55,25 @@ export const usePaymentMethods = () => {
         toast.success('Ficha eliminada');
     };
 
+    const editMethod = (id: string, updatedMethod: Omit<PaymentMethod, 'id'>) => {
+        const bankData = VENEZUELA_BANKS.find(b => b.name === updatedMethod.bank);
+        const newMethods = methods.map(m => {
+            if (m.id === id) {
+                return {
+                    ...updatedMethod,
+                    id,
+                    documentType: updatedMethod.documentType || 'V',
+                    bankCode: bankData?.code,
+                    bankLogo: bankData?.logo,
+                    bankColor: bankData?.color
+                };
+            }
+            return m;
+        });
+        saveMethods(newMethods);
+        toast.success('Ficha actualizada');
+    };
+
     const validatePhone = (phone: string) => {
         const clean = phone.replace(/\D/g, '');
         let num = clean;
@@ -90,6 +110,7 @@ export const usePaymentMethods = () => {
         methods,
         addMethod,
         removeMethod,
+        editMethod,
         validatePhone,
         formatPhoneNumber,
         formatCI

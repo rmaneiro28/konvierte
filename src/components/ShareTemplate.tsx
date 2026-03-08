@@ -147,7 +147,7 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                                         <div className="flex items-center gap-2">
                                             {paymentMethod.bankLogo && (
                                                 <img
-                                                    src={paymentMethod.bankLogo}
+                                                    src={paymentMethod.bankLogo.startsWith('data:') ? paymentMethod.bankLogo : `https://wsrv.nl/?url=${encodeURIComponent(paymentMethod.bankLogo)}&w=64&h=64&output=png`}
                                                     alt={paymentMethod.bank}
                                                     className="w-6 h-6 object-contain rounded-md bg-white p-[2px]"
                                                     crossOrigin="anonymous"
@@ -158,9 +158,11 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                                             </span>
                                         </div>
                                     </div>
-                                    <span className="text-xs font-black px-4 py-1.5 rounded-full bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20" style={{ backgroundColor: 'rgba(16, 185, 129, 0.1)', color: '#10B981' }}>
-                                        {paymentMethod.alias}
-                                    </span>
+                                    <div className="flex justify-end pr-2 pt-1">
+                                        <div className="text-[10px] font-black px-3 py-1.5 rounded-full text-center max-w-[140px]" style={{ backgroundColor: '#064e3b', color: '#34d399', whiteSpace: 'normal', wordBreak: 'break-word', lineHeight: '1.2' }}>
+                                            {paymentMethod.alias}
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-2 gap-4">
@@ -181,6 +183,22 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                                         </span>
                                     </div>
                                 </div>
+
+                                {paymentMethod.qrCode && (
+                                    <div className="mt-4 pt-4 border-t border-white/10 flex flex-col items-center justify-center gap-2">
+                                        <span className="text-[11px] font-black uppercase tracking-widest block" style={{ color: '#10B981' }}>
+                                            Escanea para Pagar
+                                        </span>
+                                        <div className="bg-white p-2 rounded-2xl w-32 h-32">
+                                            <img
+                                                src={paymentMethod.qrCode}
+                                                alt="QR Code"
+                                                className="w-full h-full object-contain rounded-xl"
+                                                crossOrigin="anonymous"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
