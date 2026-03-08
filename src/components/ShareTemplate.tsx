@@ -178,8 +178,8 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                                         <span className="text-[11px] font-black uppercase tracking-widest block mb-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
                                             Teléfono
                                         </span>
-                                        <span className="text-lg font-mono font-black whitespace-nowrap tracking-tight block" style={{ color: '#ffffff' }}>
-                                            {paymentMethod.phoneNumber.replace(/^\+58-?/, '0').replace(/-/g, ' ')}
+                                        <span className="text-xl font-mono font-black" style={{ color: '#ffffff' }}>
+                                            {paymentMethod.phoneNumber}
                                         </span>
                                     </div>
                                 </div>
