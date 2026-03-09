@@ -189,11 +189,12 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                                         <span className="text-[11px] font-black uppercase tracking-widest block" style={{ color: '#10B981' }}>
                                             Escanea para Pagar
                                         </span>
-                                        <div className="bg-white p-2 rounded-2xl w-32 h-32">
+                                        <div className="bg-white p-1.5 rounded-xl w-24 h-24">
                                             <img
                                                 src={paymentMethod.qrCode}
                                                 alt="QR Code"
-                                                className="w-full h-full object-contain rounded-xl"
+                                                className="w-full h-full object-contain rounded-lg"
+                                                crossOrigin="anonymous"
                                             />
                                         </div>
                                     </div>
