@@ -25,20 +25,20 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
     paymentMethod
 }) => {
     return (
-        <div className="fixed top-0 left-0 -z-50 pointer-events-none opacity-0">
+        <div className="fixed top-0 left-0 -z-50 pointer-events-none opacity-0" style={{ width: '500px', minWidth: '500px' }}>
             <div
                 ref={templateRef}
-                className="w-[500px] flex flex-col items-center justify-between py-12 px-8 relative font-['Outfit'] overflow-hidden"
-                style={{ backgroundColor: '#050505', minHeight: '500px', height: paymentMethod ? 'auto' : '500px' }}
+                className="flex flex-col items-center justify-between py-12 px-8 relative font-['Outfit'] overflow-hidden"
+                style={{ backgroundColor: '#050505', width: '500px', minWidth: '500px', maxWidth: '500px', minHeight: '500px', height: paymentMethod ? 'auto' : '500px', margin: '0' }}
             >
                 {/* Acento Visual Fondo */}
                 <div
-                    className="absolute -top-[100px] -right-[100px] w-[350px] h-[350px] blur-[100px] rounded-full opacity-40"
-                    style={{ background: 'rgba(16, 185, 129, 0.15)' }}
+                    className="absolute -top-[100px] -right-[100px] blur-[100px] rounded-full opacity-40 top-accent"
+                    style={{ background: 'rgba(16, 185, 129, 0.15)', width: '350px', height: '350px' }}
                 />
                 <div
-                    className="absolute -bottom-[100px] -left-[100px] w-[300px] h-[300px] blur-[90px] rounded-full opacity-20"
-                    style={{ background: 'rgba(59, 130, 246, 0.1)' }}
+                    className="absolute -bottom-[100px] -left-[100px] blur-[90px] rounded-full opacity-20 bottom-accent"
+                    style={{ background: 'rgba(59, 130, 246, 0.1)', width: '300px', height: '300px' }}
                 />
 
                 {/* Header: Logo */}
@@ -91,13 +91,17 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                             </span>
                             <div className="flex items-center gap-2">
                                 <img
-                                    src={`https://flagcdn.com/${(lastEdited === 'USD' ? (allRates[activeSource]?.flag || 'us') : 've').toLowerCase()}.svg`}
+                                    src={`https://flagcdn.com/w40/${(lastEdited === 'USD' ? (allRates[activeSource]?.flag || 'us') : 've').toLowerCase()}.png`}
                                     alt="flag"
-                                    className="w-5 h-5 rounded-full object-cover opacity-80"
+                                    className="rounded-full object-cover opacity-80"
+                                    style={{ width: '20px', height: '20px', minWidth: '20px', minHeight: '20px', maxWidth: '20px', maxHeight: '20px', flexShrink: 0, display: 'block' }}
+                                    crossOrigin="anonymous"
+                                    width={20}
+                                    height={20}
                                 />
-                                <span className="text-2xl font-black" style={{ color: '#ffffff' }}>
+                                <span className="font-black flex-1" style={{ color: '#ffffff', fontSize: '24px', lineHeight: '32px' }}>
                                     {lastEdited === 'USD' ? (inputUSD || '1.00') : (inputVES || formatCurrency(activeRateValue))}
-                                    <span className="text-sm opacity-50 ml-1 font-bold">
+                                    <span className="opacity-50 ml-1 font-bold" style={{ fontSize: '14px' }}>
                                         {lastEdited === 'USD' ? (allRates[activeSource]?.flag === 'eu' ? 'EUR' : 'USD') : 'VES'}
                                     </span>
                                 </span>
@@ -149,11 +153,14 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                                                 <img
                                                     src={paymentMethod.bankLogo.startsWith('data:') ? paymentMethod.bankLogo : `https://wsrv.nl/?url=${encodeURIComponent(paymentMethod.bankLogo)}&w=64&h=64&output=png`}
                                                     alt={paymentMethod.bank}
-                                                    className="w-6 h-6 object-contain rounded-md bg-white p-[2px]"
-                                                    crossOrigin="anonymous"
+                                                    className="object-contain rounded-md bg-white"
+                                                    style={{ width: '24px', height: '24px', minWidth: '24px', minHeight: '24px', maxWidth: '24px', maxHeight: '24px', padding: '2px', flexShrink: 0, display: 'block' }}
+                                                    crossOrigin={paymentMethod.bankLogo.startsWith('data:') ? undefined : "anonymous"}
+                                                    width={24}
+                                                    height={24}
                                                 />
                                             )}
-                                            <span className="text-2xl font-black text-white block leading-tight" style={{ color: '#ffffff' }}>
+                                            <span className="font-black text-white block" style={{ color: '#ffffff', fontSize: '24px', lineHeight: '28px' }}>
                                                 {paymentMethod.bank}
                                             </span>
                                         </div>
@@ -189,12 +196,14 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
                                         <span className="text-[11px] font-black uppercase tracking-widest block" style={{ color: '#10B981' }}>
                                             Escanea para Pagar
                                         </span>
-                                        <div className="bg-white p-1.5 rounded-xl w-24 h-24">
+                                        <div className="bg-white p-1.5 rounded-xl flex items-center justify-center" style={{ width: '96px', height: '96px' }}>
                                             <img
                                                 src={paymentMethod.qrCode}
                                                 alt="QR Code"
-                                                className="w-full h-full object-contain rounded-lg"
-                                                crossOrigin="anonymous"
+                                                className="object-contain rounded-lg"
+                                                style={{ width: '96px', height: '96px', minWidth: '96px', minHeight: '96px', maxWidth: '96px', maxHeight: '96px', display: 'block' }}
+                                                width={96}
+                                                height={96}
                                             />
                                         </div>
                                     </div>

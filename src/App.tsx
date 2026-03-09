@@ -250,6 +250,8 @@ function App() {
         backgroundColor: '#050505',
         scale: 2, // Escala reducida para asegurar estabilidad en móviles
         useCORS: true,
+        allowTaint: true,
+        windowWidth: 500,
         logging: false,
       });
 
