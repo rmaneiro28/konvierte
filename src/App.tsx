@@ -46,7 +46,6 @@ function App() {
     removeMethod,
     editMethod,
     validatePhone,
-    formatPhoneNumber,
     formatCI
   } = usePaymentMethods();
   const [isPaymentMethodsOpen, setIsPaymentMethodsOpen] = useState(false);
@@ -452,8 +451,6 @@ function App() {
 
         {/* Header Zen Fijo */}
         <Header
-          theme={theme}
-          setTheme={setTheme}
           setIsShareOpen={setIsShareOpen}
           setIsConfigOpen={setIsConfigOpen}
           setIsPaymentMethodsOpen={setIsPaymentMethodsOpen}
@@ -600,9 +597,9 @@ function App() {
                         hour: '2-digit', minute: '2-digit', hour12: true
                       });
                     } catch (e) { return ''; }
-                  }
-                  return '';
-                })()}
+                    }
+                    return '';
+                  })()}
               </div>
             </div>
 
@@ -683,6 +680,8 @@ function App() {
                 toggleDefault={toggleDefault}
                 removeCustomRate={removeCustomRate}
                 RateItem={RateItem}
+                theme={theme}
+                setTheme={setTheme}
               />
             </React.Suspense>
           )}
@@ -696,7 +695,6 @@ function App() {
           removeMethod={removeMethod}
           editMethod={editMethod}
           validatePhone={validatePhone}
-          formatPhoneNumber={formatPhoneNumber}
           formatCI={formatCI}
         />
 
@@ -712,10 +710,8 @@ function App() {
           inputUSD={inputUSD}
           inputVES={inputVES}
           activeRateValue={activeRateValue}
-          allRates={allRates}
-          activeSource={activeSource}
+          paymentMethod={paymentMethods.find(m => m.id === selectedPaymentMethodId) || paymentMethods[0]}
           templateRef={shareTemplateRef}
-          paymentMethod={paymentMethods.find(m => m.id === selectedPaymentMethodId)}
         />
 
         {/* --- Sección de Características (Landing) --- */}

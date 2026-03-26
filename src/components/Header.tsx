@@ -1,15 +1,13 @@
 import React from 'react';
-import { Sun, Moon, Share2, Settings2, Wallet } from 'lucide-react';
+import { Share2, Settings2, Wallet } from 'lucide-react';
 
 interface HeaderProps {
-    theme: 'light' | 'dark';
-    setTheme: (theme: 'light' | 'dark') => void;
     setIsShareOpen: (isOpen: boolean) => void;
     setIsConfigOpen: (isOpen: boolean) => void;
     setIsPaymentMethodsOpen: (isOpen: boolean) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ theme, setTheme, setIsShareOpen, setIsConfigOpen, setIsPaymentMethodsOpen }) => {
+export const Header: React.FC<HeaderProps> = ({ setIsShareOpen, setIsConfigOpen, setIsPaymentMethodsOpen }) => {
     return (
         <nav className="fixed top-0 left-0 w-full z-50 bg-background/60 backdrop-blur-xl border-b border-border safe-top flex items-center">
             <div className="max-w-2xl mx-auto px-6 w-full h-16 flex items-center justify-between">

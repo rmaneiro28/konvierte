@@ -19,6 +19,8 @@ interface SettingsModalProps {
     toggleDefault: (id: string) => void;
     removeCustomRate: (id: string) => void;
     RateItem: React.ComponentType<any>;
+    theme: 'light' | 'dark';
+    setTheme: (theme: 'light' | 'dark') => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -36,7 +38,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     defaultRateId,
     toggleDefault,
     removeCustomRate,
-    RateItem
+    RateItem,
+    theme,
+    setTheme
 }) => {
     return (
         <AnimatePresence>
@@ -52,6 +56,18 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                     <input value={newRateFormula} onChange={(e) => setNewRateFormula(e.target.value)} placeholder="Fórmula (Ej: bcv_usd * 1.1)" aria-label="Fórmula de la tasa" className="bg-white/5 p-4 rounded-2xl text-[11px] font-bold outline-none border border-black/5 dark:border-white/5 focus:border-primary/50 placeholder:opacity-80 transition-all" />
                                     {newRateFormula && (<div className="bg-primary/5 border border-primary/20 p-4 rounded-2xl flex items-center justify-between"><span className="text-[10px] font-black uppercase opacity-70">Resultado:</span><span className="text-sm font-black text-primary">Bs. {formatCurrency(previewRateValue)}</span></div>)}
                                     <button onClick={() => { if (newRateName && newRateFormula && previewRateValue > 0) { addCustomRate(newRateName, newRateFormula); setNewRateName(''); setNewRateFormula(''); } }} disabled={!newRateName || !newRateFormula || previewRateValue <= 0} className="bg-primary hover:bg-primary/80 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all shadow-lg shadow-primary/20 disabled:opacity-50">Añadir Tasa</button>
+                                </div>
+                            </div>
+                            <div className="pt-6 border-t border-black/5 dark:border-white/5">
+                                <span className="label-zen text-[9px]">Aspecto General</span>
+                                <div className="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
+                                    <span className="text-[11px] font-black uppercase tracking-widest opacity-70">Modo Oscuro</span>
+                                    <button
+                                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                                        className={`w-12 h-6 rounded-full transition-all relative ${theme === 'dark' ? 'bg-primary' : 'bg-white/20'}`}
+                                    >
+                                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${theme === 'dark' ? 'left-7' : 'left-1'}`} />
+                                    </button>
                                 </div>
                             </div>
                             <div className="pt-6 border-t border-black/5 dark:border-white/5">

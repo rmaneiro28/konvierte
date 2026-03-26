@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { X, Wallet, Plus, Trash2, Building2, User, ChevronDown, ClipboardPaste, Edit2, Banknote } from 'lucide-react';
@@ -15,7 +15,6 @@ interface PaymentMethodsModalProps {
     removeMethod: (id: string) => void;
     editMethod: (id: string, updatedMethod: Omit<PaymentMethod, 'id'>) => void;
     validatePhone: (phone: string) => boolean;
-    formatPhoneNumber: (phone: string) => string;
     formatCI: (ci: string) => string;
 }
 
@@ -27,7 +26,6 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
     removeMethod,
     editMethod,
     validatePhone,
-    formatPhoneNumber,
     formatCI
 }) => {
     const [isAdding, setIsAdding] = useState(false);

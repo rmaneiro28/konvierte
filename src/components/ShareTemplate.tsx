@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { formatCurrency } from '../utils/formatters';
 import type { PaymentMethod } from '../hooks/usePaymentMethods';
@@ -10,8 +9,6 @@ interface ShareTemplateProps {
     inputUSD: string;
     inputVES: string;
     activeRateValue: number;
-    allRates: any;
-    activeSource: string;
     templateRef: React.RefObject<HTMLDivElement | null>;
     paymentMethod?: PaymentMethod;
 }
@@ -21,8 +18,6 @@ export const ShareTemplate: React.FC<ShareTemplateProps> = ({
     inputUSD,
     inputVES,
     activeRateValue,
-    allRates,
-    activeSource,
     templateRef,
     paymentMethod
 }) => {
