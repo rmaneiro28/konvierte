@@ -13,6 +13,7 @@ export interface PaymentMethod {
     bankLogo?: string;
     bankColor?: string;
     qrCode?: string;
+    amount?: number;
 }
 
 const STORAGE_KEY = 'konvierte_payment_methods';
@@ -44,7 +45,8 @@ export const usePaymentMethods = () => {
             documentType: method.documentType || 'V',
             bankCode: bankData?.code,
             bankLogo: bankData?.logo,
-            bankColor: bankData?.color
+            bankColor: bankData?.color,
+            amount: (method as any).amount
         };
         saveMethods([...methods, newMethod]);
         toast.success('Ficha guardada');
@@ -65,7 +67,8 @@ export const usePaymentMethods = () => {
                     documentType: updatedMethod.documentType || 'V',
                     bankCode: bankData?.code,
                     bankLogo: bankData?.logo,
-                    bankColor: bankData?.color
+                    bankColor: bankData?.color,
+                    amount: (updatedMethod as any).amount
                 };
             }
             return m;

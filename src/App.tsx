@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Toaster, toast } from 'sonner';
 import { LazyMotion, domAnimation, AnimatePresence, useMotionValue, useTransform, motion, animate } from 'framer-motion';
-import { RotateCw } from 'lucide-react';
+import { RotateCw, ArrowLeftRight } from 'lucide-react';
 
 import { useCalculator } from './hooks/useCalculator';
 import { Share } from '@capacitor/share';
@@ -13,7 +13,7 @@ import { formatCurrency } from './utils/formatters';
 import { requestNotificationPermission } from './services/notificationService';
 
 import { Header } from './components/Header';
-import { HeroSection } from './components/HeroSection';
+import { Flag } from './components/ui/Flag';
 import { ActionButtons } from './components/ActionButtons';
 import { VirtualKeyboard } from './components/VirtualKeyboard';
 import { ShareModal } from './components/ShareModal';
@@ -23,6 +23,8 @@ import { usePaymentMethods } from './hooks/usePaymentMethods';
 import { RateItem } from './components/RateItem';
 import { RateSelector } from './components/RateSelector';
 import { HistoricalRatesModal } from './components/HistoricalRatesModal';
+import { FeaturesSection } from './components/FeaturesSection';
+import { TutorialModal } from './components/TutorialModal';
 
 
 // Carga perezosa del componente pesado de Ajustes
@@ -48,6 +50,7 @@ function App() {
     formatCI
   } = usePaymentMethods();
   const [isPaymentMethodsOpen, setIsPaymentMethodsOpen] = useState(false);
+  const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
 
   // --- Theme State ---
@@ -184,11 +187,13 @@ function App() {
           const bankCodeStr = pm.bankCode ? `${pm.bankCode} - ` : '';
 
           let formattedPhone = pm.phoneNumber;
+          // El hook ya devuelve el formato +58-4XX-XXX-XXXX, así que lo usamos directamente.
+          // Solo nos aseguramos de que tenga los guiones si viniera plano (fallback).
           const cleanPhone = pm.phoneNumber.replace(/\D/g, '');
-          if (cleanPhone.length === 11) {
-            formattedPhone = `${cleanPhone.substring(0, 4)}-${cleanPhone.substring(4, 7)}-${cleanPhone.substring(7)}`;
-          } else if (cleanPhone.length === 10) {
-            formattedPhone = `0${cleanPhone.substring(0, 3)}-${cleanPhone.substring(3, 6)}-${cleanPhone.substring(6)}`;
+          if (cleanPhone.length === 12 && cleanPhone.startsWith('58')) {
+            formattedPhone = `+58-${cleanPhone.substring(2, 5)}-${cleanPhone.substring(5, 8)}-${cleanPhone.substring(8)}`;
+          } else if (cleanPhone.length === 11 && cleanPhone.startsWith('0')) {
+            formattedPhone = `+58-${cleanPhone.substring(1, 4)}-${cleanPhone.substring(4, 7)}-${cleanPhone.substring(7)}`;
           }
 
           text = `Banco: ${bankCodeStr}${pm.bank}\n` +
@@ -454,7 +459,7 @@ function App() {
           setIsPaymentMethodsOpen={setIsPaymentMethodsOpen}
         />
 
-        <main className="relative z-10 w-full overflow-hidden flex flex-col md:grid md:grid-cols-2 md:grid-rows-[auto_auto] md:content-center md:items-start md:h-[calc(100vh-80px)] md:px-8 md:gap-6 max-w-4xl mx-auto">
+        <main className="relative z-10 w-full flex-1 overflow-hidden flex flex-col md:grid md:grid-cols-2 md:grid-rows-[auto_auto] md:content-center md:items-start md:px-8 md:gap-6 max-w-4xl mx-auto">
           {isHistoricalMode && (
             <div className="absolute top-2 w-full max-w-sm left-1/2 -translate-x-1/2 z-[100] px-4">
               <div className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-4 py-2 flex items-center justify-between shadow-xl backdrop-blur-md">
@@ -486,22 +491,60 @@ function App() {
             onPanEnd={handlePanEnd}
             className={`flex-1 flex flex-col w-full max-w-xl mx-auto px-6 pt-12 md:pt-0 h-full justify-center gap-1 transition-all duration-300 md:col-start-1 md:row-start-2 md:w-full md:max-w-lg md:mx-auto md:h-auto`}
           >
-            {/* Calculadora Zen (Inputs Secundarios) */}
-            <HeroSection
-              focusedInput={focusedInput}
-              inputUSD={inputUSD}
-              inputVES={inputVES}
-              handleInputFocus={handleInputFocus}
-              handleSwapCurrencies={handleSwapCurrencies}
-              setFixedAmount={setFixedAmount}
-              usdInputRef={usdInputRef}
-              vesInputRef={vesInputRef}
-              activeRateValue={activeRateValue}
-              allRates={allRates}
-              activeSource={activeSource}
-              isInverse={isInverse}
-              lastEdited={lastEdited}
-            />
+            <div className="flex flex-col w-full gap-2 items-center">
+                {/* Fixed Dual Layout: Always show Source -> Target */}
+                {[isInverse ? 'VES' : 'USD', 'QUICK', isInverse ? 'USD' : 'VES'].map((type) => {
+                  if (type === 'QUICK') {
+                    return (
+                      <div key="quick-amounts" className="w-full flex flex-col items-center my-1">
+                        <span className="text-[8px] font-black uppercase tracking-[0.3em] opacity-30 mb-2">Montos Rápidos (USD)</span>
+                        <div className="flex items-center gap-1.5 justify-center">
+                          {[1, 5, 10].map(v => (
+                             <button key={v} onClick={() => setFixedAmount(v.toString(), 'USD')} className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/5 text-[11px] font-black hover:bg-primary/10 transition-colors active:scale-95">${v}</button>
+                          ))}
+                          <button onClick={handleSwapCurrencies} className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20 hover:bg-primary/20 transition-all active:scale-90">
+                            <ArrowLeftRight size={14} className="rotate-90" />
+                          </button>
+                          {[20, 50, 100].map(v => (
+                             <button key={v} onClick={() => setFixedAmount(v.toString(), 'USD')} className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/5 text-[11px] font-black hover:bg-primary/10 transition-colors active:scale-95">${v}</button>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  const isUSD = type === 'USD';
+                  const ref = isUSD ? usdInputRef : vesInputRef;
+                  const value = isUSD ? inputUSD : inputVES;
+                  const isFocused = focusedInput === type;
+                  const currencyCode = isUSD ? (allRates[activeSource]?.flag === 'eu' ? 'EUR' : 'USD') : 'VES';
+                  const currencySymbol = isUSD ? (allRates[activeSource]?.flag === 'eu' ? '€' : '$') : 'Bs.';
+                  const flagCode = isUSD ? (allRates[activeSource]?.flag || 'us') : 've';
+
+                  return (
+                    <button
+                      key={type}
+                      ref={ref}
+                      onClick={() => handleInputFocus(type as 'USD' | 'VES')}
+                      className={`w-full max-w-sm flex flex-col items-center justify-center p-5 rounded-[2rem] transition-all duration-300 outline-none
+                          ${isFocused ? 'bg-primary/5 border border-primary/20 scale-[1.01]' : 'bg-transparent border border-transparent opacity-60 hover:opacity-100'}
+                      `}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <Flag code={flagCode} className="w-4 h-4" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">{currencyCode}</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-1">
+                        <span className={`text-lg font-bold ${isFocused ? 'text-primary' : 'opacity-20'}`}>{currencySymbol}</span>
+                        <span className={`text-4xl md:text-5xl font-black tracking-tighter ${isFocused ? 'text-primary' : 'text-main'}`}>
+                          {value || '0,00'}
+                        </span>
+                        {isFocused && <span className="w-0.5 h-8 bg-primary animate-pulse ml-1 rounded-full opacity-50" />}
+                      </div>
+                    </button>
+                  );
+                })}
+            </div>
 
             {/* Mobile-Only Controls */}
             <div className="md:hidden w-full flex flex-col gap-4">
@@ -520,8 +563,8 @@ function App() {
               />
 
               {/* Fecha de Actualización Mobile */}
-              <div className="text-center pt-4 opacity-40">
-                <p className="text-[10px] font-medium">
+              <div className="text-center pt-2 opacity-40">
+                <p className="text-[9px] font-bold tracking-widest uppercase">
                   Actualizado: {(() => {
                     const rate = (rates as any)[activeSource];
                     if (rate?.lastUpdate) {
@@ -590,7 +633,6 @@ function App() {
               <VirtualKeyboard
                 isOpen={true}
                 onKeyPress={onKeyPress}
-                onClose={() => { }}
                 variant="embedded"
                 className="bg-transparent border-none shadow-none p-0 w-full"
               />
@@ -603,7 +645,6 @@ function App() {
           <VirtualKeyboard
             isOpen={true}
             onKeyPress={onKeyPress}
-            onClose={() => { }}
             variant="fixed"
           />
         </div>
@@ -676,6 +717,22 @@ function App() {
           templateRef={shareTemplateRef}
           paymentMethod={paymentMethods.find(m => m.id === selectedPaymentMethodId)}
         />
+
+        {/* --- Sección de Características (Landing) --- */}
+        <FeaturesSection 
+          onOpenTutorial={() => setIsTutorialOpen(true)} 
+        />
+
+        <TutorialModal 
+          isOpen={isTutorialOpen} 
+          onClose={() => setIsTutorialOpen(false)} 
+        />
+
+        <footer className="hidden md:block w-full py-12 px-6 border-t border-white/5 bg-zinc-950/50 backdrop-blur-md text-center">
+          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white/20">
+            Konvierte Digital &copy; 2024 - Todos los derechos reservados
+          </p>
+        </footer>
       </div>
     </LazyMotion >
   );

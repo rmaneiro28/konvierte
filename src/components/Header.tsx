@@ -26,13 +26,10 @@ export const Header: React.FC<HeaderProps> = ({ theme, setTheme, setIsShareOpen,
                         <span className="sr-only"> - Calculadora de Tipo de Cambio en Venezuela</span>
                     </h1>
                 </div>
-                <div className="flex items-center gap-2">
-                    <button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} aria-label="Cambiar tema" className="w-9 h-9 rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center">
-                        {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
-                    </button>
-                    <button onClick={() => setIsShareOpen(true)} aria-label="Compartir" className="w-9 h-9 rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center"><Share2 size={16} /></button>
-                    <button onClick={() => setIsPaymentMethodsOpen(true)} aria-label="Fichas de Pago" className="w-9 h-9 rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center"><Wallet size={16} /></button>
-                    <button onClick={() => setIsConfigOpen(true)} aria-label="Ajustes" className="w-9 h-9 rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center"><Settings2 size={16} /></button>
+                <div className="flex items-center gap-1">
+                    <button onClick={() => setIsShareOpen(true)} aria-label="Compartir" className="w-9 h-9 rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center opacity-60 hover:opacity-100"><Share2 size={18} /></button>
+                    <button onClick={() => setIsPaymentMethodsOpen(true)} aria-label="Fichas de Pago" className="w-9 h-9 rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center opacity-60 hover:opacity-100"><Wallet size={18} /></button>
+                    <button onClick={() => setIsConfigOpen(true)} aria-label="Ajustes" className="w-9 h-9 rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center opacity-60 hover:opacity-100"><Settings2 size={18} /></button>
                 </div>
             </div>
         </nav>

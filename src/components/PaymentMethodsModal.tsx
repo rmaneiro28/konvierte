@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-import { X, Wallet, Plus, Trash2, Building2, User, ChevronDown, ClipboardPaste, Edit2 } from 'lucide-react';
+import { X, Wallet, Plus, Trash2, Building2, User, ChevronDown, ClipboardPaste, Edit2, Banknote } from 'lucide-react';
 import { toast } from 'sonner';
 import { Clipboard } from '@capacitor/clipboard';
 import type { PaymentMethod } from '../hooks/usePaymentMethods';
@@ -38,25 +38,28 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
     const [bank, setBank] = useState('');
     const [idNumber, setIdNumber] = useState('');
     const [phone, setPhone] = useState('');
+    const [amount, setAmount] = useState('');
     const [documentType, setDocumentType] = useState('V');
-    const [qrCode, setQrCode] = useState<string | null>(null);
     const docTypes = ['V', 'J', 'E', 'P', 'G'];
 
     const handleSave = () => {
-        if (!alias || !bank || !idNumber || !phone) return;
+        if (!alias || !bank || !idNumber || !phone) {
+            toast.error("Por favor completa todos los campos requeridos");
+            return;
+        }
 
         if (!validatePhone(phone)) {
-            alert("Número de teléfono inválido. Debe ser un celular venezolano (ej: 0412...)");
+            toast.error("Número de teléfono inválido");
             return;
         }
 
         const methodData = {
             alias,
             bank,
-            idNumber,
-            phoneNumber: formatPhoneNumber(phone),
+            idNumber: idNumber.replace(/\./g, ''),
+            phoneNumber: phone,
             documentType,
-            qrCode: qrCode || undefined
+            amount: amount ? parseFloat(amount.replace(/\./g, '').replace(',', '.')) : undefined
         };
 
         if (editingId) {
@@ -65,13 +68,16 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
             addMethod(methodData);
         }
 
-        // Reset form
+        resetForm();
+    };
+
+    const resetForm = () => {
         setAlias('');
         setBank('');
         setIdNumber('');
         setPhone('');
+        setAmount('');
         setDocumentType('V');
-        setQrCode(null);
         setEditingId(null);
         setIsAdding(false);
     };
@@ -79,32 +85,28 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
     const handleEdit = (method: PaymentMethod) => {
         setAlias(method.alias);
         setBank(method.bank);
-        setIdNumber(method.idNumber);
+        setIdNumber(formatCI(method.idNumber));
         setPhone(method.phoneNumber);
+        setAmount(method.amount ? new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2 }).format(method.amount) : '');
         setDocumentType(method.documentType || 'V');
-        setQrCode(method.qrCode || null);
         setEditingId(method.id);
         setIsAdding(true);
     };
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setQrCode(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+    const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value.replace(/\D/g, '');
+        if (!val) {
+            setAmount('');
+            return;
         }
+        const number = parseFloat(val) / 100;
+        setAmount(new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2 }).format(number));
     };
 
     const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         let val = e.target.value.replace(/\D/g, '');
-
-        // Handle country code
         if (val.startsWith('58')) val = val.substring(2);
         if (val.startsWith('0')) val = val.substring(1);
-
         if (val.length > 10) val = val.substring(0, 10);
 
         let formatted = '';
@@ -118,9 +120,7 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
 
     const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value.replace(/\D/g, '');
-        const maxLen = (documentType === 'V' || documentType === 'E') ? 8 : 10;
-        const trimmed = val.substring(0, maxLen);
-        setIdNumber(formatCI(trimmed));
+        setIdNumber(formatCI(val));
     };
 
     const handlePasteFromClipboard = async () => {
@@ -134,18 +134,13 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
             }
 
             const identifiedFields: string[] = [];
-
             let discoveredBankName = '';
-
             let remainingText = text;
 
             // Extract Phone
             const phoneMatch = remainingText.match(/(?:(?:Tel[eé]fono|Celular|Cel|Tlf)[\s:-]*)?(?:(?:\+|00)58)?(?:0)?(41[246]|42[246])[- .]?(\d{3})[- .]?(\d{4})\b/i);
             if (phoneMatch) {
-                const p1 = phoneMatch[1];
-                const p2 = phoneMatch[2];
-                const p3 = phoneMatch[3];
-                setPhone(`+58-${p1}-${p2}-${p3}`);
+                setPhone(`+58-${phoneMatch[1]}-${phoneMatch[2]}-${phoneMatch[3]}`);
                 identifiedFields.push('Teléfono');
                 remainingText = remainingText.replace(phoneMatch[0], ' ');
             }
@@ -154,9 +149,7 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
             const ciMatch = remainingText.match(/(?:(?:CI|C[eé]dula|RIF|Id)[\s:-]*)?([VJEGPvjegp])?[\s.-]*([1-9](?:\d\.?){5,9})\b/i);
             if (ciMatch) {
                 setDocumentType(ciMatch[1] ? ciMatch[1].toUpperCase() : 'V');
-                let val = ciMatch[2].replace(/\D/g, '');
-                const maxLen = (!ciMatch[1] || ciMatch[1].toUpperCase() === 'V' || ciMatch[1].toUpperCase() === 'E') ? 8 : 10;
-                val = val.substring(0, maxLen);
+                const val = ciMatch[2].replace(/\D/g, '');
                 setIdNumber(formatCI(val));
                 identifiedFields.push('C.I./RIF');
                 remainingText = remainingText.replace(ciMatch[0], ' ');
@@ -165,23 +158,19 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
             // Extract Bank
             let foundBank = undefined;
             const bankCodeMatch = remainingText.match(/\b(01\d{2}|0601)\b/);
-
             if (bankCodeMatch) {
                 foundBank = VENEZUELA_BANKS.find(b => b.code === bankCodeMatch[1]);
-                if (foundBank) remainingText = remainingText.replace(bankCodeMatch[0], ' ');
             }
-
             if (!foundBank) {
                 const t = remainingText.toLowerCase();
-                foundBank = VENEZUELA_BANKS.find(b => {
-                    if (b.shortName && t.includes(b.shortName.toLowerCase())) return true;
-                    if (t.includes(b.name.toLowerCase())) return true;
-                    if (b.code === '0102' && t.includes('venezuela')) return true;
-                    if (b.code === '0105' && t.includes('mercantil')) return true;
-                    if (b.code === '0108' && t.includes('provincial')) return true;
-                    if (b.code === '0134' && t.includes('banesco')) return true;
-                    return false;
-                });
+                foundBank = VENEZUELA_BANKS.find(b => 
+                    (b.shortName && t.includes(b.shortName.toLowerCase())) || 
+                    t.includes(b.name.toLowerCase()) ||
+                    (b.code === '0102' && t.includes('venezuela')) ||
+                    (b.code === '0105' && t.includes('mercantil')) ||
+                    (b.code === '0108' && t.includes('provincial')) ||
+                    (b.code === '0134' && t.includes('banesco'))
+                );
             }
 
             if (foundBank) {
@@ -191,13 +180,12 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
             }
 
             if (identifiedFields.length > 0) {
-                if (!alias) setAlias(discoveredBankName ? `Pago Móvil - ${discoveredBankName}` : "Ficha Copiada");
+                if (!alias) setAlias(`Pago Móvil - ${discoveredBankName || 'Nuevo'}`);
                 toast.success(`Datos identificados: ${identifiedFields.join(', ')}`);
             } else {
                 toast.error('No se detectaron datos válidos');
             }
         } catch (e) {
-            console.error('Error reading clipboard', e);
             toast.error('No se pudo acceder al portapapeles');
         }
     };
@@ -215,7 +203,7 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
                         initial={{ scale: 0.9, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         exit={{ scale: 0.9, opacity: 0 }}
-                        className="glass-card max-w-md w-full max-h-[85vh] overflow-hidden flex flex-col bg-surface dark:bg-surface border-white/10"
+                        className="glass-card max-w-md w-full max-h-[90vh] overflow-hidden flex flex-col bg-surface border-white/10"
                     >
                         {/* Header */}
                         <div className="p-6 border-b border-white/5 flex items-center justify-between shrink-0">
@@ -223,159 +211,126 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
                                 <div className="p-2 bg-primary/10 rounded-xl">
                                     <Wallet size={20} className="text-primary" />
                                 </div>
-                                <h3 className="text-xs font-black uppercase tracking-widest">
+                                <h3 className="text-sm font-black uppercase tracking-widest text-primary">
                                     Mis Fichas
                                 </h3>
                             </div>
                             <button onClick={onClose} className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-                                <X size={18} />
+                                <X size={20} />
                             </button>
                         </div>
 
                         {/* Content */}
                         <div className="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-6">
-
-                            {/* Add New Button */}
                             {!isAdding ? (
                                 <button
                                     onClick={() => setIsAdding(true)}
-                                    className="w-full py-4 rounded-2xl border-2 border-dashed border-white/10 hover:border-primary/50 hover:bg-primary/5 flex items-center justify-center gap-2 group transition-all"
+                                    className="w-full py-5 rounded-3xl border-2 border-dashed border-white/10 hover:border-primary/50 hover:bg-primary/5 flex items-center justify-center gap-3 group transition-all"
                                 >
-                                    <Plus size={18} className="opacity-50 group-hover:text-primary transition-colors" />
-                                    <span className="text-[10px] font-black uppercase tracking-widest opacity-50 group-hover:text-primary transition-colors">
+                                    <Plus size={20} className="opacity-50 group-hover:text-primary transition-colors" />
+                                    <span className="text-xs font-black uppercase tracking-widest opacity-50 group-hover:text-primary transition-colors">
                                         Nueva Ficha de Pago
                                     </span>
                                 </button>
                             ) : (
-                                <div className="bg-white/5 p-5 rounded-3xl space-y-4 border border-white/5 animate-in fade-in zoom-in">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <h4 className="text-[10px] font-black uppercase tracking-widest opacity-50">{editingId ? 'Editar Ficha' : 'Nueva Ficha'}</h4>
+                                <div className="bg-white/5 p-6 rounded-[2rem] space-y-5 border border-white/5 shadow-2xl animate-in zoom-in-95 duration-200">
+                                    <div className="flex justify-between items-center">
+                                        <h4 className="text-[10px] font-black uppercase tracking-widest text-primary/60">{editingId ? 'Editar Ficha' : 'Nueva Ficha'}</h4>
                                         <button
                                             onClick={handlePasteFromClipboard}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition-colors border border-primary/20"
+                                            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary/20 text-primary hover:bg-primary/30 transition-all border border-primary/20"
                                         >
-                                            <ClipboardPaste size={12} />
-                                            <span className="text-[9px] font-black uppercase tracking-widest">Pegar Datos</span>
+                                            <ClipboardPaste size={14} />
+                                            <span className="text-[10px] font-black uppercase">Pegar Datos</span>
                                         </button>
                                     </div>
 
-                                    <div className="space-y-3">
-                                        <div className="relative group">
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30"><User size={14} /></span>
+                                    <div className="space-y-4">
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30"><User size={16} /></span>
                                             <input
                                                 value={alias}
                                                 onChange={e => setAlias(e.target.value)}
-                                                onKeyDown={(e) => e.stopPropagation()}
-                                                placeholder="Alias (ej: Pago Móvil Personal)"
-                                                className="w-full bg-black/20 border border-white/5 rounded-xl py-3 pl-10 pr-4 text-xs font-bold outline-none focus:border-primary/50 transition-colors placeholder:font-medium placeholder:opacity-30"
+                                                placeholder="Alias (ej: Cuenta Principal)"
+                                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-xs font-bold outline-none focus:border-primary/50 transition-all placeholder:font-medium placeholder:opacity-20"
                                             />
                                         </div>
 
                                         <div className="relative group">
-                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none text-white flex items-center">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
                                                 {(() => {
                                                     const selectedBank = VENEZUELA_BANKS.find(b => b.name === bank);
-                                                    if (selectedBank && selectedBank.logo) {
-                                                        return <img src={selectedBank.logo} alt="bank logo" className="w-4 h-4 object-contain rounded-sm bg-white p-[1px]" />;
-                                                    }
-                                                    return <Building2 size={14} className="opacity-30" />;
+                                                    if (selectedBank?.logo) return <img src={selectedBank.logo} className="w-5 h-5 object-contain rounded-md bg-white p-0.5" />;
+                                                    return <Building2 size={16} className="opacity-30" />;
                                                 })()}
                                             </span>
-                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 z-10 pointer-events-none text-white"><ChevronDown size={14} /></div>
                                             <select
                                                 value={bank}
                                                 onChange={e => setBank(e.target.value)}
-                                                onKeyDown={(e) => e.stopPropagation()}
-                                                className="w-full bg-black/20 border border-white/5 rounded-xl py-3 pl-11 pr-10 text-xs font-bold outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer text-white/90"
+                                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-12 pr-10 text-xs font-bold outline-none focus:border-primary/50 transition-all appearance-none cursor-pointer"
                                             >
-                                                <option value="" disabled className="bg-zinc-900 text-white/50">Seleccionar Banco</option>
+                                                <option value="" disabled>Seleccionar Banco</option>
                                                 {VENEZUELA_BANKS.filter(b => b.active !== 0).map(b => (
-                                                    <option key={b.code} value={b.name} className="bg-zinc-900 text-white">
-                                                        {b.code} - {b.name}
-                                                    </option>
+                                                    <option key={b.code} value={b.name} className="bg-zinc-900">{b.code} - {b.name}</option>
                                                 ))}
                                             </select>
+                                            <ChevronDown size={16} className="absolute right-4 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none" />
                                         </div>
 
-                                        <div className="flex gap-2">
-                                            {/* Document Type Selector */}
-                                            <div className="relative w-20">
+                                        <div className="flex gap-3">
+                                            <div className="relative w-24">
                                                 <select
                                                     value={documentType}
                                                     onChange={e => setDocumentType(e.target.value)}
-                                                    onKeyDown={(e) => e.stopPropagation()}
-                                                    className="w-full bg-black/20 border border-white/5 rounded-xl py-3 px-2 text-center text-xs font-bold outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer text-white/90"
+                                                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 px-2 text-center text-xs font-black outline-none focus:border-primary/50 transition-all appearance-none cursor-pointer"
                                                 >
                                                     {docTypes.map(t => <option key={t} value={t} className="bg-zinc-900">{t}</option>)}
                                                 </select>
-                                                <div className="absolute right-2 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none"><ChevronDown size={10} /></div>
+                                                <ChevronDown size={12} className="absolute right-2 top-1/2 -translate-y-1/2 opacity-30 pointer-events-none" />
                                             </div>
 
                                             <input
                                                 value={idNumber}
                                                 onChange={handleIdChange}
-                                                onKeyDown={(e) => e.stopPropagation()}
-                                                placeholder="C.I. / RIF"
-                                                className="flex-1 bg-black/20 border border-white/5 rounded-xl py-3 px-4 text-xs font-bold outline-none focus:border-primary/50 transition-colors placeholder:font-medium placeholder:opacity-30"
+                                                placeholder="Cédula / RIF"
+                                                className="flex-1 bg-black/40 border border-white/5 rounded-2xl py-4 px-5 text-xs font-bold outline-none focus:border-primary/50 transition-all placeholder:opacity-20"
                                             />
                                         </div>
 
-                                        <div className="relative w-full">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center gap-1 pointer-events-none opacity-80">
-                                                <img src="https://flagcdn.com/ve.svg" alt="VE" className="w-4 h-3 object-cover rounded-[2px]" />
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 flex items-center pointer-events-none">
+                                                <img src="https://flagcdn.com/ve.svg" alt="VE" className="w-5 h-3.5 object-cover rounded-sm" />
                                             </span>
                                             <input
                                                 value={phone}
                                                 onChange={handlePhoneChange}
-                                                onKeyDown={(e) => e.stopPropagation()}
                                                 placeholder="+58-412-123-4567"
                                                 type="tel"
-                                                className="w-full bg-black/20 border border-white/5 rounded-xl py-3 pl-10 pr-4 text-xs font-bold outline-none focus:border-primary/50 transition-colors placeholder:font-medium placeholder:opacity-30"
+                                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-14 pr-4 text-xs font-bold outline-none focus:border-primary/50 transition-all placeholder:opacity-20"
                                             />
                                         </div>
 
-                                        <div className="relative w-full">
-                                            <div className="flex items-center gap-2">
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    onChange={handleImageUpload}
-                                                    className="hidden"
-                                                    id="qr-upload"
-                                                />
-                                                <label
-                                                    htmlFor="qr-upload"
-                                                    className="flex-1 cursor-pointer bg-black/20 border border-white/5 rounded-xl py-3 px-4 text-xs font-bold flex justify-between items-center transition-colors hover:border-primary/50 group"
-                                                >
-                                                    <span className="opacity-50 text-[10px] uppercase font-black tracking-widest group-hover:text-primary transition-colors">
-                                                        {qrCode ? 'QR Cargado (+)' : 'Subir código QR (Opcional)'}
-                                                    </span>
-                                                    {qrCode && <img src={qrCode} alt="QR Preview" className="w-6 h-6 object-cover rounded-md" />}
-                                                </label>
-                                            </div>
+                                        <div className="relative">
+                                            <span className="absolute left-4 top-1/2 -translate-y-1/2 opacity-30"><Banknote size={16} /></span>
+                                            <input
+                                                value={amount}
+                                                onChange={handleAmountChange}
+                                                placeholder="Monto Sugerido (Opcional)"
+                                                className="w-full bg-black/40 border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-xs font-bold outline-none focus:border-primary/50 transition-all placeholder:opacity-20"
+                                            />
                                         </div>
                                     </div>
 
-                                    <div className="flex gap-2 pt-2">
+                                    <div className="flex gap-3 pt-4">
                                         <button
-                                            onClick={() => {
-                                                setIsAdding(false);
-                                                setEditingId(null);
-                                                setAlias('');
-                                                setBank('');
-                                                setIdNumber('');
-                                                setPhone('');
-                                                setDocumentType('V');
-                                                setQrCode(null);
-                                            }}
-                                            className="flex-1 py-3 bg-white/5 rounded-xl text-[10px] font-black uppercase hover:bg-white/10 transition-colors"
+                                            onClick={resetForm}
+                                            className="flex-1 py-4 bg-white/5 rounded-2xl text-[10px] font-black uppercase hover:bg-white/10 transition-all"
                                         >
                                             Cancelar
                                         </button>
                                         <button
                                             onClick={handleSave}
-                                            disabled={!alias || !bank || !idNumber || !phone}
-                                            className="flex-1 py-3 bg-primary text-white rounded-xl text-[10px] font-black uppercase hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20"
+                                            className="flex-1 py-4 bg-primary text-white rounded-2xl text-[10px] font-black uppercase hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
                                         >
                                             Guardar
                                         </button>
@@ -384,59 +339,61 @@ export const PaymentMethodsModal: React.FC<PaymentMethodsModalProps> = ({
                             )}
 
                             {/* List */}
-                            <div className="space-y-3">
+                            <div className="grid gap-4">
                                 {methods.length === 0 && !isAdding && (
-                                    <div className="text-center py-10 opacity-30">
-                                        <p className="text-[10px] font-black uppercase tracking-widest">No tienes fichas guardadas</p>
+                                    <div className="text-center py-20 opacity-20 flex flex-col items-center gap-4">
+                                        <Wallet size={40} />
+                                        <p className="text-[10px] font-black uppercase tracking-[0.2em]">Billetera Vacía</p>
                                     </div>
                                 )}
 
                                 {methods.map(method => (
-                                    <div key={method.id} className="group bg-white/5 hover:bg-white/[0.07] border border-white/5 rounded-3xl p-5 transition-all">
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex items-center gap-3">
-                                                {method.bankLogo && (
-                                                    <img
-                                                        src={method.bankLogo}
-                                                        alt={method.bank}
-                                                        className="w-8 h-8 rounded-lg object-contain bg-white p-1"
-                                                    />
-                                                )}
+                                    <div key={method.id} className="group glass-card border-white/5 bg-white/[0.02] p-6 rounded-[2rem] hover:bg-white/[0.04] transition-all duration-300">
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 rounded-2xl bg-white p-2 shadow-inner flex items-center justify-center">
+                                                    {method.bankLogo ? (
+                                                        <img src={method.bankLogo} alt={method.bank} className="w-full h-full object-contain" />
+                                                    ) : (
+                                                        <Building2 className="text-black" size={24} />
+                                                    )}
+                                                </div>
                                                 <div>
-                                                    <h4 className="text-sm font-black text-white mb-1">{method.alias}</h4>
-                                                    <p className="text-[10px] font-bold text-primary uppercase tracking-wider">{method.bank}</p>
+                                                    <h4 className="text-sm font-black text-white">{method.alias}</h4>
+                                                    <p className="text-[10px] font-bold text-primary uppercase tracking-wider mt-0.5">{method.bank}</p>
                                                 </div>
                                             </div>
-                                            <div className="flex gap-2 transition-all">
-                                                <button
-                                                    onClick={() => handleEdit(method)}
-                                                    className="p-2 bg-blue-500/10 text-blue-500 rounded-lg hover:bg-blue-500/20 transition-all"
-                                                >
-                                                    <Edit2 size={14} />
+                                            <div className="flex gap-2">
+                                                <button onClick={() => handleEdit(method)} className="p-2.5 bg-blue-500/10 text-blue-500 rounded-xl hover:bg-blue-500/20 transition-all">
+                                                    <Edit2 size={16} />
                                                 </button>
-                                                <button
-                                                    onClick={() => removeMethod(method.id)}
-                                                    className="p-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-all"
-                                                >
-                                                    <Trash2 size={14} />
+                                                <button onClick={() => removeMethod(method.id)} className="p-2.5 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500/20 transition-all">
+                                                    <Trash2 size={16} />
                                                 </button>
                                             </div>
                                         </div>
 
-                                        <div className="space-y-4">
-                                            <div className="flex justify-between items-center py-1">
-                                                <span className="text-[9px] font-black opacity-30 uppercase tracking-widest">Cédula / RIF</span>
-                                                <span className="text-[13px] font-black text-white/90">{method.documentType || 'V'}-{method.idNumber}</span>
+                                        <div className="grid gap-3 pt-2">
+                                            <div className="flex justify-between items-center py-2 border-b border-white/5">
+                                                <span className="text-[9px] font-black opacity-30 uppercase tracking-widest text-primary">Cédula / RIF</span>
+                                                <span className="text-xs font-black text-white">{method.documentType}-{formatCI(method.idNumber)}</span>
                                             </div>
-                                            <div className="flex justify-between items-center py-1">
-                                                <span className="text-[9px] font-black opacity-30 uppercase tracking-widest">Teléfono</span>
-                                                <span className="text-[13px] font-black text-white/90 tracking-tight">{method.phoneNumber}</span>
+                                            <div className="flex justify-between items-center py-2 border-b border-white/5">
+                                                <span className="text-[9px] font-black opacity-30 uppercase tracking-widest text-primary">Teléfono</span>
+                                                <span className="text-xs font-black text-white">{method.phoneNumber}</span>
                                             </div>
+                                            {method.amount && (
+                                                <div className="flex justify-between items-center py-2">
+                                                    <span className="text-[9px] font-black opacity-30 uppercase tracking-widest text-primary">Sugerido</span>
+                                                    <span className="text-xs font-black text-primary">
+                                                        Bs. {new Intl.NumberFormat('es-VE', { minimumFractionDigits: 2 }).format(method.amount)}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 ))}
                             </div>
-
                         </div>
                     </motion.div>
                 </motion.div>

@@ -12,15 +12,15 @@ export const useCalculator = (activeRateValue: number) => {
     const updateCalculation = useCallback(async (val: string, source: 'USD' | 'VES', rate: number) => {
         try {
             if (rate <= 0) return false;
-            const cleanVal = val.replace(/\./g, '').replace(',', '.');
+            const cleanVal = val.replace(/\./g, '').replace(',', '.').replace(/×/g, '*').replace(/÷/g, '/');
 
             // Importación dinámica de mathjs para optimizar bundle
             const { evaluate } = await import('mathjs');
             const result = evaluate(cleanVal || '0');
 
             if (typeof result === 'number' && isFinite(result)) {
-                if (source === 'USD') setInputVES(formatCurrency(Math.max(0, result * rate)));
-                else setInputUSD(formatCurrency(Math.max(0, result / rate)));
+                if (source === 'USD') setInputVES(formatCurrency(Math.max(0, result * rate), 4));
+                else setInputUSD(formatCurrency(Math.max(0, result / rate), 2));
                 return true;
             }
         } catch (e) {
@@ -37,7 +37,22 @@ export const useCalculator = (activeRateValue: number) => {
 
         let newVal = currentVal;
 
-        if (isInitialState) {
+        if (key === 'AC') {
+            newVal = (focusedInput === 'USD' ? '1' : '');
+            setIsInitialState(true);
+        } else if (key === '=') {
+            updateCalculation(currentVal, focusedInput, activeRateValue);
+            setIsInitialState(true);
+            return;
+        } else if (key === 'PASTE') {
+            navigator.clipboard.readText().then(text => {
+                if (/^[0-9.,]+$/.test(text)) {
+                   setter(text.replace('.', ','));
+                   updateCalculation(text, focusedInput, activeRateValue);
+                }
+            });
+            return;
+        } else if (isInitialState) {
             if (key === 'DELETE') {
                 newVal = '';
             } else if (key === ',' || key === '.') {
@@ -74,7 +89,7 @@ export const useCalculator = (activeRateValue: number) => {
 
         // Recalcular VES para 1 USD
         if (activeRateValue > 0) {
-            setInputVES(formatCurrency(activeRateValue));
+            setInputVES(formatCurrency(activeRateValue, 4));
         } else {
             setInputVES('');
         }
