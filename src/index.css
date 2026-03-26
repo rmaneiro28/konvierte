@@ -4,38 +4,41 @@
   --color-background: var(--bg-color);
   --color-surface: var(--surface-color);
   --color-primary: #10B981;
-  --color-secondary: #8B5CF6;
+  --color-secondary: #6366F1;
   --color-accent: #F59E0B;
+  --color-main: var(--text-main);
   --font-outfit: "Outfit", sans-serif;
 }
 
 :root {
-  --bg-color: #f1f5f9;
-  --surface-color: rgba(255, 255, 255, 0.75);
+  --bg-color: #f8fafc;
+  --surface-color: rgba(255, 255, 255, 0.85);
   --text-main: #0f172a;
+  --text-secondary: #64748b;
   --text-placeholder: rgba(15, 23, 42, 0.45);
-  --border-color: rgba(0, 0, 0, 0.1);
-  --shadow-color: rgba(0, 0, 0, 0.05);
-  --key-bg: rgba(255, 255, 255, 0.8);
-  --key-active: rgba(0, 0, 0, 0.04);
+  --border-color: rgba(0, 0, 0, 0.08);
+  --shadow-color: rgba(0, 0, 0, 0.04);
+  --key-bg: rgba(255, 255, 255, 0.7);
+  --key-active: rgba(0, 0, 0, 0.05);
   --safe-area-top: env(safe-area-inset-top, 0px);
   --safe-area-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .dark {
-  --bg-color: #050505;
-  --surface-color: #111113;
-  --text-main: rgba(255, 255, 255, 0.95);
+  --bg-color: #020617;
+  --surface-color: #0f172a;
+  --text-main: #f8fafc;
+  --text-secondary: #94a3b8;
   --text-placeholder: rgba(255, 255, 255, 0.25);
-  --border-color: rgba(255, 255, 255, 0.08);
-  --shadow-color: rgba(0, 0, 0, 0.5);
+  --border-color: rgba(255, 255, 255, 0.06);
+  --shadow-color: rgba(0, 0, 0, 0.6);
   --key-bg: rgba(255, 255, 255, 0.03);
   --key-active: rgba(255, 255, 255, 0.08);
 }
 
 @layer base {
   body {
-    @apply bg-background text-white font-outfit antialiased selection:bg-primary/30 relative min-h-screen overflow-x-hidden;
+    @apply bg-background font-outfit antialiased selection:bg-primary/30 relative min-h-screen overflow-x-hidden;
     color: var(--text-main);
     padding-top: calc(4rem + var(--safe-area-top));
     padding-bottom: var(--safe-area-bottom);
@@ -93,7 +96,6 @@
 
 /* Hide Scrollbar */
 @utility no-scrollbar {
-  -ms-overflow-style: none;
   scrollbar-width: none;
 }
 
@@ -115,6 +117,30 @@
 
 ::-webkit-scrollbar-thumb {
   @apply bg-primary/20 rounded-full;
+}
+
+@utility mesh-gradient {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(99, 102, 241, 0.08) 0px, transparent 50%);
+}
+
+.dark .mesh-gradient {
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.2) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.2) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
+    radial-gradient(at 0% 100%, rgba(99, 102, 241, 0.1) 0px, transparent 50%);
+}
+
+@utility glow-primary {
+  box-shadow: 0 0 40px -10px rgba(16, 185, 129, 0.3);
+}
+
+@utility glass-border {
+  border: 1px solid var(--border-color);
 }
 
 /* SEO & Accessibility */

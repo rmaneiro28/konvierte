@@ -66,7 +66,7 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({ onOpenTutorial
 
     return (
         <section className="w-full py-20 px-6 bg-background relative overflow-hidden">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-7xl mx-auto">
                 <div className="text-center mb-16">
                     <motion.h2
                         initial={{ opacity: 0, y: 20 }}
@@ -81,7 +81,7 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({ onOpenTutorial
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="text-3xl md:text-4xl font-black text-white leading-tight"
+                        className="text-3xl md:text-4xl font-black text-main leading-tight"
                     >
                         Más que una calculadora,<br />tu centro de divisas.
                     </motion.p>
@@ -100,8 +100,8 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({ onOpenTutorial
                             <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
                                 {feature.icon}
                             </div>
-                            <h3 className="text-sm font-black uppercase tracking-widest text-white mb-3">{feature.title}</h3>
-                            <p className="text-xs font-bold text-white/40 leading-relaxed mb-6">{feature.description}</p>
+                            <h3 className="text-sm font-black uppercase tracking-widest text-main mb-3">{feature.title}</h3>
+                            <p className="text-xs font-bold text-secondary leading-relaxed mb-6">{feature.description}</p>
 
                         </motion.div>
                     ))}
@@ -112,7 +112,7 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({ onOpenTutorial
                     initial={{ opacity: 0, scale: 0.95 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    className="mt-20 relative rounded-[3rem] overflow-hidden bg-gradient-to-br from-primary/10 to-transparent border border-white/5 p-8 md:p-12"
+                    className="mt-20 relative rounded-[3rem] overflow-hidden bg-gradient-to-br from-primary/10 to-transparent border border-border p-8 md:p-12 shadow-2xl shadow-primary/5"
                 >
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                         <div className="space-y-6">
@@ -120,10 +120,10 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({ onOpenTutorial
                                 <span className="w-2 h-2 bg-primary animate-pulse rounded-full" />
                                 <span className="text-[10px] font-black uppercase tracking-widest text-primary">Disponible en Android</span>
                             </div>
-                            <h3 className="text-3xl font-black text-white leading-tight">
+                            <h3 className="text-3xl font-black text-main leading-tight">
                                 La potencia de Konvierte en tu bolsillo.
                             </h3>
-                            <p className="text-sm font-bold text-white/40 leading-relaxed">
+                            <p className="text-sm font-bold text-secondary leading-relaxed">
                                 Descarga nuestra aplicación nativa para disfrutar de una experiencia fluida, widgets en pantalla de inicio y notificaciones instantáneas de tasas.
                             </p>
                             <div className="flex gap-4">
@@ -136,7 +136,7 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({ onOpenTutorial
                                 </button>
                                 <button
                                     onClick={onOpenTutorial}
-                                    className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all"
+                                    className="px-8 py-4 bg-surface border border-border text-main rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary/10 transition-all"
                                 >
                                     Ver Tutorial
                                 </button>
