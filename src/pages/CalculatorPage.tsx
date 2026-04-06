@@ -397,7 +397,7 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ theme, setTheme }) => {
                 setIsPaymentMethodsOpen={setIsPaymentMethodsOpen}
             />
 
-            <main className="relative z-10 w-full flex-1 overflow-hidden flex flex-col md:grid md:grid-cols-2 md:grid-rows-[auto_auto] md:content-center md:items-start md:px-8 md:gap-6 max-w-4xl mx-auto">
+            <main className="relative z-10 w-full flex-1 overflow-hidden flex flex-col items-center justify-start max-w-md mx-auto">
                 {isHistoricalMode && (
                     <div className="absolute top-2 w-full max-w-sm left-1/2 -translate-x-1/2 z-[100] px-4">
                         <div className="bg-orange-500/20 text-orange-400 border border-orange-500/30 rounded-full px-4 py-2 flex items-center justify-between shadow-xl backdrop-blur-md">
@@ -423,11 +423,10 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ theme, setTheme }) => {
                     <RotateCw size={16} className={rates.loading ? 'animate-spin' : ''} />
                 </motion.div>
 
-                {/* LEFT COLUMN: Calculator Inputs */}
                 <motion.div
                     onPan={handlePan}
                     onPanEnd={handlePanEnd}
-                    className={`flex-1 flex flex-col w-full max-w-xl mx-auto px-6 pt-12 md:pt-0 h-full justify-center gap-1 transition-all duration-300 md:col-start-1 md:row-start-2 md:w-full md:max-w-lg md:mx-auto md:h-auto`}
+                    className={`flex-1 flex flex-col w-full px-6 pt-12 pb-[350px] overflow-y-auto h-full justify-start gap-1 transition-all duration-300 no-scrollbar`}
                 >
                     <div className="flex flex-col w-full gap-2 items-center">
                         {[isInverse ? 'VES' : 'USD', 'QUICK', isInverse ? 'USD' : 'VES'].map((type) => {
@@ -483,7 +482,7 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ theme, setTheme }) => {
                         })}
                     </div>
 
-                    <div className="md:hidden w-full flex flex-col gap-4">
+                    <div className="w-full flex flex-col gap-4">
                         <ActionButtons
                             handleReset={handleReset}
                             loadRates={loadRates}
@@ -517,66 +516,9 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ theme, setTheme }) => {
                     </div>
                 </motion.div>
 
-                {/* CENTER COLUMN: Rates & Actions */}
-                <div className="hidden md:flex flex-col md:flex-row md:col-span-2 md:row-start-1 w-full max-w-sm md:max-w-none h-auto bg-surface/30 backdrop-blur-xl border border-white/5 rounded-[2rem] p-6 gap-6 shadow-2xl relative overflow-hidden md:items-center">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 blur-[80px] rounded-full pointer-events-none" />
-
-                    {/* Header */}
-                    <div className="flex justify-between items-center px-1 md:flex-col md:items-start md:min-w-fit">
-                        <h2 className="text-xs font-black uppercase tracking-widest opacity-40 flex items-center gap-2 whitespace-nowrap">
-                            Tasas del Día
-                        </h2>
-                        <div className="opacity-40 text-[10px] font-medium font-mono whitespace-nowrap">
-                            {(() => {
-                                const rate = (rates as any)[activeSource];
-                                if (rate?.lastUpdate) {
-                                    try {
-                                        return new Date(rate.lastUpdate).toLocaleString('es-VE', {
-                                            hour: '2-digit', minute: '2-digit', hour12: true
-                                        });
-                                    } catch (e) { return ''; }
-                                }
-                                return '';
-                            })()}
-                        </div>
-                    </div>
-
-                    {/* Rates Horizontal List */}
-                    <div className="flex-1 overflow-y-auto md:overflow-y-visible md:overflow-x-auto pr-2 md:pr-0 custom-scrollbar">
-                        <RateSelector
-                            ratesOrder={ratesOrder}
-                            allRates={allRates}
-                            activeSource={activeSource}
-                            selectRate={selectRate}
-                            className="grid grid-cols-1 gap-3 overflow-visible px-0 md:flex md:flex-row md:gap-4 md:items-center"
-                        />
-                    </div>
-
-                    {/* Actions */}
-                    <ActionButtons
-                        handleReset={handleReset}
-                        loadRates={loadRates}
-                        isLoading={!!rates.loading}
-                        setIsHistoryOpen={setIsHistoryOpen}
-                        className="my-0 w-full flex md:w-auto md:min-w-fit"
-                    />
-                </div>
-
-                {/* RIGHT COLUMN: Keypad */}
-                <div className="hidden md:flex flex-col w-full max-w-[320px] md:col-start-2 md:row-start-2 md:max-w-lg md:w-full md:mx-auto md:justify-center">
-                    <div className="bg-surface/30 backdrop-blur-xl border border-white/5 rounded-[2.5rem] p-6 shadow-2xl w-full">
-                        <VirtualKeyboard
-                            isOpen={true}
-                            onKeyPress={onKeyPress}
-                            variant="embedded"
-                            className="bg-transparent border-none shadow-none p-0 w-full"
-                        />
-                    </div>
-                </div>
+            {/* Teclado Virtual Mobile - Funciona en web también */}
             </main>
-
-            {/* Teclado Virtual Mobile - Solo visible en mobile */}
-            <div className="md:hidden">
+            <div className="w-full">
                 <VirtualKeyboard
                     isOpen={true}
                     onKeyPress={onKeyPress}

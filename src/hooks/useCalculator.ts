@@ -82,6 +82,9 @@ export const useCalculator = (activeRateValue: number) => {
         setFocusedInput(type);
         setLastEdited(type);
         setIsInitialState(true);
+        // Limpiamos los valores visualmente de Inmediato como mejora de UX (monto por defecto)
+        setInputUSD('');
+        setInputVES('');
     }, []);
 
     const handleReset = useCallback(() => {
