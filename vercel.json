@@ -6,9 +6,12 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/((?!api/).*)",
-      "destination": "/"
-    }
+    { "source": "/api/rates", "destination": "/api/rates" },
+    { "source": "/api/history", "destination": "/api/history" },
+    { "source": "/api/usd", "destination": "/api/usd" },
+    { "source": "/api/eur", "destination": "/api/eur" },
+    { "source": "/api/usdt", "destination": "/api/usdt" },
+    { "source": "/api/status", "destination": "/api/status" },
+    { "source": "/((?!api/).*)", "destination": "/" }
   ]
 }
