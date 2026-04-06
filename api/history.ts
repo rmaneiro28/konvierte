@@ -16,7 +16,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(500).json({ error: true, message: "SUPABASE_URL o SUPABASE_KEY no definidos en Vercel." });
     }
 
-    const { currency, limit } = req.query;
+    const { currency, limit, days } = req.query;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     try {
@@ -25,7 +25,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             .select('price, currency, source, created_at')
             .order('created_at', { ascending: false });
 
-        // Si se proporciona un límite (ej: ?limit=100), se aplica. Si no, devuelve todo.
+        // Filtro por periodo de tiempo (maximize resource use)
+        if (days) {
+            const dateLimit = new Date();
+            dateLimit.setDate(dateLimit.getDate() - Number(days));
+            query = query.gte('created_at', dateLimit.toISOString());
+        }
+
+        // Si se proporciona un límite manual
         if (limit) {
             query = query.limit(Number(limit));
         }
@@ -40,12 +47,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         return res.status(200).json({
             count: data?.length || 0,
+            period: days ? `${days} days` : 'all time',
             history: data || [],
-            query_params: { currency: currency || 'all', limit: limit || 'none' }
+            query_params: { currency: currency || 'all', limit: limit || 'none', days: days || 'none' }
         });
     } catch (e: any) {
         return res.status(500).json({ error: true, message: "Error Histórico: " + e.message });
     }
 }
+
 
 
