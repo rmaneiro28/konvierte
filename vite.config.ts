@@ -42,6 +42,7 @@ export default defineConfig({
     target: 'esnext',
     minify: 'terser',
     cssMinify: true,
+    chunkSizeWarningLimit: 1600,
     rollupOptions: {
       output: {
         manualChunks: {
