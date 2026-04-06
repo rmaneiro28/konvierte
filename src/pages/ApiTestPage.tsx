@@ -75,7 +75,9 @@ const ApiTestPage: React.FC = () => {
                                 className="bg-white/5 border border-white/10 p-6 rounded-3xl"
                             >
                                 <p className="text-[10px] font-black uppercase text-white/40 mb-1">{curr}</p>
-                                <p className="text-2xl font-black text-main">{val.toFixed(2)}</p>
+                                <p className="text-2xl font-black text-main">
+                                    {typeof val === 'number' ? val.toFixed(2) : '---'}
+                                </p>
                             </motion.div>
                         ))}
                     </div>
