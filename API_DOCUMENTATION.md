@@ -1,88 +1,78 @@
-# 🚀 Konvierte API Public Documentation v1.0
+# Konvierte Financial API - Documentación Oficial 🚀
 
-¡Bienvenido a la API oficial de **Konvierte**! La herramienta definitiva para desarrolladores que necesitan tasas de cambio en tiempo real para Venezuela con redundancia inteligente.
+Konvierte es una infraestructura de datos financieros resiliente diseñada para el ecosistema digital venezolano. Ofrece acceso programático a tasas de cambio oficiales (BCV) y mercado P2P (Binance) con redundancia total.
 
----
-
-## 📍 Endpoint Único
-
-Para obtener las tasas actuales, realiza una petición **GET** a la siguiente URL:
-
-```http
-GET https://konvierte.vercel.app/api/rates
-```
+## 🔌 Base URL
+Todas las peticiones deben realizarse a la siguiente URL raíz:
+`https://konvierte.vercel.app/api`
 
 ---
 
-## ⚡ Respuesta (JSON)
+## 🏗️ Endpoints Disponibles
 
-La API responde con un objeto JSON optimizado que incluye tasas oficiales y el promedio P2P de Binance.
+### 1. Global Rates (Tasas Completas) 🌍
+Retorna un objeto JSON con todas las tasas disponibles (BCV + Binance P2P).
+- **Endpoint**: `/rates`
+- **Método**: `GET`
+- **URL Completa**: `https://konvierte.vercel.app/api/rates`
 
-### **Ejemplo de Respuesta**
-```json
-{
-  "rates": {
-    "usd_bcv": 47.06,
-    "eur_bcv": 51.12,
-    "usdt_binance": 54.25
-  },
-  "sources": {
-    "official": "BCV (Sitio Web Oficial)",
-    "p2p": "Binance P2P (USDT/VES)"
-  },
-  "last_updated": "2026-04-06T19:35:00Z",
-  "status": "online",
-  "database_synced": true
-}
-```
+### 2. Dólar BCV 💵
+Tasa oficial del Banco Central de Venezuela.
+- **Endpoint**: `/usd`
+- **Método**: `GET`
+- **URL Completa**: `https://konvierte.vercel.app/api/usd`
+
+### 3. Euro BCV 💶
+Tasa oficial en Euros del Banco Central de Venezuela.
+- **Endpoint**: `/eur`
+- **Método**: `GET`
+- **URL Completa**: `https://konvierte.vercel.app/api/eur`
+
+### 4. USDT Binance P2P ⚡
+Promedio ponderado del mercado P2P en Binance.
+- **Endpoint**: `/usdt`
+- **Método**: `GET`
+- **URL Completa**: `https://konvierte.vercel.app/api/usdt`
+
+### 5. Histórico (30 Días) 🕰️
+Serie temporal de registros financieros históricos.
+- **Endpoint**: `/history`
+- **Método**: `GET`
+- **URL Completa**: `https://konvierte.vercel.app/api/history`
+
+### 6. Health Status 🟢
+Estado operacional de los microservicios y scraper.
+- **Endpoint**: `/status`
+- **Método**: `GET`
+- **URL Completa**: `https://konvierte.vercel.app/api/status`
 
 ---
 
-## 🔍 Definición de Campos
+## 💻 Ejemplos de Implementación
 
-| Campo | Tipo | Descripción |
-| :--- | :--- | :--- |
-| `usd_bcv` | Number | Tasa oficial del Dólar estadounidense del Banco Central de Venezuela. |
-| `eur_bcv` | Number | Tasa oficial del Euro del Banco Central de Venezuela. |
-| `usdt_binance` | Number | **Promedio aritmético** de los mejores 10 anuncios de venta en Binance P2P. |
-| `last_updated` | ISO8601 | Marca de tiempo exacta de la última recolección de datos. |
-
----
-
-## 🛠️ Ejemplos de Implementación
-
-### **JavaScript (Fetch)**
+### Javascript (Fetch API)
 ```javascript
-const getRates = async () => {
-    const res = await fetch('https://konvierte.app/api/rates');
-    const { rates } = await res.json();
-    console.log(`Dólar BCV: ${rates.usd_bcv} BS`);
-};
+fetch("https://konvierte.vercel.app/api/rates")
+  .then(res => res.json())
+  .then(data => console.log(data));
 ```
 
-### **Python (Requests)**
+### Python (Requests)
 ```python
 import requests
-
-url = "https://konvierte.app/api/rates"
-response = requests.get(url)
+response = requests.get("https://konvierte.vercel.app/api/rates")
 data = response.json()
-print(f"USDT Binance: {data['rates']['usdt_binance']} VES")
+print(data)
+```
+
+### cURL
+```bash
+curl -X GET "https://konvierte.vercel.app/api/rates"
 ```
 
 ---
 
-## 🛡️ Robustez y Redundancia
-Konvierte API utiliza un sistema de **"Intento en Cadena"** para asegurar la disponibilidad del dato:
-1. **BCV Web Scraper**: Intenta obtener los datos del sitio oficial del BCV.
-2. **Instagram Secondary Scraper**: Si la web oficial está caída, el sistema conmuta automáticamente a fuentes en redes sociales.
-3. **Binance P2P Direct API**: Consulta directa a los libros de órdenes de Binance para el mercado VES/USDT.
-
----
-
-## 📜 Términos de Uso
-Esta API es gratuita y abierta para desarrolladores. Se recomienda implementar un caché de al menos **15 minutos** en el lado del cliente para optimizar el rendimiento.
-
----
-
-*Hecho con ❤️ por [Konvierte Digital](https://konvierte.app).*
+## 🏛️ Desarrollador & Licencia
+- **Arquitecto**: Rubel Maneiro
+- **GitHub**: [rmaneiro28](https://github.com/rmaneiro28)
+- **Licencia**: Proyecto de Código Abierto (Open Source).
