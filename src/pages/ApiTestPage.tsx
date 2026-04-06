@@ -36,9 +36,12 @@ const ApiTestPage: React.FC = () => {
             addLog("Modo Simulación Activado.");
             // Mock elegante para desarrollo
             setData({
-                rates: { usd: 47.06, eur: 51.12, btc: 63405.20 },
+                rates: { 
+                    usd_bcv: 47.06, 
+                    usdt_binance: 54.12 
+                },
                 last_updated: new Date().toISOString(),
-                source: "Simulación Local (Motor BCV)",
+                source: "Simulación Local (Motor Konvierte v1)",
                 status: "dev_mock_mode",
                 note: "Este es un dato de prueba. La API real se activa al desplegar en Vercel."
             });

@@ -44,32 +44,60 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
     }
 
+    // --- INTENTO 3: BINANCE P2P (VES/USDT) ---
+    let binanceRate: number | null = null;
+    try {
+        const binanceResponse = await axios.post('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
+            asset: 'USDT',
+            fiat: 'VES',
+            merchantCheck: false,
+            page: 1,
+            payTypes: [],
+            publisherType: null,
+            rows: 10,
+            tradeType: 'SELL'
+        }, { timeout: 5000 });
+
+        const advertisements = binanceResponse.data?.data;
+        if (advertisements && advertisements.length > 0) {
+            // Calculamos el promedio de los primeros 10 resultados para mayor estabilidad
+            const sum = advertisements.reduce((acc: number, adv: any) => acc + parseFloat(adv.adv.price), 0);
+            binanceRate = sum / advertisements.length;
+        }
+    } catch (e) {
+        console.warn("⚠️ Falló consulta a Binance P2P.");
+    }
+
     // --- GUARDADO INTELIGENTE EN SUPABASE ---
     try {
-        if (supabaseUrl && supabaseKey && finalRates) {
-            // Buscamos última tasa en la DB de la fuente específica
-            const { data: lastRates } = await supabase
-                .from('rates')
-                .select('price')
-                .eq('currency', 'USD')
-                .eq('source', finalRates.source_label)
-                .order('created_at', { ascending: false })
-                .limit(1);
-
-            const lastPrice = lastRates?.[0]?.price;
+        if (supabaseUrl && supabaseKey) {
+            // Guardamos BCV si hubo cambio
+            if (finalRates) {
+                const { data: lastBcv } = await supabase.from('rates').select('price').eq('currency', 'USD').eq('source', finalRates.source_label).order('created_at', { ascending: false }).limit(1);
+                if (finalRates.usd !== lastBcv?.[0]?.price) {
+                    await supabase.from('rates').insert([{ currency: 'USD', price: finalRates.usd, source: finalRates.source_label }]);
+                }
+            }
             
-            if (finalRates.usd !== lastPrice) {
-                await supabase.from('rates').insert([
-                    { currency: 'USD', price: finalRates.usd, source: finalRates.source_label }
-                ]);
+            // Guardamos Binance si hubo cambio
+            if (binanceRate) {
+                const { data: lastBinance } = await supabase.from('rates').select('price').eq('currency', 'USDT').eq('source', 'BINANCE_P2P').order('created_at', { ascending: false }).limit(1);
+                if (binanceRate !== lastBinance?.[0]?.price) {
+                    await supabase.from('rates').insert([{ currency: 'USDT', price: binanceRate, source: 'BINANCE_P2P' }]);
+                }
             }
         }
 
         const responseData = {
-            rates: { usd: finalRates.usd },
+            rates: { 
+                usd_bcv: finalRates?.usd || null,
+                usdt_binance: binanceRate || null
+            },
             last_updated: new Date().toISOString(),
-            source: finalSource,
-            source_tag: finalRates.source_label,
+            sources: {
+                official: finalSource,
+                p2p: 'Binance P2P (USDT/VES)'
+            },
             status: 'online',
             database_synced: !!(supabaseUrl && supabaseKey)
         };
