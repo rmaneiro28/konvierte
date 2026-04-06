@@ -18,8 +18,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
   const refCode = searchParams.get('ref');
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [bcvRate, setBcvRate] = useState<string>('---');
+  const [binanceRate, setBinanceRate] = useState<string>('---');
+
   const [lastUpdated, setLastUpdated] = useState<string>('hoy');
   const [waitlistCount, setWaitlistCount] = useState<number>(1240);
+
 
   useEffect(() => {
     const loadWaitlist = async () => {
@@ -40,12 +43,25 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
             } catch (e) { }
           }
         }
+        if (data.binance_usd) {
+          setBinanceRate(formatCurrency(data.binance_usd.price));
+        }
       } catch (e) {
-        console.error("Error cargando tasa en landing:", e);
+        console.error("Error cargando tasas en landing:", e);
       }
     };
     getRate();
   }, []);
+
+  const copyToClipboard = (value: string, label: string) => {
+    const rawValue = value.replace('Bs.', '').trim();
+    navigator.clipboard.writeText(rawValue);
+    // @ts-ignore
+    import('sonner').then(({ toast }) => {
+        toast.success(`${label} copiado: ${rawValue} Bs.`);
+    });
+  };
+
 
   return (
     <div className={`${theme} min-h-screen transition-colors duration-500`}>
@@ -203,20 +219,50 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                   />
                 </div>
 
-                {/* Floating elements */}
+                {/* Floating elements - Tasas en Vivo */}
                 <motion.div
                   animate={{ y: [0, -15, 0] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                  className="absolute -top-8 -right-8 glass-card p-4 shadow-2xl z-20 border-primary/20"
+                  className="absolute -top-8 -right-12 glass-card p-5 shadow-2xl z-20 border-primary/20 min-w-[180px] flex flex-col gap-4"
                 >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
-                      <TrendingUp size={20} />
+                  <div className="flex items-center justify-between group/row">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center text-primary">
+                        <TrendingUp size={14} />
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40">Ref. BCV (Oficial)</p>
+                        <p className="text-md font-black text-main">{bcvRate}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Ref. BCV</p>
-                      <p className="text-lg font-black text-main">{bcvRate} Bs.</p>
+                    <button 
+                      onClick={() => copyToClipboard(bcvRate, 'BCV')}
+                      className="p-2 hover:bg-primary/10 rounded-lg text-primary opacity-0 group-hover/row:opacity-100 transition-opacity"
+                      aria-label="Copiar tasa BCV"
+                    >
+                      <Zap size={14} />
+                    </button>
+                  </div>
+
+                  <div className="h-px bg-white/5 mx-2" />
+
+                  <div className="flex items-center justify-between group/row">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-orange-500/20 rounded-lg flex items-center justify-center text-orange-500">
+                        <Zap size={14} />
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40">USDT P2P (Promedio)</p>
+                        <p className="text-md font-black text-main">{binanceRate}</p>
+                      </div>
                     </div>
+                    <button 
+                      onClick={() => copyToClipboard(binanceRate, 'Binance')}
+                      className="p-2 hover:bg-orange-500/10 rounded-lg text-orange-500 opacity-0 group-hover/row:opacity-100 transition-opacity"
+                      aria-label="Copiar tasa Binance"
+                    >
+                      <Zap size={14} />
+                    </button>
                   </div>
                 </motion.div>
 
@@ -235,6 +281,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                     </div>
                   </div>
                 </motion.div>
+
               </div>
             </motion.div>
           </div>

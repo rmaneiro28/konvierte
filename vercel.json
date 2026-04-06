@@ -4,11 +4,5 @@
       "path": "/api/cron-sync",
       "schedule": "0 0 * * *"
     }
-  ],
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    }
   ]
 }
