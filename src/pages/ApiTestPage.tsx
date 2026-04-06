@@ -37,7 +37,8 @@ const ApiTestPage: React.FC = () => {
     const endpoints = [
         { id: 'status', label: 'Estado del Servicio', path: '/api/status', icon: <Activity size={16} />, desc: 'Verifica la salud y tiempo de actividad de la API.' },
         { id: 'rates', label: 'Tasas de Cambio', path: '/api/rates', icon: <Database size={16} />, desc: 'Obtiene todas las tasas (BCV + P2P) en un solo objeto JSON.' },
-        { id: 'history', label: 'Historial', path: '/api/history', icon: <Clock size={16} />, desc: 'Consulta los registros históricos de los últimos 30 días.' },
+        { id: 'history', label: 'Historial', path: '/api/history', icon: <Clock size={16} />, desc: 'Consulta registros históricos con filtros de tiempo (3d, 30d, 1y o All).' },
+
         { id: 'usd', label: 'Dólar BCV', path: '/api/usd', icon: <DollarSign size={16} />, desc: 'Tasa oficial del Banco Central de Venezuela.' },
         { id: 'eur', label: 'Euro BCV', path: '/api/eur', icon: <Euro size={16} />, desc: 'Tasa oficial del Banco Central de Venezuela (EUR).' },
         { id: 'usdt', label: 'P2P Binance', path: '/api/usdt', icon: <Zap size={16} />, desc: 'Promedio representativo del mercado USDT/VES en Binance.' },
@@ -169,8 +170,19 @@ const ApiTestPage: React.FC = () => {
                                                     <tr>
                                                         <td className="p-5 font-mono font-bold text-emerald-600">currency</td>
                                                         <td className="p-5 opacity-60 italic">string</td>
-                                                        <td className="p-5 font-medium italic opacity-70">Filtra la respuesta por moneda específica.</td>
+                                                        <td className="p-5 font-medium italic opacity-70">Filtra la respuesta (USD, EUR, USDT).</td>
                                                     </tr>
+                                                    <tr>
+                                                        <td className="p-5 font-mono font-bold text-emerald-600">days</td>
+                                                        <td className="p-5 opacity-60 italic">number</td>
+                                                        <td className="p-5 font-medium italic opacity-70">Filtra por antigüedad (ej: 30 o 365 días).</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="p-5 font-mono font-bold text-emerald-600">limit</td>
+                                                        <td className="p-5 opacity-60 italic">number</td>
+                                                        <td className="p-5 font-medium italic opacity-70">Limita la cantidad de registros devueltos.</td>
+                                                    </tr>
+
                                                 </tbody>
                                             </table>
                                         </div>

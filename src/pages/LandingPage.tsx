@@ -321,7 +321,33 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                     Sabemos lo difícil que es encontrar una fuente de datos estable para tasas en Venezuela. Konvierte API ofrece JSON limpio, alta disponibilidad y documentación real.
                 </p>
 
+                {/* Micro Endpoints List */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                    {[
+                        { route: '/api/rates', label: 'Global Rates' },
+                        { route: '/api/history', label: 'Historical' },
+                        { route: '/api/usd', label: 'USD oficial' },
+                        { route: '/api/usdt', label: 'USDT P2P' }
+                    ].map(ep => (
+                        <a 
+                            key={ep.route} 
+                            href={ep.route}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-3 p-3 bg-white/5 border border-white/5 rounded-2xl group/ep hover:border-primary/20 transition-all cursor-pointer"
+                        >
+                            <span className="text-[7px] font-black uppercase tracking-tighter bg-primary/20 text-primary px-2 py-0.5 rounded-md">GET</span>
+                            <div className="flex flex-col">
+                                <span className="text-[9px] font-mono opacity-30 group-hover/ep:opacity-100 transition-opacity">{ep.route}</span>
+                                <span className="text-[8px] font-black uppercase tracking-widest opacity-20">{ep.label}</span>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+
+
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-4">
+
                     <div className="p-6 bg-white/5 border border-white/10 rounded-3xl group hover:border-primary/30 transition-all">
                         <p className="text-primary font-black uppercase text-[10px] tracking-widest mb-2">99.9% Uptime</p>
                         <p className="text-sm font-medium text-white/40 italic">Infraestructura resiliente lista para producción.</p>

@@ -25,17 +25,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             .select('price, currency, source, created_at')
             .order('created_at', { ascending: false });
 
-        // Filtro por periodo de tiempo (maximize resource use)
+        // Filtro por periodo de tiempo
         if (days) {
             const dateLimit = new Date();
             dateLimit.setDate(dateLimit.getDate() - Number(days));
             query = query.gte('created_at', dateLimit.toISOString());
         }
 
-        // Si se proporciona un límite manual
+        // Si se proporciona un límite manual, se usa ese. 
+        // Si no, forzamos 30,000 para evitar el límite de 1000 de Supabase.
         if (limit) {
             query = query.limit(Number(limit));
+        } else {
+            query = query.limit(30000);
         }
+
 
         if (currency) {
             query = query.eq('currency', currency.toString().toUpperCase());
