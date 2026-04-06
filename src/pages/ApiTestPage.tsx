@@ -48,11 +48,15 @@ const ApiTestPage: React.FC = () => {
         setLoading(true);
         setData(null);
         try {
-            const res = await fetch(currentEndpoint.path);
+            // Usamos la URL completa para que funcione localmente y en producción 🚀
+            const res = await fetch(`${baseUrl}${currentEndpoint.path}`);
             const json = await res.json();
             setData(json);
         } catch (e) {
-            setData({ "error": "Petición fallida. Solo disponible en despliegue Real." });
+            setData({ 
+                "error": "Sin conexión al servidor de producción.",
+                "hint": "Verifica que el despliegue en Vercel esté activo."
+            });
         } finally {
             setLoading(false);
         }
