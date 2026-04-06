@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { LazyMotion, domAnimation } from 'framer-motion';
 
 // Pages
 import LandingPage from './pages/LandingPage';
 import ApiTestPage from './pages/ApiTestPage';
+import NotFoundPage from './pages/NotFoundPage';
+
 
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -51,8 +53,9 @@ function App() {
         <Routes>
           <Route path="/" element={<LandingPage theme={theme} setTheme={setTheme} />} />
           <Route path="/api" element={<ApiTestPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
+
       </Router>
     </LazyMotion>
   );
