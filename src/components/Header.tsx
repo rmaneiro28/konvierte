@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({ setIsShareOpen, setIsConfigOpen,
                                 <path d="M78 58C80 54 83 53 85 53C88 53 91 54 93 58L97 54M92 70C90 74 87 75 85 75C82 75 79 74 77 70L73 74" stroke="#10B981" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                         </div>
-                        <h1 className="text-sm font-black uppercase tracking-[0.2em] relative hidden sm:block">
+                        <h1 className="text-sm font-black uppercase tracking-[0.2em] relative">
                             Konvierte
                             <span className="sr-only"> - Calculadora de Tipo de Cambio en Venezuela</span>
                         </h1>
