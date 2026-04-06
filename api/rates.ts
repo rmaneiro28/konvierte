@@ -30,12 +30,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const eurValue = $('#euro strong').text().trim().replace(',', '.');
         const btcValue = $('#bitcoin strong').text().trim().replace(',', '.');
 
-        // Guardamos en Supabase para el histórico (si las variables están configuradas)
+        // Lógica de Guardar solo si cambia
         if (supabaseUrl && supabaseKey) {
-            await supabase.from('rates').insert([
-                { currency: 'USD', price: parseFloat(usdValue), source: 'BCV' },
-                { currency: 'EUR', price: parseFloat(eurValue), source: 'BCV' }
-            ]);
+            // Buscamos la última tasa guardada del BCV para USD
+            const { data: lastRates } = await supabase
+                .from('rates')
+                .select('price')
+                .eq('currency', 'USD')
+                .eq('source', 'BCV')
+                .order('created_at', { ascending: false })
+                .limit(1);
+
+            const lastPrice = lastRates?.[0]?.price;
+            const currentUsd = parseFloat(usdValue);
+
+            // Solo guardamos si el precio es diferente al último o si no hay registros
+            if (currentUsd !== lastPrice) {
+                await supabase.from('rates').insert([
+                    { currency: 'USD', price: currentUsd, source: 'BCV' },
+                    { currency: 'EUR', price: parseFloat(eurValue), source: 'BCV' }
+                ]);
+            }
         }
 
         // Armamos el JSON limpio que los DEVS aman
@@ -48,7 +63,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             last_updated: new Date().toISOString(),
             source: 'BVC Oficial (Banco Central de Venezuela)',
             status: 'success',
-            database_synced: !!(supabaseUrl && supabaseKey)
+            database_synced: !!(supabaseUrl && supabaseKey),
+            stored_new_change: (supabaseUrl && supabaseKey) // Podrías añadir lógica de boolean aquí si quieres
         };
 
         // Activamos CORS para que Konvierte (tu frontend) pueda leerlo
