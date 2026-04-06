@@ -285,13 +285,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                     </div>
                 </div>
 
-                <div className="pt-8">
+                <div className="flex flex-wrap gap-4 pt-8">
                     <button 
                         onClick={() => setIsTutorialOpen(true)}
+                        className="px-8 py-4 bg-primary text-black rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 flex items-center gap-3"
+                    >
+                        Solicitar API <ArrowRight size={14} />
+                    </button>
+                    <NavLink 
+                        to="/api"
                         className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-3 group"
                     >
-                        Solicitar API Key <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                    </button>
+                        Ver Documentación <ExternalLink size={14} className="group-hover:translate-x-1 transition-transform" />
+                    </NavLink>
                 </div>
               </motion.div>
 
@@ -325,8 +331,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                             <span className="text-white/40 ml-4">&nbsp;&nbsp;const response = <span className="text-purple-400">await</span> fetch(</span>
                         </div>
                         <div className="flex gap-4 mb-2">
-                            <span className="text-white/20 select-none">3</span>
-                            <span className="text-green-400 ml-4">&nbsp;&nbsp;&nbsp;&nbsp;'https://api.konvierte.app/v1/rates'</span>
+                            <span className="text-green-400 ml-4">&nbsp;&nbsp;&nbsp;&nbsp;'https://konvierte.vercel.app/api/rates'</span>
                         </div>
                         <div className="flex gap-4 mb-2">
                             <span className="text-white/20 select-none">4</span>

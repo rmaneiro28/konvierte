@@ -50,7 +50,7 @@ function App() {
 
         <Routes>
           <Route path="/" element={<LandingPage theme={theme} setTheme={setTheme} />} />
-          <Route path="/api-test" element={<ApiTestPage />} />
+          <Route path="/api" element={<ApiTestPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
