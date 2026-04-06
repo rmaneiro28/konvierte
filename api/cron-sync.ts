@@ -1,18 +1,20 @@
+// --- api/cron-sync.ts ---
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-    // Solo permitir GET (para cron) o POST con secreto (opcional)
     if (req.method !== 'GET' && req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    console.log("🚀 Sincronización Diaria Iniciada...");
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_KEY;
 
+    if (!supabaseUrl || !supabaseKey) {
+        return res.status(500).json({ error: true, message: "SUPABASE_URL o SUPABASE_KEY no definidos en Vercel." });
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
     const endpoints = [
         { url: 'https://ve.dolarapi.com/v1/dolares', currency: 'USD' },
         { url: 'https://ve.dolarapi.com/v1/euros', currency: 'EUR' }
@@ -46,7 +48,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             } else {
                 results.push({ currency: endpoint.currency, status: 'success', count: rows.length });
             }
-
         } catch (e: any) {
             results.push({ currency: endpoint.currency, status: 'error', message: e.message });
         }
@@ -58,3 +59,4 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         results
     });
 }
+

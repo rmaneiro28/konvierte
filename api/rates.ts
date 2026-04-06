@@ -2,19 +2,21 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseKey = process.env.SUPABASE_KEY || '';
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-    // Garantía Total JSON y CORS 🛡️⚡
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Content-Type', 'application/json');
 
-    if (req.method === 'OPTIONS') {
-        return res.status(204).end();
+    if (req.method === 'OPTIONS') return res.status(204).end();
+
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+        return res.status(500).json({ error: true, message: "SUPABASE_URL o SUPABASE_KEY no definidos en Vercel." });
     }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     try {
         const { data, error } = await supabase
@@ -23,10 +25,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             .order('created_at', { ascending: false })
             .limit(10);
 
-        if (error) throw new Error("Supabase Error: " + error.message);
+        if (error) throw new Error(error.message);
+
+        if (!data || data.length === 0) {
+            return res.status(404).json({ error: true, message: "No hay registros de tasas en la base de datos." });
+        }
 
         const rates: any = {};
-        data?.forEach(r => {
+        data.forEach(r => {
             if (!rates[r.currency.toLowerCase()]) {
                 rates[r.currency.toLowerCase()] = {
                     price: Number(r.price),
@@ -36,20 +42,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
         });
 
-        // Respuesta Estructurada Élite
-        const responseData = {
+        return res.status(200).json({
             status: "success",
             timestamp: new Date().toISOString(),
             engine: "Konvierte v1.1",
             rates: rates
-        };
-
-        return res.status(200).json(responseData);
-    } catch (e: any) {
-        return res.status(500).json({ 
-            status: "error", 
-            message: "Falla en el motor de tasas.", 
-            details: e.message 
         });
+    } catch (e: any) {
+        return res.status(500).json({ status: "error", message: "Error en el motor de tasas: " + e.message });
     }
 }
+
