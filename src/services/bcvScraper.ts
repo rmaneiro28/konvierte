@@ -42,8 +42,8 @@ export const getBcvRate = async () => {
             source: 'Banco Central de Venezuela (BCV)'
         };
 
-    } catch (error) {
-        console.error('❌ Error en el Scraper del BCV:', error.message);
+    } catch (error: any) {
+        console.error('❌ Error en el Scraper del BCV:', error?.message);
         return null;
     }
 };
