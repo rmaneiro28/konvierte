@@ -34,13 +34,20 @@ Promedio ponderado del mercado P2P en Binance.
 - **Método**: `GET`
 - **URL Completa**: `https://konvierte.vercel.app/api/usdt`
 
-### 5. Histórico (30 Días) 🕰️
-Serie temporal de registros financieros históricos.
+### 5. Histórico (Completo) 🕰️
+Serie temporal de registros financieros históricos. Ahora retorna todos los valores disponibles (sin límites por defecto) en formato compatible con DolarAPI.
 - **Endpoint**: `/history`
 - **Método**: `GET`
+- **Parámetros**: `days` (opcional), `currency` (opcional), `limit` (opcional)
 - **URL Completa**: `https://konvierte.vercel.app/api/history`
 
-### 6. Health Status 🟢
+### 6. Mirror Endpoints (DolarAPI 1:1) 🔄
+Para máxima compatibilidad con aplicaciones existentes:
+- **Dólares**: `/api/v1/historicos/dolares`
+- **Euros**: `/api/v1/historicos/euros`
+- **Formato**: Retorna un Array directo `[...]` como se muestra en la referencia.
+
+### 7. Health Status 🟢
 Estado operacional de los microservicios y scraper.
 - **Endpoint**: `/status`
 - **Método**: `GET`
