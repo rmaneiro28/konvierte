@@ -5,6 +5,11 @@
       "schedule": "0 0 * * *"
     }
   ],
+  "functions": {
+    "api/*.ts": {
+        "runtime": "nodejs18.x"
+    }
+  },
   "cleanUrls": true,
   "rewrites": [
     {
