@@ -35,17 +35,17 @@ Promedio ponderado del mercado P2P en Binance.
 - **URL Completa**: `https://konvierte.vercel.app/api/usdt`
 
 ### 5. Histórico (Completo) 🕰️
-Serie temporal de registros financieros históricos. Ahora retorna todos los valores disponibles (sin límites por defecto) en formato compatible con DolarAPI.
+Serie temporal de registros financieros históricos. Retorna todos los valores disponibles (sin límites por defecto).
 - **Endpoint**: `/history`
 - **Método**: `GET`
 - **Parámetros**: `days` (opcional), `currency` (opcional), `limit` (opcional)
 - **URL Completa**: `https://konvierte.vercel.app/api/history`
 
-### 6. Mirror Endpoints (DolarAPI 1:1) 🔄
-Para máxima compatibilidad con aplicaciones existentes:
-- **Dólares**: `/api/v1/historicos/dolares`
-- **Euros**: `/api/v1/historicos/euros`
-- **Formato**: Retorna un Array directo `[...]` como se muestra en la referencia.
+### 6. Histórico por Moneda (Series Directas) 🔄
+Endpoints especializados que retornan el array directo de registros (formato plano) con historial completo por defecto, ideales para integraciones rápidas:
+- **Dólares**: `https://konvierte.vercel.app/v1/historicos/dolares`
+- **Euros**: `https://konvierte.vercel.app/v1/historicos/euros`
+- **USDT P2P**: `https://konvierte.vercel.app/v1/historicos/usdt`
 
 ### 7. Health Status 🟢
 Estado operacional de los microservicios y scraper.

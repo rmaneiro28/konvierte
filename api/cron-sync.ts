@@ -35,7 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const rows = data.map((item: any) => ({
                 price: item.promedio || item.valor || 0,
                 currency: endpoint.currency,
-                source: `DolarAPI (${item.fuente || 'oficial'})`,
+                source: `Konvierte (${item.fuente || 'oficial'})`,
                 created_at: new Date(item.fechaActualizacion || item.fecha || new Date()).toISOString()
             })).filter(r => r.price > 0);
 

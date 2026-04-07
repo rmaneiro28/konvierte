@@ -6,6 +6,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
 
     if (req.method === 'OPTIONS') return res.status(204).end();
 
@@ -50,9 +53,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         if (error) throw new Error(error.message);
 
-        // Mapeamos los datos para que coincidan exactamente con el formato de la imagen proporcionada (DolarAPI)
+        // Mapeamos los datos para que coincidan exactamente con el estándar de Konvierte API
         const formattedHistory = (data || []).map(item => ({
-            fuente: item.source.replace('DolarAPI (', '').replace(')', ''), // Limpiamos el nombre si viene de DolarAPI
+            fuente: item.source.replace('DolarAPI', 'Konvierte'),
             compra: null,
             venta: null,
             promedio: Number(item.price),

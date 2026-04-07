@@ -1,4 +1,4 @@
-// --- api/v1/historicos/dolares.ts ---
+// --- api/v1/historicos/usdt.ts ---
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
@@ -26,7 +26,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         let query = supabase
             .from('rates')
             .select('price, source, created_at')
-            .eq('currency', 'USD')
+            .eq('currency', 'USDT')
             .order('created_at', { ascending: false });
 
         if (days) {
@@ -35,7 +35,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             query = query.gte('created_at', dateLimit.toISOString());
         }
 
-        // Sin límites por defecto
+        // Sin límites por defecto (Trae todo hasta 1M de registros)
         if (limit) {
             query = query.limit(Number(limit));
         } else {
