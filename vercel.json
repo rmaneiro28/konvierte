@@ -18,6 +18,10 @@
   ],
   "rewrites": [
     {
+      "source": "/docs/api/historicos/:path*",
+      "destination": "/api/historicos/:path*"
+    },
+    {
       "source": "/docs/api/:path*",
       "destination": "/api/:path*"
     },
@@ -27,7 +31,7 @@
     },
 
     {
-      "source": "/((?!api/|docs/|v1/|favicon.ico).*)",
+      "source": "/((?!api|docs|v1|favicon).*)",
       "destination": "/index.html"
     }
   ]

@@ -16,7 +16,7 @@ export interface RatesState {
 }
 
 // Consumimos nuestra propia arquitectura serverless
-const KONVIERTE_API = "https://konvierte.vercel.app/api";
+const KONVIERTE_API = "https://konvierte.vercel.app/docs/api";
 
 export const fetchRates = async (): Promise<Partial<RatesState>> => {
     try {
