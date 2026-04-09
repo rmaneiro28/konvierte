@@ -27,7 +27,7 @@
     },
 
     {
-      "source": "/((?!api/|v1/|favicon.ico).*)",
+      "source": "/((?!api/|docs/|v1/|favicon.ico).*)",
       "destination": "/index.html"
     }
   ]

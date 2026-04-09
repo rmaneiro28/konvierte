@@ -35,9 +35,9 @@ const ApiTestPage: React.FC = () => {
     const baseUrlHost = "https://konvierte.vercel.app";
 
     const endpoints = [
-        { id: 'status', label: 'Estado del Servicio', path: '/api/status', icon: <Activity size={16} />, desc: 'Verifica la salud y tiempo de actividad de la API.' },
-        { id: 'rates', label: 'Tasas de Cambio', path: '/api/rates', icon: <Database size={16} />, desc: 'Obtiene todas las tasas (BCV + P2P) en un solo objeto JSON.' },
-        { id: 'history', label: 'Historial', path: '/api/history', icon: <Clock size={16} />, desc: 'Consulta registros históricos con filtros de tiempo (3d, 30d, 1y o All).' },
+        { id: 'status', label: 'Estado del Servicio', path: '/docs/api/status', icon: <Activity size={16} />, desc: 'Verifica la salud y tiempo de actividad de la API.' },
+        { id: 'rates', label: 'Tasas de Cambio', path: '/docs/api/rates', icon: <Database size={16} />, desc: 'Obtiene todas las tasas (BCV + P2P) en un solo objeto JSON.' },
+        { id: 'history', label: 'Historial', path: '/docs/api/history', icon: <Clock size={16} />, desc: 'Consulta registros históricos con filtros de tiempo (3d, 30d, 1y o All).' },
 
         { id: 'usd', label: 'Dólar BCV', path: '/docs/api/usd', icon: <DollarSign size={16} />, desc: 'Tasa oficial del Banco Central de Venezuela.' },
         { id: 'eur', label: 'Euro BCV', path: '/docs/api/eur', icon: <Euro size={16} />, desc: 'Tasa oficial del Banco Central de Venezuela (EUR).' },

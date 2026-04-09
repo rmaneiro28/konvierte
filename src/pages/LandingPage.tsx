@@ -324,8 +324,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                 {/* Micro Endpoints List */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                     {[
-                        { route: '/api/rates', label: 'Global Rates' },
-                        { route: '/api/history', label: 'Historical' },
+                        { route: '/docs/api/rates', label: 'Global Rates' },
+                        { route: '/docs/api/history', label: 'Historical' },
                         { route: '/docs/api/usd', label: 'USD oficial' },
                         { route: '/docs/api/usdt', label: 'USDT P2P' }
                     ].map(ep => (
@@ -404,7 +404,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                             <span className="text-white/40 ml-4">&nbsp;&nbsp;const response = <span className="text-purple-400">await</span> fetch(</span>
                         </div>
                         <div className="flex gap-4 mb-2">
-                            <span className="text-green-400 ml-4">&nbsp;&nbsp;&nbsp;&nbsp;'https://konvierte.vercel.app/api/rates'</span>
+                            <span className="text-green-400 ml-4">&nbsp;&nbsp;&nbsp;&nbsp;'https://konvierte.vercel.app/docs/api/rates'</span>
                         </div>
                         <div className="flex gap-4 mb-2">
                             <span className="text-white/20 select-none">4</span>
