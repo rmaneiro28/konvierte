@@ -133,7 +133,19 @@ const ApiTestPage: React.FC = () => {
                     </button>
                 </header>
                 <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
-                    <div className={`flex-1 overflow-y-auto p-10 md:p-14 space-y-12 transition-all ${colors.content}`}>
+                    <div className={`flex-1 overflow-y-auto p-6 md:p-14 space-y-8 md:space-y-12 transition-all ${colors.content}`}>
+                        {/* Mobile Navigation */}
+                        <div className="lg:hidden flex overflow-x-auto gap-2 pb-2 snap-x custom-scrollbar -mx-6 px-6">
+                            {endpoints.map(e => (
+                                <button key={e.id} onClick={() => { setActiveMenu(e.id); setData(null); }} className={`flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all border snap-start shadow-sm ${activeMenu === e.id ? 'bg-emerald-500 text-white border-emerald-500' : isDark ? 'bg-[#161B22] border-[#30363D] text-[#8B949E] hover:text-white' : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900'}`}>
+                                    {e.icon} {e.label}
+                                </button>
+                            ))}
+                            <button onClick={() => setActiveMenu('team')} className={`flex-shrink-0 px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all border snap-start shadow-sm ${activeMenu === 'team' ? 'bg-emerald-500 text-white border-emerald-500' : isDark ? 'bg-[#161B22] border-[#30363D] text-[#8B949E] hover:text-white' : 'bg-white border-slate-200 text-slate-600 hover:text-slate-900'}`}>
+                                <Users size={16} /> Desarrollador
+                            </button>
+                        </div>
+
                         <AnimatePresence mode="wait">
                             {activeMenu !== 'team' ? (
                                 <motion.div key={activeMenu} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-12">
