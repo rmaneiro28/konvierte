@@ -43,8 +43,8 @@ const ApiTestPage: React.FC = () => {
         { id: 'eur', label: 'Euro BCV', path: '/docs/api/eur', icon: <Euro size={16} />, desc: 'Tasa oficial del Banco Central de Venezuela (EUR).' },
         { id: 'usdt', label: 'P2P Binance', path: '/docs/api/usdt', icon: <Zap size={16} />, desc: 'Promedio representativo del mercado USDT/VES en Binance.' },
         
-        { id: 'hist_usd', label: 'Historia Dólar', path: '/docs/api/historicos/usd', icon: <Activity size={16} />, desc: 'Serie histórica de tasaciones del USD Oficial.' },
-        { id: 'hist_eur', label: 'Historia Euro', path: '/docs/api/historicos/eur', icon: <Activity size={16} />, desc: 'Serie histórica de tasaciones del EUR Oficial.' },
+        { id: 'hist_usd', label: 'Historia Dólar', path: '/docs/api/historicos/dolares', icon: <Activity size={16} />, desc: 'Serie histórica de tasaciones del USD Oficial.' },
+        { id: 'hist_eur', label: 'Historia Euro', path: '/docs/api/historicos/euros', icon: <Activity size={16} />, desc: 'Serie histórica de tasaciones del EUR Oficial.' },
         { id: 'hist_usdt', label: 'Historia Binance', path: '/docs/api/historicos/usdt', icon: <Activity size={16} />, desc: 'Serie histórica de promedios P2P Binance USDT.' },
     ];
 

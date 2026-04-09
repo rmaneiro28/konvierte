@@ -31,8 +31,16 @@
   ],
   "rewrites": [
     {
-      "source": "/docs/api/historicos/:path*",
-      "destination": "/api/historicos/:path*"
+      "source": "/docs/api/historicos/dolares",
+      "destination": "/api/v1/historicos/dolares"
+    },
+    {
+      "source": "/docs/api/historicos/euros",
+      "destination": "/api/v1/historicos/euros"
+    },
+    {
+      "source": "/docs/api/historicos/usdt",
+      "destination": "/api/v1/historicos/usdt"
     },
     {
       "source": "/docs/api/:path*",
@@ -42,9 +50,12 @@
       "source": "/api/:path*",
       "destination": "/api/:path*"
     },
-
     {
-      "source": "/((?!api|docs|v1|favicon).*)",
+      "source": "/v1/:path*",
+      "destination": "/api/v1/:path*"
+    },
+    {
+      "source": "/((?!api/|v1/|docs/api/).*)",
       "destination": "/index.html"
     }
   ]
