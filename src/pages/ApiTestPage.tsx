@@ -32,7 +32,7 @@ const ApiTestPage: React.FC = () => {
     const [copied, setCopied] = useState<string | null>(null);
 
     // Dominio raíz (Sin /api al final) para evitar duplicidades 🌍
-    const baseUrlHost = "https://konvierte.vercel.app";
+    const baseUrlHost = typeof window !== 'undefined' ? window.location.origin : "https://konvierte.vercel.app";
 
     const endpoints = [
         { id: 'status', label: 'Estado del Servicio', path: '/docs/api/status', icon: <Activity size={16} />, desc: 'Verifica la salud y tiempo de actividad de la API.' },
