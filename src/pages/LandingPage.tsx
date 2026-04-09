@@ -366,7 +366,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                         Solicitar API <ArrowRight size={14} />
                     </button>
                     <NavLink 
-                        to="/api"
+                        to="/docs"
                         className="px-8 py-4 bg-white/5 border border-white/10 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all flex items-center gap-3 group"
                     >
                         Ver Documentación <ExternalLink size={14} className="group-hover:translate-x-1 transition-transform" />

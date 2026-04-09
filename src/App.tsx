@@ -52,7 +52,7 @@ function App() {
 
         <Routes>
           <Route path="/" element={<LandingPage theme={theme} setTheme={setTheme} />} />
-          <Route path="/api" element={<ApiTestPage />} />
+          <Route path="/docs" element={<ApiTestPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
 
