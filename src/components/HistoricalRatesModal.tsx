@@ -8,12 +8,6 @@ interface HistoricalRatesModalProps {
     applyHistoricalRates: (date: string, usdBCV: number, eurBCV: number, usdBinance: number) => void;
 }
 
-interface ApiRate {
-    fuente: string;
-    promedio: number;
-    fecha: string;
-}
-
 interface DailyRate {
     date: string;
     usd_oficial: number | null;
