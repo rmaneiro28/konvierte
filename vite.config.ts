@@ -12,7 +12,22 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg'],
       workbox: {
-        navigateFallbackDenylist: [/^\/api\/.+/]
+        navigateFallbackDenylist: [/^\/api\/.+/, /^\/docs\/api\/.+/],
+        runtimeCaching: [
+          {
+            urlPattern: /^\/(api|docs\/api)\/.+/,
+            handler: 'NetworkOnly',
+            options: {
+              cacheName: 'api-cache',
+              backgroundSync: {
+                name: 'api-sync',
+                options: {
+                  maxRetentionTime: 24 * 60
+                }
+              }
+            }
+          }
+        ]
       },
       manifest: {
         name: 'Konvierte | Calculadora de Divisas',
