@@ -24,7 +24,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
         const { data, error } = await supabase
             .from('rates')
-            .select('price, currency, source, created_at')
+            .select('price, currency, source, created_at, date_rate')
             .eq('currency', 'EUR')
             .order('created_at', { ascending: false })
             .limit(1);
@@ -41,7 +41,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             price: Number(rate.price),
             symbol: "BS",
             source: rate.source,
-            last_updated: rate.created_at
+            last_updated: rate.created_at,
+            date_rate: rate.date_rate || null
         });
     } catch (e: any) {
         return res.status(500).json({ error: true, message: "Error EUR: " + e.message });

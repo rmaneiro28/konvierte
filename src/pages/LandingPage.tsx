@@ -326,8 +326,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                     {[
                         { route: '/api/rates', label: 'Global Rates' },
                         { route: '/api/history', label: 'Historical' },
-                        { route: '/api/usd', label: 'USD oficial' },
-                        { route: '/api/usdt', label: 'USDT P2P' }
+                        { route: '/docs/api/usd', label: 'USD oficial' },
+                        { route: '/docs/api/usdt', label: 'USDT P2P' }
                     ].map(ep => (
                         <a 
                             key={ep.route} 

@@ -25,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
         let query = supabase
             .from('rates')
-            .select('price, currency, source, created_at')
+            .select('price, currency, source, created_at, date_rate')
             .order('created_at', { ascending: false });
 
         // Filtro por periodo de tiempo (opcional, ahora permite "all time")
@@ -55,12 +55,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         // Mapeamos los datos para que coincidan exactamente con el estándar de Konvierte API
         const formattedHistory = (data || []).map(item => ({
-            fuente: item.source.replace('DolarAPI', 'Konvierte'),
+            fuente: item.source,
             compra: null,
             venta: null,
             promedio: Number(item.price),
             fecha: item.created_at.split('T')[0], // YYYY-MM-DD
             timestamp: item.created_at, // Mantenemos el timestamp completo para precisión
+            date_rate: item.date_rate || null,
             currency: item.currency
         }));
 

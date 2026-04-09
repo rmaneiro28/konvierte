@@ -24,7 +24,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
         const { data, error } = await supabase
             .from('rates')
-            .select('price, currency, source, created_at')
+            .select('price, currency, source, created_at, date_rate')
             .order('created_at', { ascending: false })
             .limit(10);
 
@@ -39,8 +39,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             if (!rates[r.currency.toLowerCase()]) {
                 rates[r.currency.toLowerCase()] = {
                     price: Number(r.price),
-                    source: r.source.replace('DolarAPI', 'Konvierte'),
-                    last_updated: r.created_at
+                    source: r.source,
+                    last_updated: r.created_at,
+                    date_rate: r.date_rate || null
                 };
             }
         });

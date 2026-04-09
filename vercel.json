@@ -18,13 +18,14 @@
   ],
   "rewrites": [
     {
-      "source": "/api/:path*",
+      "source": "/docs/api/:path*",
       "destination": "/api/:path*"
     },
     {
-      "source": "/v1/:path*",
-      "destination": "/api/v1/:path*"
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
     },
+
     {
       "source": "/((?!api/|v1/|favicon.ico).*)",
       "destination": "/index.html"

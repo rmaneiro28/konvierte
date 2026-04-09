@@ -25,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
         let query = supabase
             .from('rates')
-            .select('price, source, created_at')
+            .select('price, source, created_at, date_rate')
             .eq('currency', 'USDT')
             .order('created_at', { ascending: false });
 
@@ -47,11 +47,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (error) throw new Error(error.message);
 
         const history = (data || []).map(item => ({
-            fuente: item.source.replace('DolarAPI', 'Konvierte'),
+            fuente: item.source,
             compra: null,
             venta: null,
             promedio: Number(item.price),
-            fecha: item.created_at.split('T')[0]
+            fecha: item.created_at.split('T')[0],
+            date_rate: item.date_rate || null
         }));
 
         return res.status(200).json(history);

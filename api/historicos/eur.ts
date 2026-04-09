@@ -1,4 +1,4 @@
-// --- api/v1/historicos/dolares.ts ---
+// --- api/v1/historicos/euros.ts ---
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
@@ -25,8 +25,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
         let query = supabase
             .from('rates')
-            .select('price, source, created_at')
-            .eq('currency', 'USD')
+            .select('price, source, created_at, date_rate')
+            .eq('currency', 'EUR')
+            .not('source', 'ilike', '%paralelo%')
             .order('created_at', { ascending: false });
 
         if (days) {
@@ -47,11 +48,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         if (error) throw new Error(error.message);
 
         const history = (data || []).map(item => ({
-            fuente: item.source.replace('DolarAPI', 'Konvierte'),
+            fuente: item.source,
             compra: null,
             venta: null,
             promedio: Number(item.price),
-            fecha: item.created_at.split('T')[0]
+            fecha: item.created_at.split('T')[0],
+            date_rate: item.date_rate || null
         }));
 
         return res.status(200).json(history);

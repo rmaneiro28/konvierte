@@ -39,9 +39,13 @@ const ApiTestPage: React.FC = () => {
         { id: 'rates', label: 'Tasas de Cambio', path: '/api/rates', icon: <Database size={16} />, desc: 'Obtiene todas las tasas (BCV + P2P) en un solo objeto JSON.' },
         { id: 'history', label: 'Historial', path: '/api/history', icon: <Clock size={16} />, desc: 'Consulta registros históricos con filtros de tiempo (3d, 30d, 1y o All).' },
 
-        { id: 'usd', label: 'Dólar BCV', path: '/api/usd', icon: <DollarSign size={16} />, desc: 'Tasa oficial del Banco Central de Venezuela.' },
-        { id: 'eur', label: 'Euro BCV', path: '/api/eur', icon: <Euro size={16} />, desc: 'Tasa oficial del Banco Central de Venezuela (EUR).' },
-        { id: 'usdt', label: 'P2P Binance', path: '/api/usdt', icon: <Zap size={16} />, desc: 'Promedio representativo del mercado USDT/VES en Binance.' },
+        { id: 'usd', label: 'Dólar BCV', path: '/docs/api/usd', icon: <DollarSign size={16} />, desc: 'Tasa oficial del Banco Central de Venezuela.' },
+        { id: 'eur', label: 'Euro BCV', path: '/docs/api/eur', icon: <Euro size={16} />, desc: 'Tasa oficial del Banco Central de Venezuela (EUR).' },
+        { id: 'usdt', label: 'P2P Binance', path: '/docs/api/usdt', icon: <Zap size={16} />, desc: 'Promedio representativo del mercado USDT/VES en Binance.' },
+        
+        { id: 'hist_usd', label: 'Historia Dólar', path: '/docs/api/historicos/usd', icon: <Activity size={16} />, desc: 'Serie histórica de tasaciones del USD Oficial.' },
+        { id: 'hist_eur', label: 'Historia Euro', path: '/docs/api/historicos/eur', icon: <Activity size={16} />, desc: 'Serie histórica de tasaciones del EUR Oficial.' },
+        { id: 'hist_usdt', label: 'Historia Binance', path: '/docs/api/historicos/usdt', icon: <Activity size={16} />, desc: 'Serie histórica de promedios P2P Binance USDT.' },
     ];
 
     const currentEndpoint = endpoints.find(e => e.id === activeMenu);

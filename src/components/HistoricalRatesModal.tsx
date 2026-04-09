@@ -36,29 +36,21 @@ export const HistoricalRatesModal: React.FC<HistoricalRatesModalProps> = ({ isOp
             try {
                 setLoading(true);
                 setError(null);
-                const [usdRes, eurRes] = await Promise.all([
-                    fetch('https://ve.dolarapi.com/v1/historicos/dolares'),
-                    fetch('https://ve.dolarapi.com/v1/historicos/euros')
-                ]);
-
-                if (!usdRes.ok || !eurRes.ok) throw new Error('API fetch error');
-                const usdData: ApiRate[] = await usdRes.json();
-                const eurData: ApiRate[] = await eurRes.json();
+                const res = await fetch('https://konvierte.vercel.app/api/history?limit=2000');
+                if (!res.ok) throw new Error('API fetch error');
+                const json = await res.json();
 
                 // Agrupar por fecha
                 const grouped: Record<string, DailyRate> = {};
 
-                usdData.forEach(item => {
-                    const dateStr = item.fecha.split('T')[0];
+                json.history.forEach((item: any) => {
+                    const dateStr = item.fecha; // YYYY-MM-DD
                     if (!grouped[dateStr]) grouped[dateStr] = { date: dateStr, usd_oficial: null, usd_paralelo: null, eur_oficial: null };
-                    if (item.fuente === 'oficial') grouped[dateStr].usd_oficial = item.promedio;
-                    if (item.fuente === 'paralelo') grouped[dateStr].usd_paralelo = item.promedio;
-                });
-
-                eurData.forEach(item => {
-                    const dateStr = item.fecha.split('T')[0];
-                    if (!grouped[dateStr]) grouped[dateStr] = { date: dateStr, usd_oficial: null, usd_paralelo: null, eur_oficial: null };
-                    if (item.fuente === 'oficial') grouped[dateStr].eur_oficial = item.promedio;
+                    
+                    if (item.currency === 'USD') grouped[dateStr].usd_oficial = item.promedio;
+                    // Mapeamos USDT como paralelo para rellenar ese hueco, o si de la bd viene alguno marcado como paralelo viejo
+                    if (item.currency === 'USDT' || (item.fuente || '').toLowerCase().includes('paralelo')) grouped[dateStr].usd_paralelo = item.promedio;
+                    if (item.currency === 'EUR') grouped[dateStr].eur_oficial = item.promedio;
                 });
 
                 // Convertir a array y ordenar descendente para la lista, ascendente para gráfico
