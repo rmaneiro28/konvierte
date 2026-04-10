@@ -32,15 +32,15 @@
   "rewrites": [
     {
       "source": "/docs/api/historicos/dolares",
-      "destination": "/api/v1/historicos/dolares"
+      "destination": "/api/historicos/usd"
     },
     {
       "source": "/docs/api/historicos/euros",
-      "destination": "/api/v1/historicos/euros"
+      "destination": "/api/historicos/eur"
     },
     {
       "source": "/docs/api/historicos/usdt",
-      "destination": "/api/v1/historicos/usdt"
+      "destination": "/api/historicos/usdt"
     },
     {
       "source": "/docs/api/:path*",

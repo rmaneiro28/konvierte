@@ -32,20 +32,107 @@ const ApiTestPage: React.FC = () => {
     const [copied, setCopied] = useState<string | null>(null);
 
     // Dominio raíz (Sin /api al final) para evitar duplicidades 🌍
-    const baseUrlHost = typeof window !== 'undefined' ? window.location.origin : "https://konvierte.vercel.app";
+    const baseUrlHost = typeof window !== 'undefined' ? "https://konvierte.vercel.app" : "https://konvierte.vercel.app";
 
     const endpoints = [
-        { id: 'status', label: 'Estado del Servicio', path: '/docs/api/status', icon: <Activity size={16} />, desc: 'Verifica la salud y tiempo de actividad de la API.' },
-        { id: 'rates', label: 'Tasas de Cambio', path: '/docs/api/rates', icon: <Database size={16} />, desc: 'Obtiene todas las tasas (BCV + P2P) en un solo objeto JSON.' },
-        { id: 'history', label: 'Historial', path: '/docs/api/history', icon: <Clock size={16} />, desc: 'Consulta registros históricos con filtros de tiempo (3d, 30d, 1y o All).' },
-
-        { id: 'usd', label: 'Dólar BCV', path: '/docs/api/usd', icon: <DollarSign size={16} />, desc: 'Tasa oficial del Banco Central de Venezuela.' },
-        { id: 'eur', label: 'Euro BCV', path: '/docs/api/eur', icon: <Euro size={16} />, desc: 'Tasa oficial del Banco Central de Venezuela (EUR).' },
-        { id: 'usdt', label: 'P2P Binance', path: '/docs/api/usdt', icon: <Zap size={16} />, desc: 'Promedio representativo del mercado USDT/VES en Binance.' },
-        
-        { id: 'hist_usd', label: 'Historia Dólar', path: '/docs/api/historicos/dolares', icon: <Activity size={16} />, desc: 'Serie histórica de tasaciones del USD Oficial.' },
-        { id: 'hist_eur', label: 'Historia Euro', path: '/docs/api/historicos/euros', icon: <Activity size={16} />, desc: 'Serie histórica de tasaciones del EUR Oficial.' },
-        { id: 'hist_usdt', label: 'Historia Binance', path: '/docs/api/historicos/usdt', icon: <Activity size={16} />, desc: 'Serie histórica de promedios P2P Binance USDT.' },
+        { 
+            id: 'status', label: 'Estado del Servicio', path: '/docs/api/status', icon: <Activity size={16} />, 
+            desc: 'Verifica la salud operacional y tiempo de actividad del motor API.',
+            params: [],
+            schema: [
+                { field: 'status', type: 'string', desc: 'Estado general (ej: "operational").' },
+                { field: 'uptime', type: 'number', desc: 'Segundos desde el último despliegue.' },
+                { field: 'engine', type: 'string', desc: 'Nombre y versión del motor Vercel.' },
+                { field: 'services', type: 'object', desc: 'Salud de scrapers y base de datos.' },
+                { field: 'timestamp', type: 'date', desc: 'Hora del servidor en formato ISO.' }
+            ]
+        },
+        { 
+            id: 'rates', label: 'Tasas de Cambio', path: '/docs/api/rates', icon: <Database size={16} />, 
+            desc: 'Obtiene el pull completo de tasas sincronizadas (BCV + Binance P2P).',
+            params: [
+                { field: 'currency', type: 'string', desc: '(Opcional) Filtrar por USD, EUR o USDT.' }
+            ],
+            schema: [
+                { field: 'USD', type: 'Object', desc: 'Tasa oficial BCV y metadatos.' },
+                { field: 'EUR', type: 'Object', desc: 'Tasa oficial EUR BCV.' },
+                { field: 'USDT', type: 'Object', desc: 'Promedio Binance USDT/VES.' },
+                { field: 'timestamp', type: 'string', desc: 'Momento de sincronización global.' }
+            ]
+        },
+        { 
+            id: 'history', label: 'Historial', path: '/docs/api/history', icon: <Clock size={16} />, 
+            desc: 'Consulta registros históricos con filtros de granularidad temporal.',
+            params: [
+                { field: 'currency', type: 'string', desc: 'Filtro de moneda base.' },
+                { field: 'days', type: 'number', desc: 'Período en días atrás.' },
+                { field: 'limit', type: 'number', desc: 'Max registros por respuesta.' }
+            ],
+            schema: [
+                { field: 'data', type: 'Array', desc: 'Array de objetos con precios históricos.' },
+                { field: 'count', type: 'number', desc: 'Número total de registros encontrados.' }
+            ]
+        },
+        { 
+            id: 'usd', label: 'Dólar BCV', path: '/docs/api/usd', icon: <DollarSign size={16} />, 
+            desc: 'Tasa oficial del Banco Central de Venezuela.',
+            params: [],
+            schema: [
+                { field: 'price', type: 'number', desc: 'Precio en Bolívares (VES).' },
+                { field: 'symbol', type: 'string', desc: 'Símbolo "BS" del BCV.' },
+                { field: 'source', type: 'string', desc: 'Origen de la data (BCV).' },
+                { field: 'last_updated', type: 'string', desc: 'Última actualización local.' },
+                { field: 'date_rate', type: 'string', desc: 'Fecha legal de la tasa.' }
+            ]
+        },
+        { 
+            id: 'eur', label: 'Euro BCV', path: '/docs/api/eur', icon: <Euro size={16} />, 
+            desc: 'Tasa oficial del Banco Central de Venezuela en Euros.',
+            params: [],
+            schema: [
+                { field: 'price', type: 'number', desc: 'Precio en VES.' },
+                { field: 'date_rate', type: 'string', desc: 'Fecha de vigencia legal.' }
+            ]
+        },
+        { 
+            id: 'usdt', label: 'P2P Binance', path: '/docs/api/usdt', icon: <Zap size={16} />, 
+            desc: 'Promedio de órdenes de compra/venta en Binance P2P.',
+            params: [],
+            schema: [
+                { field: 'price', type: 'number', desc: 'Promedio ponderado USDT.' },
+                { field: 'last_updated', type: 'string', desc: 'Momento exacto del scrape.' }
+            ]
+        },
+        { 
+            id: 'hist_usd', label: 'Historia Dólar', path: '/docs/api/historicos/dolares', icon: <Activity size={16} />, 
+            desc: 'Serie histórica pura (JSON Array) del dólar BCV.',
+            params: [
+                { field: 'days', type: 'number', desc: 'Días hacia atrás.' }
+            ],
+            schema: [
+                { field: '[{...}]', type: 'Array', desc: 'Lista de precios y fechas USD.' }
+            ]
+        },
+        { 
+            id: 'hist_eur', label: 'Historia Euro', path: '/docs/api/historicos/euros', icon: <Activity size={16} />, 
+            desc: 'Serie histórica pura (JSON Array) del euro BCV.',
+            params: [
+                { field: 'days', type: 'number', desc: 'Días hacia atrás.' }
+            ],
+            schema: [
+                { field: '[{...}]', type: 'Array', desc: 'Lista de precios y fechas EUR.' }
+            ]
+        },
+        { 
+            id: 'hist_usdt', label: 'Historia Binance', path: '/docs/api/historicos/usdt', icon: <Activity size={16} />, 
+            desc: 'Serie histórica pura (JSON Array) de USDT P2P.',
+            params: [
+                { field: 'days', type: 'number', desc: 'Días hacia atrás.' }
+            ],
+            schema: [
+                { field: '[{...}]', type: 'Array', desc: 'Lista de promedios diarios USDT.' }
+            ]
+        },
     ];
 
     const currentEndpoint = endpoints.find(e => e.id === activeMenu);
@@ -171,37 +258,58 @@ const ApiTestPage: React.FC = () => {
                                             </button>
                                         </div>
                                     </div>
-                                    <div className="space-y-6">
-                                        <p className="text-[10px] font-black uppercase opacity-60">Esquema Técnico</p>
-                                        <div className={`border rounded-2xl overflow-hidden shadow-lg ${colors.card}`}>
-                                            <table className="w-full text-left text-xs">
-                                                <thead className={isDark ? 'bg-white/5' : 'bg-slate-50 border-b border-inherit'}>
-                                                    <tr>
-                                                        <th className="p-5 font-black uppercase tracking-widest opacity-60">Campo</th>
-                                                        <th className="p-5 font-black uppercase tracking-widest opacity-60">Tipo</th>
-                                                        <th className="p-5 font-black uppercase tracking-widest opacity-60">Info</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-inherit">
-                                                    <tr>
-                                                        <td className="p-5 font-mono font-bold text-emerald-600">currency</td>
-                                                        <td className="p-5 opacity-60 italic">string</td>
-                                                        <td className="p-5 font-medium italic opacity-70">Filtra la respuesta (USD, EUR, USDT).</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td className="p-5 font-mono font-bold text-emerald-600">days</td>
-                                                        <td className="p-5 opacity-60 italic">number</td>
-                                                        <td className="p-5 font-medium italic opacity-70">Filtra por antigüedad (ej: 30 o 365 días).</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td className="p-5 font-mono font-bold text-emerald-600">limit</td>
-                                                        <td className="p-5 opacity-60 italic">number</td>
-                                                        <td className="p-5 font-medium italic opacity-70">Limita la cantidad de registros devueltos.</td>
-                                                    </tr>
+                                    <div className="space-y-10">
+                                        {currentEndpoint?.params && currentEndpoint.params.length > 0 && (
+                                            <div className="space-y-4">
+                                                <p className="text-[10px] font-black uppercase opacity-60">Parámetros de Consulta (Query)</p>
+                                                <div className={`border rounded-2xl overflow-hidden shadow-lg ${colors.card}`}>
+                                                    <table className="w-full text-left text-xs">
+                                                        <thead className={isDark ? 'bg-white/5' : 'bg-slate-50 border-b border-inherit'}>
+                                                            <tr>
+                                                                <th className="p-5 font-black uppercase tracking-widest opacity-60">Campo</th>
+                                                                <th className="p-5 font-black uppercase tracking-widest opacity-60">Tipo</th>
+                                                                <th className="p-5 font-black uppercase tracking-widest opacity-60">Info</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-inherit">
+                                                            {currentEndpoint.params.map((p, i) => (
+                                                                <tr key={i}>
+                                                                    <td className="p-5 font-mono font-bold text-emerald-600">{p.field}</td>
+                                                                    <td className="p-5 opacity-60 italic text-[10px] uppercase font-bold tracking-tight">{p.type}</td>
+                                                                    <td className="p-5 font-medium italic opacity-70">{p.desc}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        )}
 
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                        {currentEndpoint?.schema && (
+                                            <div className="space-y-4">
+                                                <p className="text-[10px] font-black uppercase opacity-60">Esquema de Respuesta (JSON)</p>
+                                                <div className={`border rounded-2xl overflow-hidden shadow-lg ${colors.card}`}>
+                                                    <table className="w-full text-left text-xs">
+                                                        <thead className={isDark ? 'bg-white/5' : 'bg-slate-50 border-b border-inherit'}>
+                                                            <tr>
+                                                                <th className="p-5 font-black uppercase tracking-widest opacity-60">Clave</th>
+                                                                <th className="p-5 font-black uppercase tracking-widest opacity-60">Tipo</th>
+                                                                <th className="p-5 font-black uppercase tracking-widest opacity-60">Descripción</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="divide-y divide-inherit">
+                                                            {currentEndpoint.schema.map((s, i) => (
+                                                                <tr key={i}>
+                                                                    <td className="p-5 font-mono font-bold text-emerald-600">{s.field}</td>
+                                                                    <td className="p-5 opacity-60 italic text-[10px] uppercase font-bold tracking-tight">{s.type}</td>
+                                                                    <td className="p-5 font-medium italic opacity-70">{s.desc}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </motion.div>
                             ) : (
@@ -277,9 +385,23 @@ const ApiTestPage: React.FC = () => {
                             <div className="space-y-6 flex-1 flex flex-col min-h-0">
                                 <div className={`flex items-center justify-between border-b pb-4 transition-all ${colors.sandboxBorder} ${colors.sandboxText}`}>
                                     <span className="text-[10px] font-black uppercase tracking-widest italic opacity-50">Response Payload</span>
-                                    {data && <span className="text-[10px] font-black uppercase text-emerald-500 italic flex items-center gap-2">
-                                        <Check size={12} /> 200 OK
-                                    </span>}
+                                    <div className="flex items-center gap-4">
+                                        {data && (
+                                            <>
+                                                <button 
+                                                    onClick={() => copyToClipboard(JSON.stringify(data, null, 2), 'payload')}
+                                                    className="p-1.5 hover:bg-emerald-500/10 rounded-lg hover:text-emerald-500 transition-all flex items-center gap-2 group/copy"
+                                                    title="Copiar JSON"
+                                                >
+                                                    {copied === 'payload' ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} className="opacity-50 group-hover/copy:opacity-100" />}
+                                                    <span className="text-[9px] font-black tracking-tighter">JSON</span>
+                                                </button>
+                                                <span className="text-[10px] font-black uppercase text-emerald-500 italic flex items-center gap-2">
+                                                    <Check size={12} /> 200 OK
+                                                </span>
+                                            </>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className={`p-8 rounded-[2rem] border flex-1 overflow-auto transition-all custom-scrollbar ${isDark ? 'bg-[#0D1117] border-[#30363D]' : 'bg-white border-[#CBD5E1] shadow-inner'}`}>
                                     {data ? (

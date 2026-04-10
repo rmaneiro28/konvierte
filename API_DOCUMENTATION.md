@@ -10,48 +10,65 @@ Todas las peticiones deben realizarse a la siguiente URL raíz:
 
 ## 🏗️ Endpoints Disponibles
 
-### 1. Global Rates (Tasas Completas) 🌍
-Retorna un objeto JSON con todas las tasas disponibles (BCV + Binance P2P).
+### 1. Health Status 🟢
+Verifica el estado operacional de los microservicios y el scraper.
+- **Endpoint**: `/status`
+- **Respuesta**:
+```json
+{
+  "status": "operational",
+  "uptime": 0.1632,
+  "timestamp": "2026-04-10T00:44:07.096Z",
+  "engine": "Konvierte v1.1.0-STABLE",
+  "services": {
+    "bcv_scraper": "active",
+    "binance_p2p_average": "active",
+    "supabase_connection": "operational"
+  }
+}
+```
+
+### 2. Global Rates (Tasas Completas) 🌍
+Retorna un objeto con todas las tasas disponibles sincronizadas en tiempo real.
 - **Endpoint**: `/rates`
-- **Método**: `GET`
-- **URL Completa**: `https://konvierte.vercel.app/docs/api/rates`
+- **Parámetros (Query)**:
+    - `currency`: (Opcional) Filtrar por moneda (USD, EUR, USDT).
+- **Respuesta**: Un objeto con las claves `USD`, `EUR` y `USDT`.
 
-### 2. Dólar BCV 💵
-Tasa oficial del Banco Central de Venezuela.
-- **Endpoint**: `/usd`
-- **Método**: `GET`
-- **URL Completa**: `https://konvierte.vercel.app/docs/api/usd`
-
-### 3. Euro BCV 💶
-Tasa oficial en Euros del Banco Central de Venezuela.
-- **Endpoint**: `/eur`
-- **Método**: `GET`
-- **URL Completa**: `https://konvierte.vercel.app/docs/api/eur`
+### 3. Dólar & Euro BCV 💵💶
+Tasas oficiales del Banco Central de Venezuela.
+- **Endpoints**: `/usd`, `/eur`
+- **Estructura de Respuesta**:
+```json
+{
+  "currency": "USD",
+  "price": 476.43,
+  "symbol": "BS",
+  "source": "Banco Central de Venezuela",
+  "last_updated": "2026-04-10T00:30:16.168Z",
+  "date_rate": "2026-04-10"
+}
+```
 
 ### 4. USDT Binance P2P ⚡
-Promedio ponderado del mercado P2P en Binance.
+Promedio representativo del mercado USDT/VES en Binance.
 - **Endpoint**: `/usdt`
-- **Método**: `GET`
-- **URL Completa**: `https://konvierte.vercel.app/docs/api/usdt`
+- **Respuesta**: Similar a los anteriores, con `source: "Binance P2P"`.
 
-### 5. Histórico (Completo) 🕰️
-Serie temporal de registros financieros históricos. Retorna todos los valores disponibles (sin límites por defecto).
+### 5. Histórico Inteligente 🕰️
+Serie temporal de registros financieros. Ideal para gráficas.
 - **Endpoint**: `/history`
-- **Método**: `GET`
-- **Parámetros**: `days` (opcional), `currency` (opcional), `limit` (opcional)
-- **URL Completa**: `https://konvierte.vercel.app/docs/api/history`
+- **Parámetros (Query)**:
+    - `days`: Número de días atrás (ej: 7, 30, 365).
+    - `currency`: Filtrar por moneda específica.
+    - `limit`: Cantidades de registros por página.
+- **URL Completa**: `https://konvierte.vercel.app/docs/api/history?days=30&currency=USD`
 
-### 6. Histórico por Moneda (Series Directas) 🔄
-Endpoints especializados que retornan el array directo de registros (formato plano) con historial completo por defecto:
-- **Dólares**: `https://konvierte.vercel.app/docs/api/historicos/dolares`
-- **Euros**: `https://konvierte.vercel.app/docs/api/historicos/euros`
-- **USDT P2P**: `https://konvierte.vercel.app/docs/api/historicos/usdt`
-
-### 7. Health Status 🟢
-Estado operacional de los microservicios y scraper.
-- **Endpoint**: `/status`
-- **Método**: `GET`
-- **URL Completa**: `https://konvierte.vercel.app/docs/api/status`
+### 6. Series Directas (Arrays Planos) 🔄
+Endpoints optimizados para descarga masiva de datos por moneda:
+- **Dólares**: `/historicos/dolares`
+- **Euros**: `/historicos/euros`
+- **USDT**: `/historicos/usdt`
 
 ---
 
@@ -59,22 +76,18 @@ Estado operacional de los microservicios y scraper.
 
 ### Javascript (Fetch API)
 ```javascript
-fetch("https://konvierte.vercel.app/docs/api/rates")
-  .then(res => res.json())
-  .then(data => console.log(data));
+async function getRates() {
+  const res = await fetch("https://konvierte.vercel.app/docs/api/rates");
+  const data = await res.json();
+  console.log("USD Rate:", data.USD.price);
+}
 ```
 
 ### Python (Requests)
 ```python
 import requests
-response = requests.get("https://konvierte.vercel.app/docs/api/rates")
-data = response.json()
-print(data)
-```
-
-### cURL
-```bash
-curl -X GET "https://konvierte.vercel.app/docs/api/rates"
+res = requests.get("https://konvierte.vercel.app/docs/api/usd")
+print(f"La tasa es: {res.json()['price']}")
 ```
 
 ---
@@ -82,4 +95,4 @@ curl -X GET "https://konvierte.vercel.app/docs/api/rates"
 ## 🏛️ Desarrollador & Licencia
 - **Arquitecto**: Rubel Maneiro
 - **GitHub**: [rmaneiro28](https://github.com/rmaneiro28)
-- **Licencia**: Proyecto de Código Abierto (Open Source).
+- **Estado**: Producción Estable (v1.1.0)
