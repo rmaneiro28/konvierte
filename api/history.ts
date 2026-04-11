@@ -35,13 +35,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             query = query.gte('created_at', dateLimit.toISOString());
         }
 
-        // Si se proporciona un límite manual, se usa. Si no, se quita el límite interno de 30k
-        // para devolver TODO lo que permita Supabase (generalmente hasta 1.000 o más dependiendo de la config).
         // Forzamos un límite extremadamente alto para asegurar que no se corte por defecto en 1000.
         if (limit) {
             query = query.limit(Number(limit));
         } else {
-            query = query.limit(1000000); // "No limit" práctico para Supabase
+            // "No limit" práctico para Supabase API ( sobrescribiendo el default de 1000 )
+            query = query.limit(1000000); 
         }
 
 
@@ -69,7 +68,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             count: formattedHistory.length,
             period: days ? `${days} days` : 'all time',
             history: formattedHistory,
-            query_params: { currency: currency || 'all', limit: limit || 'unlimited', days: days || 'all' }
+            query_params: { currency: currency || 'all', limit: limit || 'max (unlimited)', days: days || 'all' }
         });
     } catch (e: any) {
         return res.status(500).json({ error: true, message: "Error Histórico: " + e.message });

@@ -36,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             query = query.gte('created_at', dateLimit.toISOString());
         }
 
-        // Sin límites por defecto
+        // Forzamos un límite extremadamente alto (1 millón) para garantizar la entrega de la data completa.
         if (limit) {
             query = query.limit(Number(limit));
         } else {

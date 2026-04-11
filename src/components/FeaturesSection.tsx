@@ -9,34 +9,34 @@ interface FeaturesSectionProps {
 export const FeaturesSection: React.FC<FeaturesSectionProps> = ({ onOpenTutorial }) => {
     const features = [
         {
-            icon: <Smartphone className="text-primary" />,
-            title: "Widgets Android",
-            description: "Consulta las tasas sin abrir la app con nuestros widgets personalizables para tu pantalla de inicio."
-        },
-        {
-            icon: <History className="text-primary" />,
-            title: "Historial Completo",
-            description: "Calendario interactivo para consultar tasas de cualquier fecha pasada de forma inmediata."
-        },
-        {
             icon: <CreditCard className="text-primary" />,
-            title: "Fichas de Pago",
-            description: "Guarda y gestiona tus datos de Pago Móvil. Genera imágenes para compartir con un solo toque."
-        },
-        {
-            icon: <Bell className="text-primary" />,
-            title: "Alertas en Vivo",
-            description: "Mantente informado con notificaciones instantáneas cada vez que el BCV actualiza sus tasas."
-        },
-        {
-            icon: <Zap className="text-primary" />,
-            title: "Ultra Rápido",
-            description: "Carga instantánea y pesos mínimos. Diseñado para funcionar incluso con conexiones lentas."
+            title: "Presupuestos Pro",
+            description: "Crea presupuestos en múltiples divisas con conversión automática y exportación a PDF profesional."
         },
         {
             icon: <Share2 className="text-primary" />,
-            title: "Compartir Premium",
-            description: "Reportes visuales elegantes listos para compartir por WhatsApp, Instagram o Telegram."
+            title: "PDFs con Marca",
+            description: "Personaliza tus reportes con tu logo, redes sociales y códigos QR de Pago Móvil integrados."
+        },
+        {
+            icon: <Smartphone className="text-primary" />,
+            title: "Widgets & Accesos",
+            description: "Consulta las tasas y accede a tus herramientas favoritas directamente desde tu pantalla de inicio."
+        },
+        {
+            icon: <Zap className="text-primary" />,
+            title: "Tasa del Mañana",
+            description: "Sé el primero en saber la tasa oficial del día siguiente. Visualización anticipada apenas se publica."
+        },
+        {
+            icon: <History className="text-primary" />,
+            title: "Historial & Gráficos",
+            description: "Analiza la evolución del dólar con nuestro historial interactivo y gráficos de tendencia en tiempo real."
+        },
+        {
+            icon: <Bell className="text-primary" />,
+            title: "Directorio Bancario",
+            description: "Información actualizada de toda la banca nacional con logos oficiales para tus transacciones."
         }
     ];
 

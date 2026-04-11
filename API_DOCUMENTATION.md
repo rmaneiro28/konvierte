@@ -65,7 +65,7 @@ Serie temporal de registros financieros. Ideal para gráficas.
 - **URL Completa**: `https://konvierte.vercel.app/docs/api/history?days=30&currency=USD`
 
 ### 6. Series Directas (Arrays Planos) 🔄
-Endpoints optimizados para descarga masiva de datos por moneda:
+Endpoints optimizados para descarga masiva de datos por moneda. Proporcionan el historial **completo sin recortes por defecto**.
 - **Dólares**: `/historicos/dolares`
 - **Euros**: `/historicos/euros`
 - **USDT**: `/historicos/usdt`

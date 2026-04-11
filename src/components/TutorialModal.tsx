@@ -15,34 +15,34 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose })
     const refCode = searchParams.get('ref');
     const steps = [
         {
-            title: "Calculadora Inteligente",
-            description: "Toca cualquier monto para activar el teclado. Puedes intercambiar entre USD y VES con el botón central. ¡Las tasas se actualizan automáticamente cada vez que abres la app!",
-            icon: <Zap className="text-primary" />,
-            image: "/screenshots/Calculadora Konvierte.jpeg"
-        },
-        {
-            title: "Gestión de Fichas de Pago",
-            description: "Pulsa el icono de billetera para guardar tus datos de Pago Móvil. Puedes pegar datos directamente desde el portapapeles y la app los reconocerá automáticamente.",
+            title: "Presupuestos Multi-moneda",
+            description: "Crea presupuestos detallados en dólares, euros o bolívares. La app se encarga de las conversiones en tiempo real para que tus cuentas siempre cuadren.",
             icon: <CreditCard className="text-primary" />,
             image: "/screenshots/Ficha de Pago - Konvierte.jpeg"
         },
         {
-            title: "Widgets para Android",
-            description: "Mantén presionada tu pantalla de inicio en Android, selecciona Widgets y busca 'Konvierte'. Ahora puedes ver el precio del dólar sin abrir la aplicación.",
-            icon: <Smartphone className="text-primary" />,
-            image: "/screenshots/Widget - Konvierte.png"
+            title: "PDFs con tu Marca",
+            description: "Exporta tus presupuestos como PDFs profesionales con tu logo, redes sociales y código QR de Pago Móvil. Perfecto para negocios y freelancers.",
+            icon: <Share2 className="text-primary" />,
+            image: "/screenshots/Compartir - Konvierte.jpeg"
         },
         {
-            title: "Historial y Gráficos",
-            description: "Consulta el historial de los últimos 7 días con las mini-gráficas en el selector de tasas. Usa el botón 'Histórico' para ver tasas de cualquier fecha pasada.",
+            title: "Tasa del Mañana & Historial",
+            description: "Anticípate con la visualización de la tasa oficial del día siguiente apenas es publicada. Analiza tendencias con gráficos interactivos de los últimos 7 días.",
             icon: <History className="text-primary" />,
             image: "/screenshots/Historial de Tasas - Konvierte.jpeg"
         },
         {
-            title: "Compartir con Estilo",
-            description: "Genera reportes visuales con tus datos de pago incluidos. Perfecto para enviar presupuestos o cobrar por WhatsApp de forma profesional.",
-            icon: <Share2 className="text-primary" />,
-            image: "/screenshots/Compartir - Konvierte.jpeg"
+            title: "Widgets & Accesos Rápidos",
+            description: "Configura widgets en tu pantalla de inicio Android para consultar el precio del dólar al instante o acceder a tu calculadora con un solo toque.",
+            icon: <Smartphone className="text-primary" />,
+            image: "/screenshots/Widget - Konvierte.png"
+        },
+        {
+            title: "Directorio Bancario",
+            description: "Accede a la información oficial de toda la banca venezolana (nombres, códigos y logos) directamente desde la app para facilitar tus transferencias.",
+            icon: <Monitor className="text-primary" />,
+            image: "/screenshots/Calculadora Konvierte.jpeg"
         },
         {
             title: "Acceso Anticipado (Beta)",

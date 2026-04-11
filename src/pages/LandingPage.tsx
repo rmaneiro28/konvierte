@@ -158,11 +158,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
               </div>
 
               <h1 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.95] text-main">
-                Tus finanzas <br />en <span className="text-primary italic">Venezuela</span><br />simplificadas.
+                Tus finanzas <br />en <span className="text-primary italic">Venezuela</span><br />pioneras.
               </h1>
 
               <p className="text-lg md:text-xl font-medium opacity-60 text-main max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                La calculadora de divisas más rápida, elegante y completa. Consulta tasas en tiempo real, genera fichas de pago y gestiona tus cuentas en un solo lugar.
+                Adelántate al mercado con la <span className="text-primary">Tasa Futura</span>. Crea presupuestos en múltiples divisas, genera PDFs profesionales con tu marca y gestiona tus pagos con el directorio bancario integrado.
               </p>
 
               <div className="flex justify-center lg:justify-start">
@@ -231,7 +231,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                         <TrendingUp size={14} />
                       </div>
                       <div>
-                        <p className="text-[9px] font-black uppercase tracking-widest opacity-40">Ref. BCV (Oficial)</p>
+                        <div className="flex items-center gap-1.5">
+                          <p className="text-[9px] font-black uppercase tracking-widest opacity-40">Ref. BCV (Oficial)</p>
+                          <span className="text-[7px] font-black bg-primary/20 text-primary px-1.5 py-0.5 rounded-full animate-pulse">PRÓXIMA</span>
+                        </div>
                         <p className="text-md font-black text-main">{bcvRate}</p>
                       </div>
                     </div>
@@ -326,7 +329,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                     {[
                         { route: '/docs/api/rates', label: 'Global Rates' },
                         { route: '/docs/api/history', label: 'Historical' },
-                        { route: '/docs/api/usd', label: 'USD oficial' },
+                        { route: '/docs/api/banks', label: 'Bank Directory' },
                         { route: '/docs/api/usdt', label: 'USDT P2P' }
                     ].map(ep => (
                         <a 
