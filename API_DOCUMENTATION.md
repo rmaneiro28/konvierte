@@ -70,6 +70,26 @@ Endpoints optimizados para descarga masiva de datos por moneda:
 - **Euros**: `/historicos/euros`
 - **USDT**: `/historicos/usdt`
 
+### 7. Bancos de Venezuela 🏦
+Información institucional de las entidades bancarias venezolanas.
+- **Endpoint**: `/banks`
+- **Nota**: Este endpoint **no retorna tasas de cambio**, proporciona nombres oficiales, RIF, URLs y logos de los bancos.
+- **Estructura de Respuesta**:
+```json
+[
+  {
+    "codigo_banco": "0102",
+    "nombre_banco": "Banco de Venezuela",
+    "nombre_completo": "Banco de Venezuela, S.A. Banco Universal",
+    "nombre_corto": "BDV",
+    "rif": "G200099976",
+    "url": "http://www.bancodevenezuela.com/",
+    "logo": "https://www.bancodevenezuela.com/wp-content/uploads/2022/07/cropped-popup-192x192.png"
+  },
+  ...
+]
+```
+
 ---
 
 ## 💻 Ejemplos de Implementación

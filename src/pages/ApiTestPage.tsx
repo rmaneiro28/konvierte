@@ -18,7 +18,8 @@ import {
     Terminal,
     Users,
     ExternalLink,
-    Heart
+    Heart,
+    Landmark
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { NavLink } from 'react-router-dom';
@@ -131,6 +132,17 @@ const ApiTestPage: React.FC = () => {
             ],
             schema: [
                 { field: '[{...}]', type: 'Array', desc: 'Lista de promedios diarios USDT.' }
+            ]
+        },
+        { 
+            id: 'banks', label: 'Bancos de Venezuela', path: '/docs/api/banks', icon: <Landmark size={16} />, 
+            desc: 'Información institucional de bancos (nombres, logos y RIF). No incluye tasas.',
+            params: [],
+            schema: [
+                { field: 'codigo_banco', type: 'string', desc: 'Código bancario oficial.' },
+                { field: 'nombre_banco', type: 'string', desc: 'Nombre comercial del banco.' },
+                { field: 'logo', type: 'string', desc: 'URL del logo en formato PNG/ICO.' },
+                { field: 'rif', type: 'string', desc: 'Registro de Información Fiscal.' }
             ]
         },
     ];
