@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     try {
         // Desactivamos la validación TLS porque el certificado de bcv.org.ve usualmente expira o es inválido 🛡️
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-        
+
         const bcvRes = await fetch('https://www.bcv.org.ve');
         const html = await bcvRes.text();
         const $ = cheerio.load(html);
@@ -67,14 +67,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             const binanceRes = await fetch('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ asset: 'USDT', fiat: 'VES', merchantCheck: false, page: 1, payTypes: [], publisherType: null, rows: 5, tradeType: 'SELL' })
+                body: JSON.stringify({
+                    asset: 'USDT',
+                    fiat: 'VES',
+                    merchantCheck: true,
+                    page: 1,
+                    payTypes: [],
+                    publisherType: "merchant",
+                    rows: 10,
+                    tradeType: 'BUY'
+                })
             });
             const binanceData = await binanceRes.json();
             if (binanceData?.data && binanceData.data.length > 0) {
                 // Fetch top 5 prices and calculate average to avoid outliers
                 const prices = binanceData.data.map((i: any) => parseFloat(i.adv.price));
                 const usdtPrice = prices.reduce((a: number, b: number) => a + b) / prices.length;
-                
+
                 rows.push({
                     price: Number(usdtPrice.toFixed(4)),
                     currency: 'USDT',
