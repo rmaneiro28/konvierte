@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Smartphone, History, CreditCard, Share2, Zap, Monitor, Users, Star } from 'lucide-react';
+import { X, Smartphone, History, CreditCard, Share2, Monitor, Users, Star } from 'lucide-react';
 import { joinWaitlist, getWaitlistCount, getUserWaitlistState } from '../services/waitlistService';
 import { toast } from 'sonner';
 import { useSearchParams } from 'react-router-dom';
