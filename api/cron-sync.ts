@@ -46,9 +46,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             rows.push({
                 price: eurPrice,
                 currency: 'EUR',
+                symbol: 'BS',
                 source: bcvSourceName,
                 created_at: timestamp,
-                date_rate: dateRate
+                date_rate: dateRate ? dateRate.split('T')[0] : null
             });
         }
 
@@ -56,9 +57,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             rows.push({
                 price: usdPrice,
                 currency: 'USD',
+                symbol: 'BS',
                 source: bcvSourceName,
                 created_at: timestamp,
-                date_rate: dateRate
+                date_rate: dateRate ? dateRate.split('T')[0] : null
             });
         }
 
@@ -70,26 +72,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 body: JSON.stringify({
                     asset: 'USDT',
                     fiat: 'VES',
-                    merchantCheck: false,
+                    merchantCheck: true,
                     page: 1,
                     payTypes: [],
                     publisherType: null,
-                    rows: 5,
+                    rows: 20,
                     tradeType: 'BUY'
                 })
             });
             const binanceData = await binanceRes.json();
             if (binanceData?.data && binanceData.data.length > 0) {
-                // Fetch top 5 prices and calculate average to avoid outliers
-                const prices = binanceData.data.map((i: any) => parseFloat(i.adv.price));
-                const usdtPrice = prices.reduce((a: number, b: number) => a + b) / prices.length;
+                // ESTRATEGIA SEGURA: Usamos una muestra de 20 anuncios y calculamos la MEDIANA.
+                // Esto elimina cualquier impacto de anuncios con precios basura o inflados.
+                const prices = binanceData.data
+                    .map((i: any) => parseFloat(i.adv.price))
+                    .sort((a: number, b: number) => a - b);
+                
+                const mid = Math.floor(prices.length / 2);
+                const usdtPrice = prices.length % 2 !== 0 
+                    ? prices[mid] 
+                    : (prices[mid - 1] + prices[mid]) / 2;
 
                 rows.push({
                     price: Number(usdtPrice.toFixed(4)),
                     currency: 'USDT',
+                    symbol: 'BS',
                     source: 'Binance P2P',
                     created_at: timestamp,
-                    date_rate: new Date().toISOString() // Binance is real-time, logic date is now
+                    date_rate: new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
                 });
             }
         } catch (binanceErr: any) {
