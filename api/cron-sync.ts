@@ -70,11 +70,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 body: JSON.stringify({
                     asset: 'USDT',
                     fiat: 'VES',
-                    merchantCheck: true,
+                    merchantCheck: false,
                     page: 1,
                     payTypes: [],
-                    publisherType: "merchant",
-                    rows: 10,
+                    publisherType: null,
+                    rows: 5,
                     tradeType: 'BUY'
                 })
             });
