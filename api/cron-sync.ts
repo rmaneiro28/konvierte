@@ -2,6 +2,8 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import * as cheerio from 'cheerio';
+import { getBinanceRate } from '../src/services/binanceService';
+
 
 /**
  * Este script sincroniza las tasas de cambio oficiales del BCV y Binance P2P.
@@ -66,47 +68,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             }
         }
 
-        // 2. Extracción de Binance P2P (BUY y SELL)
-        const fetchBinance = async (tradeType: 'BUY' | 'SELL') => {
-            try {
-                const res = await fetch('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-                    },
-                    body: JSON.stringify({
-                        asset: 'USDT',
-                        fiat: 'VES',
-                        merchantCheck: true,
-                        page: 1,
-                        rows: 1,
-                        tradeType: tradeType,
-                        transAmount: 50000, // Filtro de seguridad del repo
-                        filterType: 'CLASSIC',
-                        publisherType: null,
-                        countries: [],
-                        periods: [],
-                        classifies: ["mass", "profession"]
-                    })
-                });
-                const data = await res.json();
-                const price = data?.data?.[0]?.adv?.price;
-                return price ? parseFloat(price) : null;
-            } catch (e) {
-                console.error(`Error en Binance ${tradeType}:`, e);
-                return null;
-            }
-        };
-
+        // 2. Extracción de Binance P2P (Compra y Venta) usando el nuevo servicio
         const [binanceBuy, binanceSell] = await Promise.all([
-            fetchBinance('BUY'),
-            fetchBinance('SELL')
+            getBinanceRate('BUY'),
+            getBinanceRate('SELL')
         ]);
-
+        
         if (binanceBuy) {
             rows.push({
-                price: Number(binanceBuy.toFixed(4)),
+                price: binanceBuy.price,
                 currency: 'USDT',
                 symbol: 'BS',
                 source: 'Binance P2P (Compra)',
@@ -117,7 +87,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
         if (binanceSell) {
             rows.push({
-                price: Number(binanceSell.toFixed(4)),
+                price: binanceSell.price,
                 currency: 'USDT',
                 symbol: 'BS',
                 source: 'Binance P2P (Venta)',
@@ -125,6 +95,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 date_rate: new Date().toISOString().split('T')[0]
             });
         }
+
 
         // 3. Sincronización con Base de Datos
         if (rows.length > 0) {
