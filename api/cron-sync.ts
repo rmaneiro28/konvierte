@@ -2,8 +2,8 @@
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import * as cheerio from 'cheerio';
-import { getBinanceRate } from '../src/services/binanceService';
-import { getBcvRates } from '../src/services/bcvScraper';
+import { getBinanceRate } from '../src/services/binanceService.js';
+import { getBcvRates } from '../src/services/bcvScraper.js';
 
 
 /**
