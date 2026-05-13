@@ -32,7 +32,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // 1. Obtención de tasas del BCV usando el servicio modular
         const bcvRates = await getBcvRates();
         if (bcvRates && bcvRates.length > 0) {
-            rows.push(...bcvRates);
+            const cleanBcv = bcvRates.map(r => ({
+                price: r.price,
+                currency: r.currency,
+                source: r.source,
+                created_at: r.created_at,
+                date_rate: r.date_rate
+            }));
+            rows.push(...cleanBcv);
         }
 
 
@@ -46,7 +53,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             rows.push({
                 price: binanceBuy.price,
                 currency: 'USDT',
-                symbol: 'BS',
                 source: 'Binance P2P (Compra)',
                 created_at: timestamp,
                 date_rate: new Date().toISOString().split('T')[0]
@@ -57,12 +63,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             rows.push({
                 price: binanceSell.price,
                 currency: 'USDT',
-                symbol: 'BS',
                 source: 'Binance P2P (Venta)',
                 created_at: timestamp,
                 date_rate: new Date().toISOString().split('T')[0]
             });
         }
+
 
 
         // 3. Sincronización con Base de Datos

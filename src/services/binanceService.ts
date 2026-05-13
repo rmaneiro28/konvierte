@@ -9,16 +9,16 @@ export const getBinanceRate = async (tradeType: 'BUY' | 'SELL' = 'BUY') => {
         const { data } = await axios.post('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
             asset: 'USDT',
             fiat: 'VES',
-            merchantCheck: true,
+            merchantCheck: false, // Relajamos para asegurar resultados
             page: 1,
-            rows: 15, // Aumentamos a 15 para un mejor cálculo de mediana
+            rows: 20, 
             tradeType: tradeType,
-            transAmount: 100, // Filtro básico de monto
+            transAmount: "", // Sin monto mínimo para ampliar búsqueda
             filterType: 'CLASSIC',
             publisherType: null,
             countries: [],
             periods: [],
-            classifies: ["mass", "profession"]
+            classifies: [] // Quitamos restricciones de clasificación
         }, {
             headers: {
                 'Content-Type': 'application/json',
