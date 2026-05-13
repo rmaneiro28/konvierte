@@ -64,45 +64,65 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             });
         }
 
-        // --- Extracción de Binance P2P (Réplica exacta de bcvScrapper) ---
+        // --- Extracción de Binance P2P (Réplica exacta de bcvScrapper: Compra y Venta) ---
         try {
-            const binanceRes = await fetch('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-                },
-                body: JSON.stringify({
-                    asset: 'USDT',
-                    fiat: 'VES',
-                    merchantCheck: true,
-                    page: 1,
-                    rows: 1, // El repo usa 1
-                    tradeType: 'BUY',
-                    transAmount: 50000, // Monto alto para filtrar "trash" ads (extraído de main.go del repo)
-                    filterType: 'CLASSIC',
-                    publisherType: null,
-                    countries: [],
-                    periods: []
-                })
-            });
-            const binanceData = await binanceRes.json();
-            if (binanceData?.data && binanceData.data.length > 0) {
-                const usdtPrice = parseFloat(binanceData.data[0].adv.price);
-                
-                // Log para verificar antes de "subir" (upsert)
-                console.log(`[Binance Sync] Tasa extraída: ${usdtPrice} BS (Filtro Amount: 50000)`);
+            const fetchBinance = async (tradeType: 'BUY' | 'SELL') => {
+                const res = await fetch('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                    },
+                    body: JSON.stringify({
+                        asset: 'USDT',
+                        fiat: 'VES',
+                        merchantCheck: true,
+                        page: 1,
+                        rows: 1,
+                        tradeType: tradeType,
+                        transAmount: 50000,
+                        filterType: 'CLASSIC',
+                        publisherType: null,
+                        countries: [],
+                        periods: []
+                    })
+                });
+                const data = await res.json();
+                return data?.data?.[0]?.adv?.price ? parseFloat(data.data[0].adv.price) : null;
+            };
 
+            // Ejecutamos ambas peticiones en paralelo como en el repo de Go
+            const [buyPrice, sellPrice] = await Promise.all([
+                fetchBinance('BUY'),
+                fetchBinance('SELL')
+            ]);
+
+            if (buyPrice) {
+                console.log(`[Binance Sync] Compra: ${buyPrice} BS`);
                 rows.push({
-                    price: Number(usdtPrice.toFixed(4)),
+                    price: Number(buyPrice.toFixed(4)),
                     currency: 'USDT',
                     symbol: 'BS',
-                    source: 'Binance P2P',
+                    source: 'Binance P2P (Compra)',
                     created_at: timestamp,
                     date_rate: new Date().toISOString().split('T')[0]
                 });
-            } else {
-                console.warn('[Binance Sync] No se encontraron anuncios con el filtro de 50,000 VES.');
+            }
+
+            if (sellPrice) {
+                console.log(`[Binance Sync] Venta: ${sellPrice} BS`);
+                rows.push({
+                    price: Number(sellPrice.toFixed(4)),
+                    currency: 'USDT',
+                    symbol: 'BS',
+                    source: 'Binance P2P (Venta)',
+                    created_at: timestamp,
+                    date_rate: new Date().toISOString().split('T')[0]
+                });
+            }
+
+            if (!buyPrice && !sellPrice) {
+                console.warn('[Binance Sync] No se encontraron anuncios para Compra ni Venta con 50k VES.');
             }
         } catch (binanceErr: any) {
             results.push({ status: 'warning', message: "Error extrayendo Binance P2P: " + binanceErr.message });
