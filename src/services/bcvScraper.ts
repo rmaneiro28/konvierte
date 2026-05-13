@@ -4,49 +4,67 @@ import https from 'https';
 
 /**
  * Scraper oficial para el Banco Central de Venezuela (BCV)
- * Este script está diseñado para ejecutarse en un entorno Node.js / Serverless.
+ * Soporta múltiples monedas (USD, EUR, CNY, TRY, RUB).
  */
-export const getBcvRate = async () => {
+export const getBcvRates = async () => {
     try {
-        // 1. Configuramos el agente para ignorar problemas de certificados SSL viejos del BCV
         const agent = new https.Agent({  
             rejectUnauthorized: false
         });
 
-        // 2. Descargamos el HTML del sitio oficial del BCV
         const { data } = await axios.get('https://www.bcv.org.ve/', { 
             httpsAgent: agent,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
+            },
+            timeout: 15000
         });
 
-        // 3. Cargamos el HTML en Cheerio (similar a JQuery)
         const $ = cheerio.load(data);
+        const timestamp = new Date().toISOString();
+        
+        // Extracción de Fecha oficial
+        const rawDateRate = $('.pull-right.dinpro.center .date-display-single').first().attr('content');
+        const dateRate = rawDateRate ? new Date(rawDateRate).toISOString().split('T')[0] : null;
 
-        // 4. Buscamos el div específico del Dólar (ID: dolar)
-        // El BCV suele tener una estructura: div#dolar > strong
-        const rawValue = $('#dolar strong').text().trim();
-
-        if (!rawValue) {
-            throw new Error('No se pudo encontrar la tasa del dólar en el HTML del BCV');
-        }
-
-        // 5. Limpiamos el valor (convertimos "47,06570000" a 47.0657)
-        const cleanRate = parseFloat(rawValue.replace(',', '.'));
-
-        return {
-            symbol: 'USD',
-            price: cleanRate,
-            last_updated: new Date().toISOString(),
-            source: 'Banco Central de Venezuela (BCV)'
+        const extractPrice = (id: string) => {
+            const text = $(`${id} .centrado strong`).text().trim();
+            return text ? parseFloat(text.replace(',', '.')) : 0;
         };
 
+        const currencies = [
+            { id: '#euro', symbol: 'EUR' },
+            { id: '#yuan', symbol: 'CNY' },
+            { id: '#lira', symbol: 'TRY' },
+            { id: '#rublo', symbol: 'RUB' },
+            { id: '#dolar', symbol: 'USD' }
+        ];
+
+        const rates = currencies.map(curr => {
+            const price = extractPrice(curr.id);
+            if (price === 0) return null;
+            
+            return {
+                price: Number(price.toFixed(4)),
+                currency: curr.symbol,
+                symbol: 'BS',
+                source: 'Banco Central de Venezuela',
+                created_at: timestamp,
+                date_rate: dateRate
+            };
+        }).filter(r => r !== null);
+
+        return rates;
+
     } catch (error: any) {
-        console.error('❌ Error en el Scraper del BCV:', error?.message);
-        return null;
+        console.error('❌ [BcvScraper] Error al obtener tasas del BCV:', error?.message);
+        return [];
     }
 };
 
-// Ejemplo de uso para pruebas locales:
-// getBcvRate().then(rate => console.log('Tasa BCV hoy:', rate));
+// Mantenemos compatibilidad con el nombre anterior si fuera necesario, pero enfocado a USD
+export const getBcvRate = async () => {
+    const rates = await getBcvRates();
+    return rates.find(r => r?.currency === 'USD') || null;
+};
+

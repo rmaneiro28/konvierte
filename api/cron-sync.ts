@@ -3,6 +3,7 @@ import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 import * as cheerio from 'cheerio';
 import { getBinanceRate } from '../src/services/binanceService';
+import { getBcvRates } from '../src/services/bcvScraper';
 
 
 /**
@@ -28,45 +29,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const rows = [];
 
     try {
-        // Desactivamos validación TLS para el BCV (certificado suele fallar)
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
-        // 1. Scraping del BCV (Banco Central de Venezuela)
-        const bcvRes = await fetch('https://www.bcv.org.ve');
-        const html = await bcvRes.text();
-        const $ = cheerio.load(html);
-
-        // Extracción de Fecha oficial
-        const rawDateRate = $('.pull-right.dinpro.center .date-display-single').first().attr('content');
-        const dateRate = rawDateRate ? new Date(rawDateRate).toISOString().split('T')[0] : null;
-
-        const extractBcvPrice = (id: string) => {
-            const text = $(`${id} .centrado strong`).text().trim();
-            // Reemplaza coma por punto para parsing
-            return text ? parseFloat(text.replace(',', '.')) : 0;
-        };
-
-        const bcvCurrencies = [
-            { id: '#euro', symbol: 'EUR' },
-            { id: '#yuan', symbol: 'CNY' },
-            { id: '#lira', symbol: 'TRY' },
-            { id: '#rublo', symbol: 'RUB' },
-            { id: '#dolar', symbol: 'USD' }
-        ];
-
-        for (const currency of bcvCurrencies) {
-            const price = extractBcvPrice(currency.id);
-            if (price > 0) {
-                rows.push({
-                    price: Number(price.toFixed(4)),
-                    currency: currency.symbol,
-                    symbol: 'BS',
-                    source: 'Banco Central de Venezuela',
-                    created_at: timestamp,
-                    date_rate: dateRate
-                });
-            }
+        // 1. Obtención de tasas del BCV usando el servicio modular
+        const bcvRates = await getBcvRates();
+        if (bcvRates && bcvRates.length > 0) {
+            rows.push(...bcvRates);
         }
+
 
         // 2. Extracción de Binance P2P (Compra y Venta) usando el nuevo servicio
         const [binanceBuy, binanceSell] = await Promise.all([
