@@ -64,7 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             });
         }
 
-        // --- Extracción de Binance P2P (Siguiendo patrón de bcvScrapper) ---
+        // --- Extracción de Binance P2P (Réplica exacta de bcvScrapper) ---
         try {
             const binanceRes = await fetch('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
                 method: 'POST',
@@ -77,9 +77,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     fiat: 'VES',
                     merchantCheck: true,
                     page: 1,
-                    rows: 20, // Mantenemos 20 para calcular la mediana (más estable que el rows: 1 del repo)
+                    rows: 1, // El repo usa 1
                     tradeType: 'BUY',
-                    transAmount: 100, // Filtro de monto mínimo (extraído de bcvScrapper)
+                    transAmount: 50000, // Monto alto para filtrar "trash" ads (extraído de main.go del repo)
                     filterType: 'CLASSIC',
                     publisherType: null,
                     countries: [],
@@ -88,16 +88,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             });
             const binanceData = await binanceRes.json();
             if (binanceData?.data && binanceData.data.length > 0) {
-                // ESTRATEGIA SEGURA: Usamos la MEDIANA de los resultados filtrados.
-                // Esto es más robusto que tomar el primer resultado directo.
-                const prices = binanceData.data
-                    .map((i: any) => parseFloat(i.adv.price))
-                    .sort((a: number, b: number) => a - b);
+                const usdtPrice = parseFloat(binanceData.data[0].adv.price);
                 
-                const mid = Math.floor(prices.length / 2);
-                const usdtPrice = prices.length % 2 !== 0 
-                    ? prices[mid] 
-                    : (prices[mid - 1] + prices[mid]) / 2;
+                // Log para verificar antes de "subir" (upsert)
+                console.log(`[Binance Sync] Tasa extraída: ${usdtPrice} BS (Filtro Amount: 50000)`);
 
                 rows.push({
                     price: Number(usdtPrice.toFixed(4)),
@@ -107,6 +101,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     created_at: timestamp,
                     date_rate: new Date().toISOString().split('T')[0]
                 });
+            } else {
+                console.warn('[Binance Sync] No se encontraron anuncios con el filtro de 50,000 VES.');
             }
         } catch (binanceErr: any) {
             results.push({ status: 'warning', message: "Error extrayendo Binance P2P: " + binanceErr.message });
