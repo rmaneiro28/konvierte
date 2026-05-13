@@ -64,26 +64,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             });
         }
 
-        // --- Extracción de Binance P2P ---
+        // --- Extracción de Binance P2P (Siguiendo patrón de bcvScrapper) ---
         try {
             const binanceRes = await fetch('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                },
                 body: JSON.stringify({
                     asset: 'USDT',
                     fiat: 'VES',
                     merchantCheck: true,
                     page: 1,
-                    payTypes: [],
+                    rows: 20, // Mantenemos 20 para calcular la mediana (más estable que el rows: 1 del repo)
+                    tradeType: 'BUY',
+                    transAmount: 100, // Filtro de monto mínimo (extraído de bcvScrapper)
+                    filterType: 'CLASSIC',
                     publisherType: null,
-                    rows: 20,
-                    tradeType: 'BUY'
+                    countries: [],
+                    periods: []
                 })
             });
             const binanceData = await binanceRes.json();
             if (binanceData?.data && binanceData.data.length > 0) {
-                // ESTRATEGIA SEGURA: Usamos una muestra de 20 anuncios y calculamos la MEDIANA.
-                // Esto elimina cualquier impacto de anuncios con precios basura o inflados.
+                // ESTRATEGIA SEGURA: Usamos la MEDIANA de los resultados filtrados.
+                // Esto es más robusto que tomar el primer resultado directo.
                 const prices = binanceData.data
                     .map((i: any) => parseFloat(i.adv.price))
                     .sort((a: number, b: number) => a - b);
@@ -99,7 +105,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                     symbol: 'BS',
                     source: 'Binance P2P',
                     created_at: timestamp,
-                    date_rate: new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD
+                    date_rate: new Date().toISOString().split('T')[0]
                 });
             }
         } catch (binanceErr: any) {
