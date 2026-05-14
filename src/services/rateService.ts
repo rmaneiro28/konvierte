@@ -93,13 +93,20 @@ export const fetchRates = async (): Promise<Partial<RatesState>> => {
         // Procesar cada moneda con su respectivo historial
         // Nota: La API /history devuelve objetos con campo 'price' y 'fecha'
         // Mapeamos para que processRate los entienda
-        const hUsd = (await hUsdRes.json()).history || [];
-        const hEur = (await hEurRes.json()).history || [];
-        const hUsdt = (await hUsdtRes.json()).history || [];
+        const usdHist = (await hUsdRes.json()).history || [];
+        const eurHist = (await hEurRes.json()).history || [];
+        const usdtHist = (await hUsdtRes.json()).history || [];
 
-        const usdRes = processRate(rates.usd, hUsd);
-        const eurRes = processRate(rates.eur, hEur);
-        const usdtRes = processRate(rates.usdt, hUsdt);
+        // Reutilizamos los mismos datos ya leídos para formatHistory (sin releer el body)
+        const mapPrices = (hist: any[]) => hist.reverse().map((h: any) => Number(h.price || h.promedio));
+        const usdHistPrices = mapPrices([...usdHist]);
+        const eurHistPrices = mapPrices([...eurHist]);
+        const usdtHistPrices = mapPrices([...usdtHist]);
+
+        const usdRes = processRate(rates.usd, usdHist);
+        const eurRes = processRate(rates.eur, eurHist);
+        const usdtRes = processRate(rates.usdt, usdtHist);
+
 
         return {
             bcv_usd: {
@@ -108,8 +115,8 @@ export const fetchRates = async (): Promise<Partial<RatesState>> => {
                 dateRate: usdRes.dateRate,
                 symbol: 'USD',
                 lastUpdate: usdRes.lastUpdate,
-                history: usdHist.length > 0 ? usdHist : [usdRes.price],
-                change24h: calcVariation(usdHist, usdRes.price)
+                history: usdHistPrices.length > 0 ? usdHistPrices : [usdRes.price],
+                change24h: calcVariation(usdHistPrices, usdRes.price)
             },
             bcv_eur: {
                 price: eurRes.price,
@@ -117,8 +124,8 @@ export const fetchRates = async (): Promise<Partial<RatesState>> => {
                 dateRate: eurRes.dateRate,
                 symbol: 'EUR',
                 lastUpdate: eurRes.lastUpdate,
-                history: eurHist.length > 0 ? eurHist : [eurRes.price],
-                change24h: calcVariation(eurHist, eurRes.price)
+                history: eurHistPrices.length > 0 ? eurHistPrices : [eurRes.price],
+                change24h: calcVariation(eurHistPrices, eurRes.price)
             },
             binance_usd: {
                 price: usdtRes.price,
@@ -126,10 +133,11 @@ export const fetchRates = async (): Promise<Partial<RatesState>> => {
                 dateRate: usdtRes.dateRate,
                 symbol: 'USDT',
                 lastUpdate: usdtRes.lastUpdate,
-                history: usdtHist.length > 0 ? usdtHist : [usdtRes.price],
-                change24h: calcVariation(usdtHist, usdtRes.price)
+                history: usdtHistPrices.length > 0 ? usdtHistPrices : [usdtRes.price],
+                change24h: calcVariation(usdtHistPrices, usdtRes.price)
             },
         };
+
     } catch (error) {
         console.error("Falla en la API nativa de Konvierte:", error);
         throw error;
