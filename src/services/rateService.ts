@@ -36,15 +36,7 @@ export const fetchRates = async (): Promise<Partial<RatesState>> => {
             fetch(`${KONVIERTE_API}/history?currency=USDT&limit=7`)
         ]);
 
-        const formatHistory = async (resp: Response) => {
-            const data = await resp.json();
-            // Invertimos para que el gráfico vaya de antiguo a nuevo
-            return (data.history || []).reverse().map((h: any) => Number(h.price));
-        };
 
-        const usdHist = await formatHistory(hUsdRes);
-        const eurHist = await formatHistory(hEurRes);
-        const usdtHist = await formatHistory(hUsdtRes);
 
         const isFuture = (dateStr: string) => {
             if (!dateStr) return false;
