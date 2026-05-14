@@ -7,6 +7,8 @@ import { LazyMotion, domAnimation } from 'framer-motion';
 import LandingPage from './pages/LandingPage';
 import ApiTestPage from './pages/ApiTestPage';
 import NotFoundPage from './pages/NotFoundPage';
+import FeaturesPage from './pages/FeaturesPage';
+import DevelopersPage from './pages/DevelopersPage';
 
 
 function App() {
@@ -52,6 +54,8 @@ function App() {
 
         <Routes>
           <Route path="/" element={<LandingPage theme={theme} setTheme={setTheme} />} />
+          <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/developers" element={<DevelopersPage />} />
           <Route path="/docs" element={<ApiTestPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
