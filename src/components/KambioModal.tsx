@@ -24,13 +24,13 @@ export const KambioModal: React.FC<KambioModalProps> = ({
     isOpen,
     onClose,
     currentRate,
-    rateName
+    rateName: _rateName
 }) => {
     const [totalUsd, setTotalUsd] = useState('0.00');
     const [rate, setRate] = useState(currentRate.toString());
     const [payments, setPayments] = useState<PaymentEntry[]>([]);
     
-    const [totalPaidUsd, setTotalPaidUsd] = useState(0);
+    const [_totalPaidUsd, setTotalPaidUsd] = useState(0);
     const [remainingUsd, setRemainingUsd] = useState(0);
     const [excessUsd, setExcessUsd] = useState(0);
 

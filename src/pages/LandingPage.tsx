@@ -6,7 +6,7 @@ import { TutorialModal } from '../components/TutorialModal';
 import { NavLink, useSearchParams } from 'react-router-dom';
 import { fetchRates } from '../services/rateService';
 import { formatCurrency } from '../utils/formatters';
-import { getWaitlistCount } from '../services/waitlistService';
+
 import { getDownloadCount, registerDownload } from '../services/downloadService';
 import { PostDownloadModal } from '../components/PostDownloadModal';
 
@@ -21,8 +21,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [bcvRate, setBcvRate] = useState<string>('---');
   const [binanceRate, setBinanceRate] = useState<string>('---');
-  const [lastUpdated, setLastUpdated] = useState<string>('hoy');
-  const [waitlistCount, setWaitlistCount] = useState<number>(1240);
   const [downloadCount, setDownloadCount] = useState<number>(847);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadDone, setDownloadDone] = useState(false);
@@ -55,15 +53,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
   };
 
   useEffect(() => {
-    const loadWaitlist = async () => {
-      const count = await getWaitlistCount();
-      setWaitlistCount(count);
-    };
     const loadDownloads = async () => {
       const count = await getDownloadCount();
       setDownloadCount(count);
     };
-    loadWaitlist();
     loadDownloads();
 
     const getRate = async () => {
@@ -71,12 +64,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
         const data = await fetchRates();
         if (data.bcv_usd) {
           setBcvRate(formatCurrency(data.bcv_usd.price));
-          if (data.bcv_usd.lastUpdate) {
-            try {
-              const date = new Date(data.bcv_usd.lastUpdate);
-              setLastUpdated(date.toLocaleDateString('es-VE', { day: '2-digit', month: 'short' }));
-            } catch (e) { }
-          }
         }
         if (data.binance_usd) {
           setBinanceRate(formatCurrency(data.binance_usd.price));
