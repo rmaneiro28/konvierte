@@ -8,6 +8,7 @@ import { fetchRates } from '../services/rateService';
 import { formatCurrency } from '../utils/formatters';
 import { getWaitlistCount } from '../services/waitlistService';
 import { getDownloadCount, registerDownload } from '../services/downloadService';
+import { PostDownloadModal } from '../components/PostDownloadModal';
 
 interface LandingPageProps {
   theme: 'light' | 'dark';
@@ -25,6 +26,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
   const [downloadCount, setDownloadCount] = useState<number>(847);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadDone, setDownloadDone] = useState(false);
+  const [isPostDownloadOpen, setIsPostDownloadOpen] = useState(false);
 
   const APK_URL = '/releases/Konvierte.apk';
   const APK_VERSION = '1.2.0';
@@ -45,6 +47,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
       document.body.removeChild(link);
       setDownloadDone(true);
       setTimeout(() => setDownloadDone(false), 4000);
+      // Abrir modal post-descarga con un pequeño delay para que el usuario vea que inició
+      setTimeout(() => setIsPostDownloadOpen(true), 1200);
     } finally {
       setIsDownloading(false);
     }
@@ -117,10 +121,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
               <a href="#features" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Características</a>
               <a href="#download" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Descargas</a>
               <button
-                onClick={() => setIsTutorialOpen(true)}
+                onClick={handleDownload}
                 className="px-6 py-2.5 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-2"
               >
-                Unirme <ArrowRight size={14} />
+                <Download size={14} /> Descargar
               </button>
               <button
                 onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -139,10 +143,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                 {theme === 'dark' ? <Sun size={16} className="text-primary" /> : <Moon size={16} className="text-primary" />}
               </button>
               <button
-                onClick={() => setIsTutorialOpen(true)}
-                className="px-4 py-2 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20"
+                onClick={handleDownload}
+                className="px-4 py-2 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-1.5"
               >
-                Unirme
+                <Download size={13} /> Descargar
               </button>
             </div>
           </div>
@@ -178,13 +182,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
               )}
 
               <div className="flex flex-col md:flex-row items-center justify-center lg:justify-start gap-4 mb-10">
-                <div className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary text-black rounded-full shadow-[0_0_30px_rgba(16,185,129,0.4)]">
-                  <span className="w-2 h-2 bg-black animate-ping rounded-full" />
-                  <span className="text-[11px] font-black uppercase tracking-[0.2em]">Lanzamiento Oficial: 1 de Mayo</span>
+                <div className="inline-flex items-center gap-2 px-6 py-2.5 bg-primary/15 border border-primary/40 text-primary rounded-full">
+                  <span className="w-2 h-2 bg-primary animate-pulse rounded-full" />
+                  <span className="text-[11px] font-black uppercase tracking-[0.2em]">Disponible Ahora · Android</span>
                 </div>
-                <div className="flex items-center gap-2 opacity-100">
-                  <div className="w-1.5 h-1.5 bg-white/40 rounded-full" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-white italic">Cupos de acceso beta limitados</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-1.5 bg-primary/40 rounded-full" />
+                  <span className="text-[10px] font-black uppercase tracking-widest text-white/60 italic">Descarga gratuita · Sin registro</span>
                 </div>
               </div>
 
@@ -196,33 +200,38 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                 Adelántate al mercado con la <span className="text-primary">Tasa Futura</span>. Crea presupuestos en múltiples divisas, genera PDFs profesionales con tu marca y gestiona tus pagos con el directorio bancario integrado.
               </p>
 
-              <div className="flex justify-center lg:justify-start">
+              <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
                 <button
-                  onClick={() => setIsTutorialOpen(true)}
-                  className="px-12 py-6 bg-primary text-white rounded-[1.5rem] text-sm font-black uppercase tracking-[0.2em] hover:bg-primary/90 transition-all active:scale-95 shadow-[0_20px_50px_rgba(16,185,129,0.3)] flex items-center justify-center gap-4"
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                  className="px-10 py-5 rounded-[1.5rem] text-sm font-black uppercase tracking-[0.15em] transition-all active:scale-95 shadow-[0_20px_50px_rgba(16,185,129,0.35)] flex items-center justify-center gap-3 relative overflow-hidden group/hero disabled:opacity-70"
+                  style={{ background: 'linear-gradient(135deg, #10B981, #059669)' }}
                 >
-                  Unirme Ahora
-                  <ArrowRight size={20} />
+                  <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/hero:translate-x-[100%] transition-transform duration-700 skew-x-12" />
+                  {downloadDone ? <><CheckCircle size={18} /> ¡Descarga iniciada!</> : isDownloading ? <><Download size={18} className="animate-bounce" /> Preparando...</> : <><Download size={18} /> Descargar APK Gratis</>}
                 </button>
+                <a
+                  href="#download"
+                  className="px-8 py-5 bg-white/5 border border-white/10 rounded-[1.5rem] text-sm font-black uppercase tracking-[0.15em] hover:bg-white/10 transition-all flex items-center justify-center gap-3 text-white/70"
+                >
+                  Ver más <ArrowRight size={16} />
+                </a>
               </div>
 
-              <div className="flex items-center justify-center lg:justify-start gap-8 pt-8 opacity-40">
+              <div className="flex items-center justify-center lg:justify-start gap-8 pt-8 opacity-50">
                 <div className="text-center">
                   <p className="text-xl font-black">100%</p>
                   <p className="text-[10px] font-bold uppercase tracking-widest">Gratis</p>
                 </div>
                 <div className="w-px h-8 bg-white/20" />
                 <div className="text-center">
-                  <p className="text-xl font-black">{waitlistCount.toLocaleString()}+</p>
-                  <div className="flex flex-col">
-                    <p className="text-[10px] font-bold uppercase tracking-widest">En Espera</p>
-                    <p className="text-[8px] opacity-40 uppercase tracking-tighter italic">Tasas de {lastUpdated}</p>
-                  </div>
+                  <p className="text-xl font-black">{downloadCount.toLocaleString()}+</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest">Descargas</p>
                 </div>
                 <div className="w-px h-8 bg-white/20" />
                 <div className="text-center">
-                  <p className="text-xl font-black">Fast</p>
-                  <p className="text-[10px] font-bold uppercase tracking-widest">Cloud Sync</p>
+                  <p className="text-xl font-black">~38 MB</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest">Android 6.0+</p>
                 </div>
               </div>
             </motion.div>
@@ -744,6 +753,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
         </footer>
       </div>
     </div>
+
+    <PostDownloadModal
+      isOpen={isPostDownloadOpen}
+      onClose={() => setIsPostDownloadOpen(false)}
+      downloadCount={downloadCount}
+    />
   );
 };
 
