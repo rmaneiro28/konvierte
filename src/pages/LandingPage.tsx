@@ -99,6 +99,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
 
 
   return (
+    <>
     <div className={`${theme} min-h-screen transition-colors duration-500`}>
       <div className="min-h-screen bg-background text-main selection:bg-primary/30 overflow-x-hidden relative">
         {/* Global Mesh Gradient Background */}
@@ -759,6 +760,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
       onClose={() => setIsPostDownloadOpen(false)}
       downloadCount={downloadCount}
     />
+    </>
   );
 };
 
