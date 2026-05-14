@@ -1,3 +1,4 @@
+// Updated DevelopersPage
 import React from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Monitor, ArrowRight } from 'lucide-react';

@@ -1,3 +1,4 @@
+// Updated LandingPage
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Smartphone, Zap, Shield, Sun, Moon, Users, Download, CheckCircle, Star, Lock, Clock, Award, ExternalLink } from 'lucide-react';
