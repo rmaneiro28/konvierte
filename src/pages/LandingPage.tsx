@@ -108,6 +108,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Características</a>
               <a href="#download" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Descargas</a>
+              <a href="#team" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Equipo</a>
               <button
                 onClick={handleDownload}
                 className="px-6 py-2.5 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-2"
@@ -714,6 +715,174 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
               </button>
             </div>
           </motion.div>
+        </section>
+
+        {/* Team Section */}
+        <section id="team" className="py-32 px-6 relative overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[600px] bg-primary/5 blur-[180px] -z-10 rounded-full pointer-events-none" />
+
+          <div className="max-w-5xl mx-auto">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-20"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/30 rounded-full mb-6">
+                <Users size={14} className="text-primary" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary">El Equipo</span>
+              </div>
+              <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-tight mb-6">
+                Quiénes somos<br />
+                <span className="text-primary italic">detrás de Konvierte</span>
+              </h2>
+              <p className="text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">
+                Dos estudiantes venezolanos de Ingeniería en Sistemas que construyeron la herramienta financiera que ellos mismos necesitaban.
+              </p>
+            </motion.div>
+
+            {/* Team Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+              {[
+                {
+                  name: 'Rúbel Maneiro',
+                  handle: 'rmaneiro28',
+                  role: 'Full-Stack Developer',
+                  bio: 'Estudiante de Ingeniería en Sistemas, 10mo semestre. Arquitecto principal de Konvierte: backend, API, sync de tasas y lógica financiera.',
+                  avatar: 'https://avatars.githubusercontent.com/u/72143708?v=4',
+                  blog: 'https://rmaneiro.vercel.app/',
+                  github: 'https://github.com/rmaneiro28',
+                  repos: 31,
+                  location: 'Venezuela',
+                  accent: 'primary',
+                  accentColor: '#10B981',
+                  tags: ['Flutter', 'React', 'TypeScript', 'Supabase'],
+                },
+                {
+                  name: 'Sneider Araque',
+                  handle: 'Sneider22',
+                  role: 'Frontend & Mobile Developer',
+                  bio: 'Estudiante de Ingeniería en Sistemas. Especialista en UI/UX y desarrollo mobile. Co-creador de la experiencia de usuario de Konvierte.',
+                  avatar: 'https://avatars.githubusercontent.com/u/126375669?v=4',
+                  blog: null,
+                  github: 'https://github.com/sneider22',
+                  repos: 18,
+                  location: 'Venezuela',
+                  accent: 'blue',
+                  accentColor: '#3B82F6',
+                  tags: ['Flutter', 'React', 'Dart', 'UI/UX'],
+                },
+              ].map((member, i) => (
+                <motion.div
+                  key={member.handle}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.15 }}
+                  className="relative group"
+                >
+                  {/* Glow */}
+                  <div
+                    className="absolute -inset-1 rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-60 transition-opacity duration-700"
+                    style={{ background: `radial-gradient(ellipse, ${member.accentColor}40, transparent 70%)` }}
+                  />
+
+                  <div className="relative glass-card p-8 rounded-[2rem] border-white/10 group-hover:border-white/20 transition-all duration-500 flex flex-col gap-6 h-full">
+                    {/* Avatar + Identity */}
+                    <div className="flex items-start gap-5">
+                      <div className="relative flex-shrink-0">
+                        <div
+                          className="absolute -inset-1 rounded-full blur-md opacity-50"
+                          style={{ background: `radial-gradient(circle, ${member.accentColor}60, transparent)` }}
+                        />
+                        <img
+                          src={member.avatar}
+                          alt={member.name}
+                          className="relative w-16 h-16 rounded-full object-cover border-2 ring-2 ring-offset-2 ring-offset-transparent"
+                          style={{ borderColor: member.accentColor + '60', outlineColor: member.accentColor + '40' }}
+                        />
+                        {/* Online dot */}
+                        <div
+                          className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-background animate-pulse"
+                          style={{ backgroundColor: member.accentColor }}
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-black tracking-tight text-main">{member.name}</h3>
+                        <p className="text-[10px] font-black uppercase tracking-widest opacity-40">@{member.handle}</p>
+                        <span
+                          className="inline-block mt-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest"
+                          style={{ background: member.accentColor + '20', color: member.accentColor }}
+                        >
+                          {member.role}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Bio */}
+                    <p className="text-sm text-white/50 leading-relaxed flex-1">{member.bio}</p>
+
+                    {/* Tags */}
+                    <div className="flex flex-wrap gap-2">
+                      {member.tags.map(tag => (
+                        <span
+                          key={tag}
+                          className="px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest bg-white/5 border border-white/8 text-white/50"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+
+                    {/* Stats + Links */}
+                    <div className="flex items-center justify-between pt-2 border-t border-white/5">
+                      <div className="flex items-center gap-1 text-[10px] text-white/30 font-bold">
+                        <span style={{ color: member.accentColor }} className="font-black text-sm">{member.repos}</span>
+                        &nbsp;repos públicos · 🇻🇪 {member.location}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {member.blog && (
+                          <a
+                            href={member.blog}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                            aria-label={`Portfolio de ${member.name}`}
+                          >
+                            <ExternalLink size={13} />
+                          </a>
+                        )}
+                        <a
+                          href={member.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-8 h-8 rounded-xl flex items-center justify-center text-black font-black text-[10px] hover:scale-105 transition-transform"
+                          style={{ backgroundColor: member.accentColor }}
+                          aria-label={`GitHub de ${member.name}`}
+                        >
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z" />
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Bottom tagline */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.4 }}
+              className="text-center text-[11px] text-white/20 uppercase tracking-[0.3em] font-bold mt-16"
+            >
+              Construido con ❤️ en Venezuela · Open Source
+            </motion.p>
+          </div>
         </section>
 
         {/* Simplified Footer */}
