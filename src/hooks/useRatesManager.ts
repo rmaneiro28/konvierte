@@ -53,6 +53,12 @@ export const useRatesManager = () => {
         }
     });
 
+    const [preferFutureRate, setPreferFutureRate] = useState<boolean>(() => {
+        try {
+            return localStorage.getItem('konvierte_prefer_future_rate') === 'true';
+        } catch (e) { return false; }
+    });
+
     // Precios previos para detectar cambios y enviar notificaciones
     const prevPricesRef = useRef<Record<string, number>>({});
 
@@ -149,11 +155,21 @@ export const useRatesManager = () => {
     }, [defaultRateId]);
 
     useEffect(() => {
+        localStorage.setItem('konvierte_prefer_future_rate', String(preferFutureRate));
+    }, [preferFutureRate]);
+
+    useEffect(() => {
         const calculateResolutions = async () => {
+            const getEffPrice = (r?: any) => {
+                if (!r) return 0;
+                if (!preferFutureRate && r.todayPrice) return r.todayPrice;
+                return r.price;
+            };
+
             const base: Record<string, number> = {
-                bcv_usd: rates.bcv_usd?.price || 0,
-                bcv_eur: rates.bcv_eur?.price || 0,
-                binance_usd: rates.binance_usd?.price || 0,
+                bcv_usd: getEffPrice(rates.bcv_usd),
+                bcv_eur: getEffPrice(rates.bcv_eur),
+                binance_usd: getEffPrice(rates.binance_usd),
             };
 
             const resolved: Record<string, { name: string; price: number; flag: string; change24h?: number }> = {
@@ -191,7 +207,7 @@ export const useRatesManager = () => {
         };
 
         calculateResolutions();
-    }, [rates, customRates]);
+    }, [rates, customRates, preferFutureRate]);
 
     const allRates = resolvedPrices;
 
@@ -241,6 +257,8 @@ export const useRatesManager = () => {
         toggleDefault,
         updateOrder,
         applyHistoricalRates,
-        isHistoricalMode
+        isHistoricalMode,
+        preferFutureRate,
+        setPreferFutureRate
     };
 };

@@ -5,6 +5,8 @@ export interface ExchangeRate {
     lastUpdate: string;
     change24h: number;
     history: number[]; // Últimos 7 días
+    todayPrice?: number;
+    dateRate?: string;
 }
 
 export interface RatesState {
@@ -44,34 +46,88 @@ export const fetchRates = async (): Promise<Partial<RatesState>> => {
         const eurHist = await formatHistory(hEurRes);
         const usdtHist = await formatHistory(hUsdtRes);
 
-        // Lógica de cálculo de variación 24h basada en historial real
+        const isFuture = (dateStr: string) => {
+            if (!dateStr) return false;
+            const date = new Date(dateStr);
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            return date > today;
+        };
+
         const calcVariation = (history: number[], current: number) => {
             if (history.length < 2) return 0;
             const previous = history[history.length - 2];
             return ((current - previous) / previous) * 100;
         };
 
+        const processRate = (current: any, history: any[]) => {
+            const all = [current, ...history].sort((a, b) => 
+                new Date(b.date_rate || b.fecha).getTime() - new Date(a.date_rate || a.fecha).getTime()
+            );
+
+            const latest = all[0];
+            const latestPrice = Number(latest.price || latest.promedio);
+            const latestDate = latest.date_rate || latest.fecha;
+
+            const nonFuture = all.filter(e => !isFuture(e.date_rate || e.fecha));
+            let todayPrice: number | undefined;
+
+            if (nonFuture.length > 0) {
+                todayPrice = Number(nonFuture[0].price || nonFuture[0].promedio);
+            } else {
+                todayPrice = Number(all[all.length - 1].price || all[all.length - 1].promedio);
+            }
+
+            if (todayPrice === latestPrice && !isFuture(latestDate)) {
+                todayPrice = undefined;
+            }
+
+            return {
+                price: latestPrice,
+                todayPrice,
+                dateRate: latestDate,
+                lastUpdate: latest.last_updated || latest.fecha || new Date().toISOString()
+            };
+        };
+
+        // Procesar cada moneda con su respectivo historial
+        // Nota: La API /history devuelve objetos con campo 'price' y 'fecha'
+        // Mapeamos para que processRate los entienda
+        const hUsd = (await hUsdRes.json()).history || [];
+        const hEur = (await hEurRes.json()).history || [];
+        const hUsdt = (await hUsdtRes.json()).history || [];
+
+        const usdRes = processRate(rates.usd, hUsd);
+        const eurRes = processRate(rates.eur, hEur);
+        const usdtRes = processRate(rates.usdt, hUsdt);
+
         return {
             bcv_usd: {
-                price: rates.usd.price,
+                price: usdRes.price,
+                todayPrice: usdRes.todayPrice,
+                dateRate: usdRes.dateRate,
                 symbol: 'USD',
-                lastUpdate: rates.usd.last_updated,
-                history: usdHist.length > 0 ? usdHist : [rates.usd.price],
-                change24h: calcVariation(usdHist, rates.usd.price)
+                lastUpdate: usdRes.lastUpdate,
+                history: usdHist.length > 0 ? usdHist : [usdRes.price],
+                change24h: calcVariation(usdHist, usdRes.price)
             },
             bcv_eur: {
-                price: rates.eur.price,
+                price: eurRes.price,
+                todayPrice: eurRes.todayPrice,
+                dateRate: eurRes.dateRate,
                 symbol: 'EUR',
-                lastUpdate: rates.eur.last_updated,
-                history: eurHist.length > 0 ? eurHist : [rates.eur.price],
-                change24h: calcVariation(eurHist, rates.eur.price)
+                lastUpdate: eurRes.lastUpdate,
+                history: eurHist.length > 0 ? eurHist : [eurRes.price],
+                change24h: calcVariation(eurHist, eurRes.price)
             },
             binance_usd: {
-                price: rates.usdt.price,
+                price: usdtRes.price,
+                todayPrice: usdtRes.todayPrice,
+                dateRate: usdtRes.dateRate,
                 symbol: 'USDT',
-                lastUpdate: rates.usdt.last_updated,
-                history: usdtHist.length > 0 ? usdtHist : [rates.usdt.price],
-                change24h: calcVariation(usdtHist, rates.usdt.price)
+                lastUpdate: usdtRes.lastUpdate,
+                history: usdtHist.length > 0 ? usdtHist : [usdtRes.price],
+                change24h: calcVariation(usdtHist, usdtRes.price)
             },
         };
     } catch (error) {

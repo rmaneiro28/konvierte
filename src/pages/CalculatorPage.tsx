@@ -19,6 +19,7 @@ import { VirtualKeyboard } from '../components/VirtualKeyboard';
 import { ShareModal } from '../components/ShareModal';
 import { ShareTemplate } from '../components/ShareTemplate';
 import { PaymentMethodsModal } from '../components/PaymentMethodsModal';
+import { KambioModal } from '../components/KambioModal';
 import { usePaymentMethods } from '../hooks/usePaymentMethods';
 import { RateItem } from '../components/RateItem';
 import { RateSelector } from '../components/RateSelector';
@@ -50,6 +51,7 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ theme, setTheme }) => {
         formatCI
     } = usePaymentMethods();
     const [isPaymentMethodsOpen, setIsPaymentMethodsOpen] = useState(false);
+    const [isKambioOpen, setIsKambioOpen] = useState(false);
     const [selectedPaymentMethodId, setSelectedPaymentMethodId] = useState<string | null>(null);
 
 
@@ -58,7 +60,8 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ theme, setTheme }) => {
         rates, activeSource, setActiveSource, allRates,
         loadRates, addCustomRate, removeCustomRate,
         ratesOrder, updateOrder, defaultRateId, toggleDefault,
-        applyHistoricalRates, isHistoricalMode
+        applyHistoricalRates, isHistoricalMode,
+        preferFutureRate, setPreferFutureRate
     } = useRatesManager();
 
     const activeRateValue = allRates[activeSource]?.price || 0;
@@ -395,6 +398,7 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ theme, setTheme }) => {
                 setIsShareOpen={setIsShareOpen}
                 setIsConfigOpen={setIsConfigOpen}
                 setIsPaymentMethodsOpen={setIsPaymentMethodsOpen}
+                setIsKambioOpen={setIsKambioOpen}
             />
 
             <main className="relative z-10 w-full flex-1 overflow-hidden flex flex-col items-center justify-start max-w-md mx-auto">
@@ -561,6 +565,8 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ theme, setTheme }) => {
                             RateItem={RateItem}
                             theme={theme}
                             setTheme={setTheme}
+                            preferFutureRate={preferFutureRate}
+                            setPreferFutureRate={setPreferFutureRate}
                         />
                     </React.Suspense>
                 )}
@@ -575,6 +581,13 @@ const CalculatorPage: React.FC<CalculatorPageProps> = ({ theme, setTheme }) => {
                 editMethod={editMethod}
                 validatePhone={validatePhone}
                 formatCI={formatCI}
+            />
+
+            <KambioModal
+                isOpen={isKambioOpen}
+                onClose={() => setIsKambioOpen(false)}
+                currentRate={activeRateValue}
+                rateName={allRates[activeSource]?.name || ''}
             />
 
             <HistoricalRatesModal

@@ -1,14 +1,15 @@
 import React from 'react';
-import { Share2, Settings2, Wallet, ArrowLeft } from 'lucide-react';
+import { Share2, Settings2, Wallet, ArrowLeft, Coins } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
 
 interface HeaderProps {
     setIsShareOpen: (isOpen: boolean) => void;
     setIsConfigOpen: (isOpen: boolean) => void;
     setIsPaymentMethodsOpen: (isOpen: boolean) => void;
+    setIsKambioOpen: (isOpen: boolean) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ setIsShareOpen, setIsConfigOpen, setIsPaymentMethodsOpen }) => {
+export const Header: React.FC<HeaderProps> = ({ setIsShareOpen, setIsConfigOpen, setIsPaymentMethodsOpen, setIsKambioOpen }) => {
     const navigate = useNavigate();
 
     return (
@@ -38,6 +39,7 @@ export const Header: React.FC<HeaderProps> = ({ setIsShareOpen, setIsConfigOpen,
                 </div>
                 <div className="flex items-center gap-1">
                     <button onClick={() => setIsShareOpen(true)} aria-label="Compartir" className="w-9 h-9 rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center opacity-60 hover:opacity-100"><Share2 size={18} /></button>
+                    <button onClick={() => setIsKambioOpen(true)} aria-label="Kambio" className="w-9 h-9 rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center opacity-60 hover:opacity-100"><Coins size={18} /></button>
                     <button onClick={() => setIsPaymentMethodsOpen(true)} aria-label="Fichas de Pago" className="w-9 h-9 rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center opacity-60 hover:opacity-100"><Wallet size={18} /></button>
                     <button onClick={() => setIsConfigOpen(true)} aria-label="Ajustes" className="w-9 h-9 rounded-lg hover:bg-white/5 transition-colors flex items-center justify-center opacity-60 hover:opacity-100"><Settings2 size={18} /></button>
                 </div>

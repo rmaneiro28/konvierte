@@ -31,6 +31,10 @@
   ],
   "rewrites": [
     {
+      "source": "/docs/api/download",
+      "destination": "/api/download"
+    },
+    {
       "source": "/docs/api/historicos/dolares",
       "destination": "/api/historicos/usd"
     },

@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight, Smartphone, Zap, Shield, TrendingUp, ExternalLink, Sun, Moon, Users, Monitor } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, Smartphone, Zap, Shield, TrendingUp, ExternalLink, Sun, Moon, Users, Monitor, Download, CheckCircle, Star, Lock, Clock, Award } from 'lucide-react';
 import { FeaturesSection } from '../components/FeaturesSection';
 import { TutorialModal } from '../components/TutorialModal';
 import { NavLink, useSearchParams } from 'react-router-dom';
 import { fetchRates } from '../services/rateService';
 import { formatCurrency } from '../utils/formatters';
 import { getWaitlistCount } from '../services/waitlistService';
+import { getDownloadCount, registerDownload } from '../services/downloadService';
 
 interface LandingPageProps {
   theme: 'light' | 'dark';
@@ -19,17 +20,47 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
   const [isTutorialOpen, setIsTutorialOpen] = useState(false);
   const [bcvRate, setBcvRate] = useState<string>('---');
   const [binanceRate, setBinanceRate] = useState<string>('---');
-
   const [lastUpdated, setLastUpdated] = useState<string>('hoy');
   const [waitlistCount, setWaitlistCount] = useState<number>(1240);
+  const [downloadCount, setDownloadCount] = useState<number>(847);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadDone, setDownloadDone] = useState(false);
 
+  const APK_URL = '/releases/Konvierte.apk';
+  const APK_VERSION = '1.2.0';
+
+
+  const handleDownload = async () => {
+    if (isDownloading) return;
+    setIsDownloading(true);
+    try {
+      const total = await registerDownload(APK_VERSION);
+      setDownloadCount(total);
+      // Iniciar descarga real
+      const link = document.createElement('a');
+      link.href = APK_URL;
+      link.download = `Konvierte-v${APK_VERSION}.apk`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setDownloadDone(true);
+      setTimeout(() => setDownloadDone(false), 4000);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   useEffect(() => {
     const loadWaitlist = async () => {
       const count = await getWaitlistCount();
       setWaitlistCount(count);
     };
+    const loadDownloads = async () => {
+      const count = await getDownloadCount();
+      setDownloadCount(count);
+    };
     loadWaitlist();
+    loadDownloads();
 
     const getRate = async () => {
       try {
@@ -485,8 +516,177 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
           </div>
         </section>
 
+        {/* APK Download Section */}
+        <section id="download" className="py-24 px-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-primary/8 blur-[200px] rounded-full pointer-events-none" />
+
+          <div className="max-w-5xl mx-auto">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-16"
+            >
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/30 rounded-full mb-6">
+                <Smartphone size={14} className="text-primary" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary">App Nativa para Android</span>
+              </div>
+              <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-tight mb-6">
+                Descarga la app,<br /><span className="text-primary italic">sin rodeos.</span>
+              </h2>
+              <p className="text-lg text-white/50 max-w-2xl mx-auto">
+                APK directa, sin Play Store, sin rastreos. Solo Konvierte funcionando en tu bolsillo.
+              </p>
+            </motion.div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              {/* Trust badges */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="space-y-5"
+              >
+                {[
+                  { icon: Shield, color: 'text-primary', bg: 'bg-primary/10 border-primary/20', title: '100% Libre de virus', desc: 'Compilada directamente desde nuestro código fuente abierto. Sin modificaciones, sin malware.' },
+                  { icon: Lock, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20', title: 'Sin permisos invasivos', desc: 'No pedimos acceso a tu cámara, contactos ni ubicación. Solo lo que necesitas para calcular.' },
+                  { icon: Clock, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20', title: 'Funciona sin internet', desc: 'Las conversiones básicas funcionan offline. Las tasas se sincronizan cuando tienes conexión.' },
+                  { icon: Award, color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/20', title: 'Actualizaciones frecuentes', desc: 'El equipo lanza mejoras constantemente. Cada versión nueva está en esta misma página.' },
+                ].map((item, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, x: -15 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className={`flex items-start gap-4 p-4 rounded-2xl border ${item.bg} group hover:scale-[1.01] transition-transform`}
+                  >
+                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${item.bg}`}>
+                      <item.icon size={18} className={item.color} />
+                    </div>
+                    <div>
+                      <p className={`text-sm font-black ${item.color} mb-1`}>{item.title}</p>
+                      <p className="text-xs text-white/40 leading-relaxed">{item.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+
+              {/* Download Card */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                className="relative"
+              >
+                <div className="absolute -inset-1 bg-gradient-to-br from-primary/30 via-primary/10 to-transparent rounded-[2.5rem] blur-lg" />
+                <div className="relative glass-card p-8 md:p-10 rounded-[2rem] border-primary/20 space-y-8">
+
+                  {/* App Info */}
+                  <div className="flex items-center gap-5">
+                    <div className="w-16 h-16 bg-primary/20 rounded-2xl flex items-center justify-center border border-primary/30 flex-shrink-0">
+                      <svg width="32" height="32" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M38 32V96M38 64 L74 32M56 64L88 96" stroke="#10B981" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="85" cy="64" r="18" fill="transparent" stroke="#10B981" strokeWidth="6" />
+                        <path d="M78 58C80 54 83 53 85 53C88 53 91 54 93 58L97 54M92 70C90 74 87 75 85 75C82 75 79 74 77 70L73 74" stroke="#10B981" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-black uppercase tracking-widest">Konvierte</h3>
+                      <p className="text-xs text-white/40 font-bold uppercase tracking-wider">v{APK_VERSION} · Android 6.0+</p>
+                      <div className="flex items-center gap-1 mt-1">
+                        {[1,2,3,4,5].map(s => <Star key={s} size={10} className="fill-yellow-400 text-yellow-400" />)}
+                        <span className="text-[10px] text-white/40 ml-1">5.0</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Stats row */}
+                  <div className="grid grid-cols-3 gap-3">
+                    {[
+                      { value: `${downloadCount.toLocaleString()}+`, label: 'Descargas' },
+                      { value: '~38 MB', label: 'Tamaño' },
+                      { value: 'Gratis', label: 'Precio' },
+                    ].map((stat, i) => (
+                      <div key={i} className="bg-white/5 border border-white/5 rounded-xl p-3 text-center">
+                        <p className="text-base font-black text-primary">{stat.value}</p>
+                        <p className="text-[9px] font-bold uppercase tracking-widest text-white/40">{stat.label}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Checkmarks */}
+                  <div className="space-y-2">
+                    {['Sin cuenta requerida', 'Sin publicidad intrusiva', 'Datos 100% locales', 'Código abierto'].map((feat, i) => (
+                      <div key={i} className="flex items-center gap-3">
+                        <CheckCircle size={14} className="text-primary flex-shrink-0" />
+                        <span className="text-xs font-bold text-white/60">{feat}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Download Button */}
+                  <button
+                    onClick={handleDownload}
+                    disabled={isDownloading}
+                    className="w-full py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all active:scale-95 disabled:opacity-70 flex items-center justify-center gap-3 relative overflow-hidden group/dl"
+                    style={{ background: 'linear-gradient(135deg, #10B981, #059669)', boxShadow: '0 20px 50px rgba(16,185,129,0.35)' }}
+                  >
+                    <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/dl:translate-x-[100%] transition-transform duration-700 skew-x-12" />
+                    <AnimatePresence mode="wait">
+                      {downloadDone ? (
+                        <motion.span key="done" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
+                          <CheckCircle size={18} /> ¡Descarga iniciada!
+                        </motion.span>
+                      ) : isDownloading ? (
+                        <motion.span key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
+                          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}>
+                            <Download size={18} />
+                          </motion.div>
+                          Preparando...
+                        </motion.span>
+                      ) : (
+                        <motion.span key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
+                          <Download size={18} /> Descargar APK Gratis
+                        </motion.span>
+                      )}
+                    </AnimatePresence>
+                  </button>
+
+                  {/* Safety note */}
+                  <p className="text-center text-[10px] text-white/25 leading-relaxed">
+                    Al instalar, activa <span className="text-white/50 font-bold">"Fuentes desconocidas"</span> en Ajustes de tu Android.<br />
+                    Es normal para APKs externas al Play Store.
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+
+            {/* FAQ mini */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-4"
+            >
+              {[
+                { q: '¿Por qué no está en Play Store?', a: 'Google cobra tarifas y restringe apps venezolanas. Distribuimos directamente para llegar a más usuarios.' },
+                { q: '¿Cómo sé que es segura?', a: 'Nuestro código es público en GitHub. Puedes verificar que la APK es idéntica a lo que compilamos.' },
+                { q: '¿Qué hago si Android la bloquea?', a: 'Ve a Ajustes → Seguridad → Fuentes desconocidas y actívala. Es un paso estándar para APKs externas.' },
+              ].map((faq, i) => (
+                <div key={i} className="p-5 bg-white/3 border border-white/8 rounded-2xl space-y-2 hover:border-primary/20 transition-colors">
+                  <p className="text-xs font-black text-white/70">{faq.q}</p>
+                  <p className="text-[11px] text-white/35 leading-relaxed">{faq.a}</p>
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
         {/* CTA Section */}
-        <section id="download" className="py-32 px-6">
+        <section className="py-24 px-6">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -495,22 +695,25 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
           >
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 blur-[100px] -z-10 rounded-full group-hover:bg-primary/30 transition-colors" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-secondary/10 blur-[100px] -z-10 rounded-full" />
-
             <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-8 italic">
               ¿Listo para simplificar <br className="hidden md:block" /> tus cuentas?
             </h2>
-
             <p className="text-lg md:text-xl font-medium text-white/40 max-w-2xl mx-auto mb-12">
               Únete a los miles de venezolanos que ya usan Konvierte para gestionar sus pagos y consultar el dólar cada día.
             </p>
-
-            <div className="flex justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <button
+                onClick={handleDownload}
+                className="px-10 py-5 rounded-[2rem] text-[11px] font-black uppercase tracking-[0.25em] hover:opacity-90 transition-all active:scale-95 shadow-xl shadow-primary/20 flex items-center gap-3"
+                style={{ background: 'linear-gradient(135deg, #10B981, #059669)' }}
+              >
+                <Download size={18} /> Descargar App
+              </button>
               <button
                 onClick={() => setIsTutorialOpen(true)}
-                className="px-12 py-6 bg-primary text-white rounded-[2rem] text-[12px] font-black uppercase tracking-[0.3em] hover:bg-primary/90 transition-all active:scale-95 shadow-xl shadow-primary/20 flex items-center justify-center gap-3"
+                className="px-10 py-5 bg-white/5 border border-white/10 rounded-[2rem] text-[11px] font-black uppercase tracking-[0.25em] hover:bg-white/10 transition-all flex items-center gap-3"
               >
-                <Users size={20} />
-                Unirme a la lista
+                <Users size={18} /> Unirme a la lista
               </button>
             </div>
           </motion.div>

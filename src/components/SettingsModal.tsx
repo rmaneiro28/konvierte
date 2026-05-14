@@ -21,6 +21,8 @@ interface SettingsModalProps {
     RateItem: React.ComponentType<any>;
     theme: 'light' | 'dark';
     setTheme: (theme: 'light' | 'dark') => void;
+    preferFutureRate: boolean;
+    setPreferFutureRate: (val: boolean) => void;
 }
 
 const SettingsModal: React.FC<SettingsModalProps> = ({
@@ -40,7 +42,9 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
     removeCustomRate,
     RateItem,
     theme,
-    setTheme
+    setTheme,
+    preferFutureRate,
+    setPreferFutureRate
 }) => {
     return (
         <AnimatePresence>
@@ -58,6 +62,23 @@ const SettingsModal: React.FC<SettingsModalProps> = ({
                                     <button onClick={() => { if (newRateName && newRateFormula && previewRateValue > 0) { addCustomRate(newRateName, newRateFormula); setNewRateName(''); setNewRateFormula(''); } }} disabled={!newRateName || !newRateFormula || previewRateValue <= 0} className="bg-primary hover:bg-primary/80 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all shadow-lg shadow-primary/20 disabled:opacity-50">Añadir Tasa</button>
                                 </div>
                             </div>
+
+                            <div className="pt-6 border-t border-black/5 dark:border-white/5">
+                                <span className="label-zen text-[9px]">Preferencia de Actualización</span>
+                                <div className="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
+                                    <div className="flex flex-col gap-1">
+                                        <span className="text-[11px] font-black uppercase tracking-widest opacity-70">Tasa de Mañana</span>
+                                        <span className="text-[8px] opacity-50 max-w-[200px]">Usa la tasa oficial más reciente disponible (pueden ser valores futuros).</span>
+                                    </div>
+                                    <button
+                                        onClick={() => setPreferFutureRate(!preferFutureRate)}
+                                        className={`w-12 h-6 rounded-full transition-all relative ${preferFutureRate ? 'bg-primary' : 'bg-white/20'}`}
+                                    >
+                                        <div className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-all ${preferFutureRate ? 'left-7' : 'left-1'}`} />
+                                    </button>
+                                </div>
+                            </div>
+
                             <div className="pt-6 border-t border-black/5 dark:border-white/5">
                                 <span className="label-zen text-[9px]">Aspecto General</span>
                                 <div className="flex items-center justify-between bg-white/5 p-4 rounded-2xl border border-white/5">
