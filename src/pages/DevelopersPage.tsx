@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Monitor, ExternalLink, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Monitor, ArrowRight } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 const DevelopersPage: React.FC = () => {

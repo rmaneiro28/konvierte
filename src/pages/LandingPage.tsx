@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Smartphone, Zap, Shield, ExternalLink, Sun, Moon, Users, Download, CheckCircle, Star, Lock, Clock, Award } from 'lucide-react';
-import { NavLink, useSearchParams } from 'react-router-dom';
+import { ArrowRight, Smartphone, Zap, Shield, Sun, Moon, Users, Download, CheckCircle, Star, Lock, Clock, Award } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
 
 import { getDownloadCount, registerDownload } from '../services/downloadService';
 import { PostDownloadModal } from '../components/PostDownloadModal';
@@ -12,7 +12,6 @@ interface LandingPageProps {
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
-  const [searchParams] = useSearchParams();
   const [downloadCount, setDownloadCount] = useState<number>(847);
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadDone, setDownloadDone] = useState(false);

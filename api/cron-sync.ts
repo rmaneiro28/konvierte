@@ -83,7 +83,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 results.push({ 
                     status: 'success', 
                     count: rows.length, 
-                    sources: ['BCV (USD/EUR/CNY/TRY/RUB)', 'Binance P2P'],
+                    sources: ['BCV (USD/EUR)', 'Binance P2P'],
                     data: rows 
                 });
             }
