@@ -78,7 +78,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose })
     const handleShare = () => {
         if (userState?.referralLink) {
             const shareText = `🚀 ¡Acabo de unirme a la lista de espera de *Konvierte*! La app definitiva para el dólar en Venezuela.\n\nÚnete tú también aquí para tener acceso anticipado:\n${userState.referralLink}\n\n¡Estoy en el puesto *#${userState.position?.toLocaleString()}*! Si usas mi link, subo puestos y tú entras antes. 🔥`;
-            
+
             navigator.clipboard.writeText(shareText);
             toast.success("¡Mensaje de invitación copiado! Pégalo en tus grupos de WhatsApp.");
         }
@@ -135,7 +135,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose })
                                         {(step as any).isWaitlist && (
                                             <div className="mt-4">
                                                 {refCode && !userState && (
-                                                    <motion.div 
+                                                    <motion.div
                                                         initial={{ opacity: 0, x: -10 }}
                                                         animate={{ opacity: 1, x: 0 }}
                                                         className="mb-4 p-3 bg-primary/10 border border-primary/20 rounded-xl flex items-center gap-3"
@@ -152,23 +152,23 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose })
                                                             <Users size={14} className="text-primary" />
                                                             <span className="text-[10px] font-bold uppercase tracking-widest">{getWaitlistCount().toLocaleString()} personas en espera</span>
                                                         </div>
-                                                        <input 
+                                                        <input
                                                             required
                                                             disabled={isSaving}
-                                                            type="text" 
-                                                            placeholder="Tu Nombre" 
+                                                            type="text"
+                                                            placeholder="Tu Nombre"
                                                             className="w-full h-11 bg-black/40 border border-white/10 rounded-xl px-4 text-xs font-bold text-white outline-none focus:border-primary transition-all disabled:opacity-50"
-                                                            onChange={(e) => setWaitlistData({...waitlistData, name: e.target.value})}
+                                                            onChange={(e) => setWaitlistData({ ...waitlistData, name: e.target.value })}
                                                         />
-                                                        <input 
+                                                        <input
                                                             required
                                                             disabled={isSaving}
-                                                            type="tel" 
-                                                            placeholder="Tu WhatsApp (Ej: 0412...)" 
+                                                            type="tel"
+                                                            placeholder="Tu WhatsApp (Ej: 0412...)"
                                                             className="w-full h-11 bg-black/40 border border-white/10 rounded-xl px-4 text-xs font-bold text-white outline-none focus:border-primary transition-all disabled:opacity-50"
-                                                            onChange={(e) => setWaitlistData({...waitlistData, whatsapp: e.target.value})}
+                                                            onChange={(e) => setWaitlistData({ ...waitlistData, whatsapp: e.target.value })}
                                                         />
-                                                        <button 
+                                                        <button
                                                             type="submit"
                                                             disabled={isSaving}
                                                             className="w-full py-3.5 bg-primary text-white rounded-xl text-[9px] font-black uppercase tracking-[0.2em] hover:bg-primary/90 transition-all active:scale-95 disabled:opacity-50"
@@ -177,7 +177,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose })
                                                         </button>
                                                     </form>
                                                 ) : (
-                                                    <motion.div 
+                                                    <motion.div
                                                         initial={{ opacity: 0, scale: 0.9 }}
                                                         animate={{ opacity: 1, scale: 1 }}
                                                         className="bg-white/5 border border-white/10 p-6 rounded-[2rem] text-center space-y-4"
@@ -186,12 +186,12 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose })
                                                             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">¡Estás en la fila!</p>
                                                             <h4 className="text-3xl font-black text-white tracking-tighter italic">#{userState.position?.toLocaleString()}</h4>
                                                         </div>
-                                                        
+
                                                         <p className="text-[11px] font-bold text-white/50 leading-tight">
                                                             Invita a tus contactos para subir <span className="text-primary">10,000 puestos</span> y obtener acceso antes que nadie. Te avisaremos el <span className="text-white">1 de Mayo</span>.
                                                         </p>
 
-                                                        <button 
+                                                        <button
                                                             onClick={handleShare}
                                                             className="w-full py-4 bg-white text-black rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all flex items-center justify-center gap-2"
                                                         >
