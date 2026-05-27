@@ -34,9 +34,6 @@ export const getBcvRates = async () => {
 
         const currencies = [
             { id: '#euro', symbol: 'EUR' },
-            { id: '#yuan', symbol: 'CNY' },
-            { id: '#lira', symbol: 'TRY' },
-            { id: '#rublo', symbol: 'RUB' },
             { id: '#dolar', symbol: 'USD' }
         ];
 
