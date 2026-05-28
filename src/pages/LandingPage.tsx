@@ -1,7 +1,7 @@
 // Updated LandingPage sfd
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Smartphone, Zap, Shield, Sun, Moon, Users, Download, CheckCircle, Star, Lock, Clock, Award, ExternalLink } from 'lucide-react';
+import { ArrowRight, Smartphone, Zap, Shield, Sun, Moon, Users, Download, CheckCircle, Star, Lock, Clock, Award, ExternalLink, Menu, X } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 import { getDownloadCount, registerDownload } from '../services/downloadService';
@@ -17,6 +17,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [downloadDone, setDownloadDone] = useState(false);
   const [isPostDownloadOpen, setIsPostDownloadOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const APK_URL = '/releases/Konvierte.apk';
   const APK_VERSION = '1.2.0';
@@ -75,6 +76,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
               </NavLink>            <div className="hidden md:flex items-center gap-8">
                 <NavLink to="/features" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Características</NavLink>
                 <NavLink to="/developers" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Desarrolladores</NavLink>
+                <NavLink to="/docs" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">API Docs</NavLink>
                 <a href="#team" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Equipo</a>
                 <button
                   onClick={handleDownload}
@@ -102,10 +104,35 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                   onClick={handleDownload}
                   className="px-4 py-2 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-1.5"
                 >
-                  <Download size={13} /> Descargar
+                  <Download size={13} />
+                </button>
+                <button
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                  className="w-9 h-9 rounded-lg bg-surface border border-border flex items-center justify-center"
+                >
+                  {isMobileMenuOpen ? <X size={16} className="text-primary" /> : <Menu size={16} className="text-primary" />}
                 </button>
               </div>
             </div>
+
+            {/* Mobile Menu Dropdown */}
+            <AnimatePresence>
+              {isMobileMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="absolute top-20 left-0 w-full bg-background/95 backdrop-blur-xl border-b border-border shadow-xl md:hidden"
+                >
+                  <div className="flex flex-col p-6 gap-6">
+                    <NavLink to="/features" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-black uppercase tracking-widest opacity-70">Características</NavLink>
+                    <NavLink to="/developers" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-black uppercase tracking-widest opacity-70">Desarrolladores</NavLink>
+                    <NavLink to="/docs" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-black uppercase tracking-widest opacity-70">API Docs</NavLink>
+                    <a href="#team" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-black uppercase tracking-widest opacity-70">Equipo</a>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </nav>
 
           {/* Hero Section */}
@@ -142,7 +169,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                     className="px-12 py-6 rounded-[2rem] text-base font-black uppercase tracking-[0.15em] transition-all active:scale-95 shadow-[0_20px_50px_rgba(16,185,129,0.35)] flex items-center justify-center gap-3 relative overflow-hidden group/hero disabled:opacity-70"
                     style={{ background: 'linear-gradient(135deg, #10B981, #059669)' }}
                   >
-                    <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/hero:translate-x-[100%] transition-transform duration-700 skew-x-12" />
+                    <div className="absolute inset-0 bg-black/10 dark:bg-white/10 translate-x-[-100%] group-hover/hero:translate-x-[100%] transition-transform duration-700 skew-x-12" />
                     {downloadDone ? <><CheckCircle size={20} /> ¡Descarga iniciada!</> : isDownloading ? <><Download size={20} className="animate-bounce" /> Preparando...</> : <><Download size={20} /> Descargar APK Gratis</>}
                   </button>
                 </div>
@@ -152,7 +179,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                     <p className="text-2xl font-black">{downloadCount.toLocaleString()}+</p>
                     <p className="text-[10px] font-bold uppercase tracking-widest">Descargas</p>
                   </div>
-                  <div className="w-px h-10 bg-white/20" />
+                  <div className="w-px h-10 bg-black/20 dark:bg-white/20" />
                   <div className="text-center">
                     <p className="text-2xl font-black">~38 MB</p>
                     <p className="text-[10px] font-bold uppercase tracking-widest">Tamaño APK</p>
@@ -184,11 +211,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
           </header>
 
           {/* Mini Features Summary */}
-          <section className="py-24 px-6 border-y border-white/5 bg-surface/10">
+          <section className="py-24 px-6 border-y border-black/5 dark:border-white/5 bg-surface/10">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-12">
               <div className="space-y-4 max-w-md">
                 <h2 className="text-3xl font-black tracking-tight">Mucho más que <br /><span className="text-primary italic">solo tasas.</span></h2>
-                <p className="text-white/40 font-medium">Descubre todas las herramientas que hemos construido para simplificar tu día a día financiero.</p>
+                <p className="opacity-40 font-medium">Descubre todas las herramientas que hemos construido para simplificar tu día a día financiero.</p>
                 <NavLink to="/features" className="inline-flex items-center gap-2 text-primary font-black uppercase text-xs tracking-widest hover:gap-3 transition-all">
                   Ver todas las funciones <ArrowRight size={14} />
                 </NavLink>
@@ -200,7 +227,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                   { icon: Zap, label: 'Tasas en Vivo' },
                   { icon: ExternalLink, label: 'Reportes PDF' },
                 ].map((item, i) => (
-                  <div key={i} className="p-6 bg-white/5 border border-white/5 rounded-3xl flex items-center gap-4">
+                  <div key={i} className="p-6 bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-3xl flex items-center gap-4">
                     <item.icon size={20} className="text-primary" />
                     <span className="text-[10px] font-black uppercase tracking-widest">{item.label}</span>
                   </div>
@@ -218,28 +245,28 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                     <Smartphone size={24} />
                   </div>
                   <h3 className="text-lg font-black uppercase tracking-widest">Mobile First</h3>
-                  <p className="text-sm font-bold text-white/40 leading-relaxed">Optimizada para la mejor experiencia móvil nativa.</p>
+                  <p className="text-sm font-bold opacity-40 leading-relaxed">Optimizada para la mejor experiencia móvil nativa.</p>
                 </div>
                 <div className="space-y-4">
                   <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary mb-6">
                     <Zap size={24} />
                   </div>
                   <h3 className="text-lg font-black uppercase tracking-widest">Real Time</h3>
-                  <p className="text-sm font-bold text-white/40 leading-relaxed">Tasas actualizadas automáticamente desde fuentes oficiales.</p>
+                  <p className="text-sm font-bold opacity-40 leading-relaxed">Tasas actualizadas automáticamente desde fuentes oficiales.</p>
                 </div>
                 <div className="space-y-4">
                   <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary mb-6">
                     <ExternalLink size={24} />
                   </div>
                   <h3 className="text-lg font-black uppercase tracking-widest">Multilink</h3>
-                  <p className="text-sm font-bold text-white/40 leading-relaxed">Comparte reportes y tasas directamente a tus apps.</p>
+                  <p className="text-sm font-bold opacity-40 leading-relaxed">Comparte reportes y tasas directamente a tus apps.</p>
                 </div>
                 <div className="space-y-4">
                   <div className="w-12 h-12 bg-primary/20 rounded-2xl flex items-center justify-center text-primary mb-6">
                     <Shield size={24} />
                   </div>
                   <h3 className="text-lg font-black uppercase tracking-widest">Sin Registro</h3>
-                  <p className="text-sm font-bold text-white/40 leading-relaxed">Usa todas las funciones sin necesidad de dejar tus datos.</p>
+                  <p className="text-sm font-bold opacity-40 leading-relaxed">Usa todas las funciones sin necesidad de dejar tus datos.</p>
                 </div>
               </div>
             </div>
@@ -265,7 +292,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                 <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-tight mb-6">
                   Descarga la app,<br /><span className="text-primary italic">sin rodeos.</span>
                 </h2>
-                <p className="text-lg text-white/50 max-w-2xl mx-auto">
+                <p className="text-lg opacity-50 max-w-2xl mx-auto">
                   APK directa, sin Play Store, sin rastreos. Solo Konvierte funcionando en tu bolsillo.
                 </p>
               </motion.div>
@@ -297,7 +324,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                       </div>
                       <div>
                         <p className={`text-sm font-black ${item.color} mb-1`}>{item.title}</p>
-                        <p className="text-xs text-white/40 leading-relaxed">{item.desc}</p>
+                        <p className="text-xs opacity-40 leading-relaxed">{item.desc}</p>
                       </div>
                     </motion.div>
                   ))}
@@ -324,10 +351,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                       </div>
                       <div>
                         <h3 className="text-xl font-black uppercase tracking-widest">Konvierte</h3>
-                        <p className="text-xs text-white/40 font-bold uppercase tracking-wider">v{APK_VERSION} · Android 6.0+</p>
+                        <p className="text-xs opacity-40 font-bold uppercase tracking-wider">v{APK_VERSION} · Android 6.0+</p>
                         <div className="flex items-center gap-1 mt-1">
                           {[1, 2, 3, 4, 5].map(s => <Star key={s} size={10} className="fill-yellow-400 text-yellow-400" />)}
-                          <span className="text-[10px] text-white/40 ml-1">5.0</span>
+                          <span className="text-[10px] opacity-40 ml-1">5.0</span>
                         </div>
                       </div>
                     </div>
@@ -339,9 +366,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                         { value: '~38 MB', label: 'Tamaño' },
                         { value: 'Gratis', label: 'Precio' },
                       ].map((stat, i) => (
-                        <div key={i} className="bg-white/5 border border-white/5 rounded-xl p-3 text-center">
+                        <div key={i} className="bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/5 rounded-xl p-3 text-center">
                           <p className="text-base font-black text-primary">{stat.value}</p>
-                          <p className="text-[9px] font-bold uppercase tracking-widest text-white/40">{stat.label}</p>
+                          <p className="text-[9px] font-bold uppercase tracking-widest opacity-40">{stat.label}</p>
                         </div>
                       ))}
                     </div>
@@ -351,7 +378,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                       {['Sin cuenta requerida', 'Sin publicidad intrusiva', 'Datos 100% locales', 'Código abierto'].map((feat, i) => (
                         <div key={i} className="flex items-center gap-3">
                           <CheckCircle size={14} className="text-primary flex-shrink-0" />
-                          <span className="text-xs font-bold text-white/60">{feat}</span>
+                          <span className="text-xs font-bold opacity-60">{feat}</span>
                         </div>
                       ))}
                     </div>
@@ -363,7 +390,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                       className="w-full py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all active:scale-95 disabled:opacity-70 flex items-center justify-center gap-3 relative overflow-hidden group/dl"
                       style={{ background: 'linear-gradient(135deg, #10B981, #059669)', boxShadow: '0 20px 50px rgba(16,185,129,0.35)' }}
                     >
-                      <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover/dl:translate-x-[100%] transition-transform duration-700 skew-x-12" />
+                      <div className="absolute inset-0 bg-black/10 dark:bg-white/10 translate-x-[-100%] group-hover/dl:translate-x-[100%] transition-transform duration-700 skew-x-12" />
                       <AnimatePresence mode="wait">
                         {downloadDone ? (
                           <motion.span key="done" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
@@ -385,8 +412,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                     </button>
 
                     {/* Safety note */}
-                    <p className="text-center text-[10px] text-white/25 leading-relaxed">
-                      Al instalar, activa <span className="text-white/50 font-bold">"Fuentes desconocidas"</span> en Ajustes de tu Android.<br />
+                    <p className="text-center text-[10px] opacity-25 leading-relaxed">
+                      Al instalar, activa <span className="opacity-50 font-bold">"Fuentes desconocidas"</span> en Ajustes de tu Android.<br />
                       Es normal para APKs externas al Play Store.
                     </p>
                   </div>
@@ -405,9 +432,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                   { q: '¿Cómo sé que es segura?', a: 'Nuestro código es público en GitHub. Puedes verificar que la APK es idéntica a lo que compilamos.' },
                   { q: '¿Qué hago si Android la bloquea?', a: 'Ve a Ajustes → Seguridad → Fuentes desconocidas y actívala. Es un paso estándar para APKs externas.' },
                 ].map((faq, i) => (
-                  <div key={i} className="p-5 bg-white/3 border border-white/8 rounded-2xl space-y-2 hover:border-primary/20 transition-colors">
-                    <p className="text-xs font-black text-white/70">{faq.q}</p>
-                    <p className="text-[11px] text-white/35 leading-relaxed">{faq.a}</p>
+                  <div key={i} className="p-5 bg-black/5 dark:bg-black/5 dark:bg-white/5 border border-black/10 dark:border-black/10 dark:border-white/10 rounded-2xl space-y-2 hover:border-primary/20 transition-colors">
+                    <p className="text-xs font-black opacity-70">{faq.q}</p>
+                    <p className="text-[11px] opacity-35 leading-relaxed">{faq.a}</p>
                   </div>
                 ))}
               </motion.div>
@@ -427,7 +454,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
               <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-8 italic">
                 ¿Listo para simplificar <br className="hidden md:block" /> tus cuentas?
               </h2>
-              <p className="text-lg md:text-xl font-medium text-white/40 max-w-2xl mx-auto mb-12">
+              <p className="text-lg md:text-xl font-medium opacity-40 max-w-2xl mx-auto mb-12">
                 Únete a los miles de venezolanos que ya usan Konvierte para gestionar sus pagos y consultar el dólar cada día.
               </p>
               <div className="flex justify-center items-center">
@@ -462,7 +489,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                   Quiénes somos<br />
                   <span className="text-primary italic">detrás de Konvierte</span>
                 </h2>
-                <p className="text-lg text-white/50 max-w-2xl mx-auto leading-relaxed">
+                <p className="text-lg opacity-50 max-w-2xl mx-auto leading-relaxed">
                   Dos estudiantes venezolanos de Ingeniería en Sistemas que construyeron la herramienta financiera que ellos mismos necesitaban.
                 </p>
               </motion.div>
@@ -513,7 +540,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                       style={{ background: `radial-gradient(ellipse, ${member.accentColor}40, transparent 70%)` }}
                     />
 
-                    <div className="relative glass-card p-8 rounded-[2rem] border-white/10 group-hover:border-white/20 transition-all duration-500 flex flex-col gap-6 h-full">
+                    <div className="relative glass-card p-8 rounded-[2rem] border-black/10 dark:border-white/10 group-hover:border-black/20 dark:border-white/20 transition-all duration-500 flex flex-col gap-6 h-full">
                       {/* Avatar + Identity */}
                       <div className="flex items-start gap-5">
                         <div className="relative flex-shrink-0">
@@ -546,14 +573,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                       </div>
 
                       {/* Bio */}
-                      <p className="text-sm text-white/50 leading-relaxed flex-1">{member.bio}</p>
+                      <p className="text-sm opacity-50 leading-relaxed flex-1">{member.bio}</p>
 
                       {/* Tags */}
                       <div className="flex flex-wrap gap-2">
                         {member.tags.map(tag => (
                           <span
                             key={tag}
-                            className="px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest bg-white/5 border border-white/8 text-white/50"
+                            className="px-3 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest bg-black/5 dark:bg-white/5 border border-black/10 dark:border-black/10 dark:border-white/10 opacity-50"
                           >
                             {tag}
                           </span>
@@ -561,8 +588,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                       </div>
 
                       {/* Stats + Links */}
-                      <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                        <div className="flex items-center gap-1 text-[10px] text-white/30 font-bold">
+                      <div className="flex items-center justify-between pt-2 border-t border-black/5 dark:border-white/5">
+                        <div className="flex items-center gap-1 text-[10px] opacity-30 font-bold">
                           <span style={{ color: member.accentColor }} className="font-black text-sm">{member.repos}</span>
                           &nbsp;repos públicos · 🇻🇪 {member.location}
                         </div>
@@ -572,7 +599,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                               href={member.blog}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                              className="w-8 h-8 rounded-xl bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 flex items-center justify-center opacity-40 hover:text-white hover:bg-black/10 dark:bg-white/10 transition-all"
                               aria-label={`Portfolio de ${member.name}`}
                             >
                               <ExternalLink size={13} />
@@ -603,7 +630,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                 whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.4 }}
-                className="text-center text-[11px] text-white/20 uppercase tracking-[0.3em] font-bold mt-16"
+                className="text-center text-[11px] opacity-20 uppercase tracking-[0.3em] font-bold mt-16"
               >
                 Construido con ❤️ en Venezuela · Open Source
               </motion.p>
@@ -611,7 +638,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
           </section>
 
           {/* Simplified Footer */}
-          <footer className="py-20 px-6 border-t border-white/5 text-center bg-zinc-950/20 backdrop-blur-md">
+          <footer className="py-20 px-6 border-t border-black/5 dark:border-white/5 text-center bg-surface backdrop-blur-md">
             <div className="max-w-7xl mx-auto flex flex-col items-center gap-8">
               <div className="flex items-center gap-3 opacity-60">
                 <div className="w-8 h-8 bg-surface rounded-lg flex items-center justify-center shadow-lg border border-border overflow-hidden">
