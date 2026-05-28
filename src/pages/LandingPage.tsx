@@ -72,7 +72,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                     <path d="M78 58C80 54 83 53 85 53C88 53 91 54 93 58L97 54M92 70C90 74 87 75 85 75C82 75 79 74 77 70L73 74" stroke="#10B981" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
-                <span className="text-lg font-black uppercase tracking-[0.2em]">Konvierte</span>
+                <span className="hidden sm:block text-lg font-black uppercase tracking-[0.2em]">Konvierte</span>
               </NavLink>            <div className="hidden md:flex items-center gap-8">
                 <NavLink to="/features" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Características</NavLink>
                 <NavLink to="/developers" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Desarrolladores</NavLink>
