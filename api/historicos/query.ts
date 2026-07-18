@@ -1,4 +1,4 @@
-// --- api/v1/historicos/dolares.ts ---
+// --- api/historicos/query.ts ---
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
@@ -12,6 +12,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     if (req.method === 'OPTIONS') return res.status(204).end();
 
+    const { currency, limit, days } = req.query;
+    if (!currency || typeof currency !== 'string') {
+        return res.status(400).json({ error: true, message: "Parámetro 'currency' es requerido." });
+    }
+
+    const currencyKey = currency.toUpperCase();
+    const allowedCurrencies = ['USD', 'EUR', 'USDT', 'COP'];
+    if (!allowedCurrencies.includes(currencyKey)) {
+        return res.status(400).json({ error: true, message: `Moneda '${currencyKey}' no soportada.` });
+    }
+
     const supabaseUrl = process.env.SUPABASE_URL;
     const supabaseKey = process.env.SUPABASE_KEY;
 
@@ -19,16 +30,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(500).json({ error: true, message: "SUPABASE_URL o SUPABASE_KEY no definidos." });
     }
 
-    const { limit, days } = req.query;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     try {
         let query = supabase
             .from('rates')
             .select('price, source, created_at, date_rate')
-            .eq('currency', 'USD')
-            .not('source', 'ilike', '%paralelo%')
+            .eq('currency', currencyKey)
             .order('created_at', { ascending: false });
+
+        // Mantenemos la exclusión de fuentes no oficiales si es USD para evitar distorsiones
+        if (currencyKey === 'USD') {
+            query = query.not('source', 'ilike', '%paralelo%');
+        }
 
         if (days) {
             const dateLimit = new Date();
@@ -36,7 +50,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             query = query.gte('created_at', dateLimit.toISOString());
         }
 
-        // Forzamos un límite extremadamente alto (1 millón) para garantizar la entrega de la data completa.
+        // Límite alto por defecto para asegurar la data completa.
         if (limit) {
             query = query.limit(Number(limit));
         } else {

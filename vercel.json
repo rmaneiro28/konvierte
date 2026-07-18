@@ -71,20 +71,36 @@
       "destination": "/api/download"
     },
     {
+      "source": "/docs/api/usd",
+      "destination": "/api/rate?currency=USD"
+    },
+    {
+      "source": "/docs/api/eur",
+      "destination": "/api/rate?currency=EUR"
+    },
+    {
+      "source": "/docs/api/usdt",
+      "destination": "/api/rate?currency=USDT"
+    },
+    {
+      "source": "/docs/api/cop",
+      "destination": "/api/rate?currency=COP"
+    },
+    {
       "source": "/docs/api/historicos/dolares",
-      "destination": "/api/historicos/usd"
+      "destination": "/api/historicos/query?currency=USD"
     },
     {
       "source": "/docs/api/historicos/euros",
-      "destination": "/api/historicos/eur"
+      "destination": "/api/historicos/query?currency=EUR"
     },
     {
       "source": "/docs/api/historicos/usdt",
-      "destination": "/api/historicos/usdt"
+      "destination": "/api/historicos/query?currency=USDT"
     },
     {
       "source": "/docs/api/historicos/pesos",
-      "destination": "/api/historicos/cop"
+      "destination": "/api/historicos/query?currency=COP"
     },
     {
       "source": "/docs/api/:path*",
