@@ -236,7 +236,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                   <div className="absolute -inset-4 bg-primary/20 rounded-[3.5rem] blur-2xl opacity-50" />
                   <div className="relative z-10 w-[300px] md:w-[350px] rounded-[3rem] border-[12px] border-zinc-900 shadow-[0_50px_100px_rgba(0,0,0,0.5)] overflow-hidden aspect-[9/19.5] bg-zinc-950">
                     <img
-                      src="/screenshots/Calculadora Konvierte.jpeg"
+                      src="/screenshots/Calculadora Konvierte.png"
                       alt="App Interface"
                       className="w-full h-full object-cover"
                       onError={(e) => {

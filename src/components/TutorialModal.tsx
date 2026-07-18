@@ -42,7 +42,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onClose })
             title: "Directorio Bancario",
             description: "Accede a la información oficial de toda la banca venezolana (nombres, códigos y logos) directamente desde la app para facilitar tus transferencias.",
             icon: <Monitor className="text-primary" />,
-            image: "/screenshots/Calculadora Konvierte.jpeg"
+            image: "/screenshots/Calculadora Konvierte.png"
         },
         {
             title: "Acceso Anticipado (Beta)",

@@ -116,7 +116,7 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({ onOpenTutorial
                             <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full pointer-events-none" />
                             <div className="relative z-10 w-full max-w-[280px] rounded-[2.5rem] border-[8px] border-zinc-900 shadow-2xl overflow-hidden aspect-[9/19.5] bg-zinc-950">
                                 <img
-                                    src="/screenshots/Calculadora Konvierte.jpeg"
+                                    src="/screenshots/Calculadora Konvierte.png"
                                     alt="App Screenshot"
                                     className="w-full h-full object-cover"
                                 />
