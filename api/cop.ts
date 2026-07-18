@@ -1,4 +1,4 @@
-// --- api/rates.ts ---
+// --- api/cop.ts ---
 import { VercelRequest, VercelResponse } from '@vercel/node';
 import { createClient } from '@supabase/supabase-js';
 
@@ -25,35 +25,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const { data, error } = await supabase
             .from('rates')
             .select('price, currency, source, created_at, date_rate')
+            .eq('currency', 'COP')
             .order('created_at', { ascending: false })
-            .limit(20);
+            .limit(1);
 
         if (error) throw new Error(error.message);
-
+        
         if (!data || data.length === 0) {
-            return res.status(404).json({ error: true, message: "No hay registros de tasas en la base de datos." });
+            return res.status(404).json({ error: true, message: "No hay registros de COP en la base de datos." });
         }
 
-        const rates: any = {};
-        data.forEach(r => {
-            if (!rates[r.currency.toLowerCase()]) {
-                rates[r.currency.toLowerCase()] = {
-                    price: Number(r.price),
-                    source: r.source,
-                    last_updated: r.created_at,
-                    date_rate: r.date_rate || null
-                };
-            }
-        });
-
+        const rate = data[0];
         return res.status(200).json({
-            status: "success",
-            timestamp: new Date().toISOString(),
-            engine: "Konvierte v1.1",
-            rates: rates
+            currency: "COP",
+            price: Number(rate.price),
+            symbol: "COP",
+            source: rate.source,
+            last_updated: rate.created_at,
+            date_rate: rate.date_rate || null
         });
     } catch (e: any) {
-        return res.status(500).json({ status: "error", message: "Error en el motor de tasas: " + e.message });
+        return res.status(500).json({ error: true, message: "Error COP: " + e.message });
     }
 }
-

@@ -724,7 +724,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
       <PostDownloadModal
         isOpen={isPostDownloadOpen}
         onClose={() => setIsPostDownloadOpen(false)}
-        downloadCount={downloadCount}
       />
     </>
   );

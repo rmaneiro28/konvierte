@@ -13,6 +13,7 @@ export interface RatesState {
     bcv_usd: ExchangeRate;
     bcv_eur: ExchangeRate;
     binance_usd: ExchangeRate;
+    binance_cop: ExchangeRate;
     loading: boolean;
     error: string | null;
 }
@@ -30,10 +31,11 @@ export const fetchRates = async (): Promise<Partial<RatesState>> => {
         const { rates } = json;
 
         // 2. Obtenemos historial real para las gráficas (paralelo para velocidad)
-        const [hUsdRes, hEurRes, hUsdtRes] = await Promise.all([
+        const [hUsdRes, hEurRes, hUsdtRes, hCopRes] = await Promise.all([
             fetch(`${KONVIERTE_API}/history?currency=USD&limit=7`),
             fetch(`${KONVIERTE_API}/history?currency=EUR&limit=7`),
-            fetch(`${KONVIERTE_API}/history?currency=USDT&limit=7`)
+            fetch(`${KONVIERTE_API}/history?currency=USDT&limit=7`),
+            fetch(`${KONVIERTE_API}/history?currency=COP&limit=7`)
         ]);
 
 
@@ -88,16 +90,19 @@ export const fetchRates = async (): Promise<Partial<RatesState>> => {
         const usdHist = (await hUsdRes.json()).history || [];
         const eurHist = (await hEurRes.json()).history || [];
         const usdtHist = (await hUsdtRes.json()).history || [];
+        const copHist = (await hCopRes.json()).history || [];
 
         // Reutilizamos los mismos datos ya leídos para formatHistory (sin releer el body)
         const mapPrices = (hist: any[]) => hist.reverse().map((h: any) => Number(h.price || h.promedio));
         const usdHistPrices = mapPrices([...usdHist]);
         const eurHistPrices = mapPrices([...eurHist]);
         const usdtHistPrices = mapPrices([...usdtHist]);
+        const copHistPrices = mapPrices([...copHist]);
 
         const usdRes = processRate(rates.usd, usdHist);
         const eurRes = processRate(rates.eur, eurHist);
         const usdtRes = processRate(rates.usdt, usdtHist);
+        const copRes = processRate(rates.cop || { price: 3950, source: 'Binance P2P COP', last_updated: new Date().toISOString() }, copHist);
 
 
         return {
@@ -127,6 +132,15 @@ export const fetchRates = async (): Promise<Partial<RatesState>> => {
                 lastUpdate: usdtRes.lastUpdate,
                 history: usdtHistPrices.length > 0 ? usdtHistPrices : [usdtRes.price],
                 change24h: calcVariation(usdtHistPrices, usdtRes.price)
+            },
+            binance_cop: {
+                price: copRes.price,
+                todayPrice: copRes.todayPrice,
+                dateRate: copRes.dateRate,
+                symbol: 'COP',
+                lastUpdate: copRes.lastUpdate,
+                history: copHistPrices.length > 0 ? copHistPrices : [copRes.price],
+                change24h: calcVariation(copHistPrices, copRes.price)
             },
         };
 

@@ -83,6 +83,10 @@
       "destination": "/api/historicos/usdt"
     },
     {
+      "source": "/docs/api/historicos/pesos",
+      "destination": "/api/historicos/cop"
+    },
+    {
       "source": "/docs/api/:path*",
       "destination": "/api/:path*"
     },

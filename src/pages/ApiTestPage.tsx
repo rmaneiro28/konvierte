@@ -19,7 +19,8 @@ import {
     Users,
     ExternalLink,
     Heart,
-    Landmark
+    Landmark,
+    Coins
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { NavLink } from 'react-router-dom';
@@ -33,7 +34,9 @@ const ApiTestPage: React.FC = () => {
     const [copied, setCopied] = useState<string | null>(null);
 
     // Dominio raíz (Sin /api al final) para evitar duplicidades 🌍
-    const baseUrlHost = typeof window !== 'undefined' ? "https://konvierte.vercel.app" : "https://konvierte.vercel.app";
+    const baseUrlHost = typeof window !== 'undefined'
+        ? (window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://konvierte.vercel.app')
+        : "https://konvierte.vercel.app";
 
     const endpoints = [
         { 
@@ -52,12 +55,13 @@ const ApiTestPage: React.FC = () => {
             id: 'rates', label: 'Tasas de Cambio', path: '/docs/api/rates', icon: <Database size={16} />, 
             desc: 'Obtiene el pull completo de tasas sincronizadas (BCV + Binance P2P).',
             params: [
-                { field: 'currency', type: 'string', desc: '(Opcional) Filtrar por USD, EUR o USDT.' }
+                { field: 'currency', type: 'string', desc: '(Opcional) Filtrar por USD, EUR, USDT o COP.' }
             ],
             schema: [
                 { field: 'USD', type: 'Object', desc: 'Tasa oficial BCV y metadatos.' },
                 { field: 'EUR', type: 'Object', desc: 'Tasa oficial EUR BCV.' },
                 { field: 'USDT', type: 'Object', desc: 'Promedio Binance USDT/VES.' },
+                { field: 'COP', type: 'Object', desc: 'Promedio Binance COP/USDT.' },
                 { field: 'timestamp', type: 'string', desc: 'Momento de sincronización global.' }
             ]
         },
@@ -105,6 +109,15 @@ const ApiTestPage: React.FC = () => {
             ]
         },
         { 
+            id: 'cop', label: 'P2P Pesos', path: '/docs/api/cop', icon: <Coins size={16} />, 
+            desc: 'Promedio de órdenes de compra/venta en pesos colombianos Binance P2P.',
+            params: [],
+            schema: [
+                { field: 'price', type: 'number', desc: 'Promedio ponderado en Pesos Colombianos (COP).' },
+                { field: 'last_updated', type: 'string', desc: 'Momento exacto del scrape.' }
+            ]
+        },
+        { 
             id: 'hist_usd', label: 'Historia Dólar', path: '/docs/api/historicos/dolares', icon: <Activity size={16} />, 
             desc: 'Serie histórica pura (JSON Array) del dólar BCV.',
             params: [
@@ -132,6 +145,16 @@ const ApiTestPage: React.FC = () => {
             ],
             schema: [
                 { field: '[{...}]', type: 'Array', desc: 'Lista de promedios diarios USDT.' }
+            ]
+        },
+        { 
+            id: 'hist_cop', label: 'Historia Pesos', path: '/docs/api/historicos/pesos', icon: <Activity size={16} />, 
+            desc: 'Serie histórica pura (JSON Array) del peso colombiano (COP).',
+            params: [
+                { field: 'days', type: 'number', desc: 'Días hacia atrás.' }
+            ],
+            schema: [
+                { field: '[{...}]', type: 'Array', desc: 'Lista de promedios diarios COP.' }
             ]
         },
         { 

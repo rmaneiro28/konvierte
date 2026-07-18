@@ -32,8 +32,8 @@ Verifica el estado operacional de los microservicios y el scraper.
 Retorna un objeto con todas las tasas disponibles sincronizadas en tiempo real.
 - **Endpoint**: `/rates`
 - **Parámetros (Query)**:
-    - `currency`: (Opcional) Filtrar por moneda (USD, EUR, USDT).
-- **Respuesta**: Un objeto con las claves `USD`, `EUR` y `USDT`.
+    - `currency`: (Opcional) Filtrar por moneda (USD, EUR, USDT, COP).
+- **Respuesta**: Un objeto con las claves `USD`, `EUR`, `USDT` y `COP`.
 
 ### 3. Dólar & Euro BCV 💵💶
 Tasas oficiales del Banco Central de Venezuela.
@@ -55,22 +55,38 @@ Promedio representativo del mercado USDT/VES en Binance.
 - **Endpoint**: `/usdt`
 - **Respuesta**: Similar a los anteriores, con `source: "Binance P2P"`.
 
-### 5. Histórico Inteligente 🕰️
+### 5. Pesos Colombianos Binance P2P 🇨🇴
+Promedio del dólar (USDT) en Pesos Colombianos desde Binance.
+- **Endpoint**: `/cop`
+- **Respuesta**:
+```json
+{
+  "currency": "COP",
+  "price": 3950.00,
+  "symbol": "COP",
+  "source": "Binance P2P COP",
+  "last_updated": "2026-04-10T00:30:16.168Z",
+  "date_rate": "2026-04-10"
+}
+```
+
+### 6. Histórico Inteligente 🕰️
 Serie temporal de registros financieros. Ideal para gráficas.
 - **Endpoint**: `/history`
 - **Parámetros (Query)**:
     - `days`: Número de días atrás (ej: 7, 30, 365).
-    - `currency`: Filtrar por moneda específica.
+    - `currency`: Filtrar por moneda específica (USD, EUR, USDT, COP).
     - `limit`: Cantidades de registros por página.
 - **URL Completa**: `https://konvierte.vercel.app/docs/api/history?days=30&currency=USD`
 
-### 6. Series Directas (Arrays Planos) 🔄
+### 7. Series Directas (Arrays Planos) 🔄
 Endpoints optimizados para descarga masiva de datos por moneda. Proporcionan el historial **completo sin recortes por defecto**.
 - **Dólares**: `/historicos/dolares`
 - **Euros**: `/historicos/euros`
 - **USDT**: `/historicos/usdt`
+- **Pesos**: `/historicos/pesos`
 
-### 7. Bancos de Venezuela 🏦
+### 8. Bancos de Venezuela 🏦
 Información institucional de las entidades bancarias venezolanas.
 - **Endpoint**: `/banks`
 - **Nota**: Este endpoint **no retorna tasas de cambio**, proporciona nombres oficiales, RIF, URLs y logos de los bancos.

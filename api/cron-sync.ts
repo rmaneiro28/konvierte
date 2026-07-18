@@ -69,6 +69,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             });
         }
 
+        // 2.5 Extracción de Binance P2P COP (Compra y Venta)
+        const [binanceCopBuy, binanceCopSell] = await Promise.all([
+            getBinanceRate('BUY', 'COP'),
+            getBinanceRate('SELL', 'COP')
+        ]);
+
+        if (binanceCopBuy) {
+            rows.push({
+                price: binanceCopBuy.price,
+                currency: 'COP',
+                source: 'Binance P2P COP (Compra)',
+                created_at: timestamp,
+                date_rate: new Date().toISOString().split('T')[0]
+            });
+        }
+
+        if (binanceCopSell) {
+            rows.push({
+                price: binanceCopSell.price,
+                currency: 'COP',
+                source: 'Binance P2P COP (Venta)',
+                created_at: timestamp,
+                date_rate: new Date().toISOString().split('T')[0]
+            });
+        }
+
 
 
         // 3. Sincronización con Base de Datos

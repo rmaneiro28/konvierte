@@ -94,13 +94,13 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({ onOpenTutorial
                         <div className="space-y-6">
                             <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 rounded-full border border-primary/20">
                                 <span className="w-2 h-2 bg-primary animate-pulse rounded-full" />
-                                <span className="text-[10px] font-black uppercase tracking-widest text-primary">Acceso Anticipado</span>
+                                <span className="text-[10px] font-black uppercase tracking-widest text-primary">Prueba la Beta</span>
                             </div>
                             <h3 className="text-3xl font-black text-main leading-tight">
                                 La potencia de <span className="text-primary">Konvierte</span> <br/> en tu bolsillo.
                             </h3>
                             <p className="text-sm font-bold text-main/50 leading-relaxed italic">
-                                Únete a la lista de espera para disfrutar de una experiencia fluida, widgets en pantalla de inicio y notificaciones instantáneas de tasas.
+                                Descarga la app ahora mismo para disfrutar de una experiencia fluida, widgets en pantalla de inicio y notificaciones instantáneas de tasas.
                             </p>
                             <div className="flex justify-center md:justify-start">
                                 <button
@@ -108,7 +108,7 @@ export const FeaturesSection: React.FC<FeaturesSectionProps> = ({ onOpenTutorial
                                     className="px-12 py-5 bg-primary text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-primary/90 transition-all active:scale-95 shadow-xl shadow-primary/20 flex items-center gap-3"
                                 >
                                     <Smartphone size={16} />
-                                    Unirme a la lista
+                                    Ver características
                                 </button>
                             </div>
                         </div>

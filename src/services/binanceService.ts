@@ -4,11 +4,11 @@ import axios from 'axios';
  * Service to fetch rates from Binance P2P.
  * Implements median-based pricing to avoid outliers and manipulation.
  */
-export const getBinanceRate = async (tradeType: 'BUY' | 'SELL' = 'BUY') => {
+export const getBinanceRate = async (tradeType: 'BUY' | 'SELL' = 'BUY', fiat: string = 'VES') => {
     try {
         const { data } = await axios.post('https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search', {
             asset: 'USDT',
-            fiat: 'VES',
+            fiat: fiat,
             merchantCheck: false, // Relajamos para asegurar resultados
             page: 1,
             rows: 20, 
@@ -29,7 +29,7 @@ export const getBinanceRate = async (tradeType: 'BUY' | 'SELL' = 'BUY') => {
 
         const ads = data?.data || [];
         if (ads.length === 0) {
-            console.warn(`[BinanceService] No se encontraron anuncios para ${tradeType}`);
+            console.warn(`[BinanceService] No se encontraron anuncios para ${tradeType} fiat ${fiat}`);
             return null;
         }
 
@@ -49,12 +49,13 @@ export const getBinanceRate = async (tradeType: 'BUY' | 'SELL' = 'BUY') => {
 
         return {
             symbol: 'USDT',
+            fiat: fiat,
             price: Number(median.toFixed(4)),
             last_updated: new Date().toISOString(),
-            source: `Binance P2P (${tradeType === 'BUY' ? 'Compra' : 'Venta'})`
+            source: `Binance P2P ${fiat} (${tradeType === 'BUY' ? 'Compra' : 'Venta'})`
         };
     } catch (error: any) {
-        console.error('❌ [BinanceService] Error al obtener tasa de Binance:', error?.message);
+        console.error(`❌ [BinanceService] Error al obtener tasa de Binance para fiat ${fiat}:`, error?.message);
         return null;
     }
 };
