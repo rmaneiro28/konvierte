@@ -45,6 +45,35 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
     }
   };
 
+  const [timeLeft, setTimeLeft] = useState({
+    days: 20,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  useEffect(() => {
+    const target = new Date('2026-08-06T23:59:59-04:00'); // 20 days from current date (July 17, 2026)
+    const updateCountdown = () => {
+      const now = new Date();
+      const difference = target.getTime() - now.getTime();
+      
+      if (difference <= 0) {
+        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+      } else {
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((difference / 1000 / 60) % 60);
+        const seconds = Math.floor((difference / 1000) % 60);
+        setTimeLeft({ days, hours, minutes, seconds });
+      }
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     const loadDownloads = async () => {
       const count = await getDownloadCount();
@@ -52,6 +81,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
     };
     loadDownloads();
   }, []);
+
 
 
 
@@ -162,15 +192,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                   La herramienta definitiva para gestionar tus finanzas en Venezuela. Tasas en tiempo real, presupuestos y reportes profesionales en una sola app.
                 </p>
 
-                <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4 pt-4">
+                <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
+                  <div className="px-8 py-4.5 rounded-[2rem] text-sm font-black uppercase tracking-[0.15em] border border-primary/30 text-primary/80 bg-background/50 backdrop-blur-md flex flex-col items-center justify-center gap-1 shadow-[0_20px_50px_rgba(16,185,129,0.1)] w-full sm:w-auto min-w-[280px]">
+                    <span className="text-[9px] font-extrabold text-primary uppercase tracking-[0.2em] flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse" />
+                      Próximamente en Play Store
+                    </span>
+                    <span className="text-base font-black font-mono tracking-widest text-main">
+                      {String(timeLeft.days).padStart(2, '0')}d : {String(timeLeft.hours).padStart(2, '0')}h : {String(timeLeft.minutes).padStart(2, '0')}m : {String(timeLeft.seconds).padStart(2, '0')}s
+                    </span>
+                  </div>
                   <button
                     onClick={handleDownload}
                     disabled={isDownloading}
-                    className="px-12 py-6 rounded-[2rem] text-base font-black uppercase tracking-[0.15em] transition-all active:scale-95 shadow-[0_20px_50px_rgba(16,185,129,0.35)] flex items-center justify-center gap-3 relative overflow-hidden group/hero disabled:opacity-70"
+                    className="w-full sm:w-auto px-8 py-6 rounded-[2rem] text-sm font-black uppercase tracking-[0.15em] transition-all active:scale-95 shadow-[0_20px_50px_rgba(16,185,129,0.35)] flex items-center justify-center gap-3 relative overflow-hidden group/hero disabled:opacity-70"
                     style={{ background: 'linear-gradient(135deg, #10B981, #059669)' }}
                   >
                     <div className="absolute inset-0 bg-black/10 dark:bg-white/10 translate-x-[-100%] group-hover/hero:translate-x-[100%] transition-transform duration-700 skew-x-12" />
-                    {downloadDone ? <><CheckCircle size={20} /> ¡Descarga iniciada!</> : isDownloading ? <><Download size={20} className="animate-bounce" /> Preparando...</> : <><Download size={20} /> Descargar APK Gratis</>}
+                    {downloadDone ? <><CheckCircle size={18} /> ¡Descarga iniciada!</> : isDownloading ? <><Download size={18} className="animate-bounce" /> Preparando...</> : <><Download size={18} /> Descargar APK Gratis</>}
                   </button>
                 </div>
 
@@ -287,13 +326,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
               >
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/30 rounded-full mb-6">
                   <Smartphone size={14} className="text-primary" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">App Nativa para Android</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">Próximamente en Google Play Store</span>
                 </div>
                 <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-tight mb-6">
-                  Descarga la app,<br /><span className="text-primary italic">sin rodeos.</span>
+                  Descarga la app,<br /><span className="text-primary italic">como prefieras.</span>
                 </h2>
                 <p className="text-lg opacity-50 max-w-2xl mx-auto">
-                  APK directa, sin Play Store, sin rastreos. Solo Konvierte funcionando en tu bolsillo.
+                  Instálala directamente desde Google Play Store de forma segura o descarga el archivo APK de manera directa.
                 </p>
               </motion.div>
 
@@ -306,10 +345,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                   className="space-y-5"
                 >
                   {[
-                    { icon: Shield, color: 'text-primary', bg: 'bg-primary/10 border-primary/20', title: '100% Libre de virus', desc: 'Compilada directamente desde nuestro código fuente abierto. Sin modificaciones, sin malware.' },
+                    { icon: Shield, color: 'text-primary', bg: 'bg-primary/10 border-primary/20', title: 'Próximamente en Google Play Store', desc: 'Pronto estará verificada por Play Protect para asegurar una instalación 100% segura y libre de malware.' },
                     { icon: Lock, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20', title: 'Sin permisos invasivos', desc: 'No pedimos acceso a tu cámara, contactos ni ubicación. Solo lo que necesitas para calcular.' },
                     { icon: Clock, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20', title: 'Funciona sin internet', desc: 'Las conversiones básicas funcionan offline. Las tasas se sincronizan cuando tienes conexión.' },
-                    { icon: Award, color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/20', title: 'Actualizaciones frecuentes', desc: 'El equipo lanza mejoras constantemente. Cada versión nueva está en esta misma página.' },
+                    { icon: Award, color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/20', title: 'Actualizaciones frecuentes', desc: 'El equipo lanza mejoras constantemente. Cada versión nueva está en esta misma página y en Google Play.' },
                   ].map((item, i) => (
                     <motion.div
                       key={i}
@@ -338,7 +377,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                   className="relative"
                 >
                   <div className="absolute -inset-1 bg-gradient-to-br from-primary/30 via-primary/10 to-transparent rounded-[2.5rem] blur-lg" />
-                  <div className="relative glass-card p-8 md:p-10 rounded-[2rem] border-primary/20 space-y-8">
+                  <div className="relative glass-card p-8 md:p-10 rounded-[2rem] border-primary/20 space-y-6">
 
                     {/* App Info */}
                     <div className="flex items-center gap-5">
@@ -375,7 +414,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
 
                     {/* Checkmarks */}
                     <div className="space-y-2">
-                      {['Sin cuenta requerida', 'Sin publicidad intrusiva', 'Datos 100% locales', 'Código abierto'].map((feat, i) => (
+                      {['Instalación certificada Play Protect', 'Sin registro obligatorio', 'Datos guardados localmente', 'Código abierto verificado'].map((feat, i) => (
                         <div key={i} className="flex items-center gap-3">
                           <CheckCircle size={14} className="text-primary flex-shrink-0" />
                           <span className="text-xs font-bold opacity-60">{feat}</span>
@@ -383,38 +422,49 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                       ))}
                     </div>
 
-                    {/* Download Button */}
-                    <button
-                      onClick={handleDownload}
-                      disabled={isDownloading}
-                      className="w-full py-5 rounded-2xl font-black text-sm uppercase tracking-[0.2em] transition-all active:scale-95 disabled:opacity-70 flex items-center justify-center gap-3 relative overflow-hidden group/dl"
-                      style={{ background: 'linear-gradient(135deg, #10B981, #059669)', boxShadow: '0 20px 50px rgba(16,185,129,0.35)' }}
-                    >
-                      <div className="absolute inset-0 bg-black/10 dark:bg-white/10 translate-x-[-100%] group-hover/dl:translate-x-[100%] transition-transform duration-700 skew-x-12" />
-                      <AnimatePresence mode="wait">
-                        {downloadDone ? (
-                          <motion.span key="done" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
-                            <CheckCircle size={18} /> ¡Descarga iniciada!
-                          </motion.span>
-                        ) : isDownloading ? (
-                          <motion.span key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
-                            <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}>
-                              <Download size={18} />
-                            </motion.div>
-                            Preparando...
-                          </motion.span>
-                        ) : (
-                          <motion.span key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
-                            <Download size={18} /> Descargar APK Gratis
-                          </motion.span>
-                        )}
-                      </AnimatePresence>
-                    </button>
+                    {/* Action Buttons */}
+                    <div className="space-y-3">
+                      <div className="w-full py-3 rounded-xl border border-primary/30 text-primary/80 bg-background/50 backdrop-blur-md flex flex-col items-center justify-center gap-0.5">
+                        <span className="text-[9px] font-extrabold text-primary uppercase tracking-[0.15em] flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse" />
+                          Próximamente en Play Store
+                        </span>
+                        <span className="text-sm font-black font-mono tracking-widest text-main">
+                          {String(timeLeft.days).padStart(2, '0')}d : {String(timeLeft.hours).padStart(2, '0')}h : {String(timeLeft.minutes).padStart(2, '0')}m : {String(timeLeft.seconds).padStart(2, '0')}s
+                        </span>
+                      </div>
+
+                      <button
+                        onClick={handleDownload}
+                        disabled={isDownloading}
+                        className="w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.15em] transition-all active:scale-95 disabled:opacity-70 flex items-center justify-center gap-2 relative overflow-hidden group/dl"
+                        style={{ background: 'linear-gradient(135deg, #10B981, #059669)', boxShadow: '0 10px 30px rgba(16,185,129,0.25)' }}
+                      >
+                        <div className="absolute inset-0 bg-black/10 dark:bg-white/10 translate-x-[-100%] group-hover/dl:translate-x-[100%] transition-transform duration-700 skew-x-12" />
+                        <AnimatePresence mode="wait">
+                          {downloadDone ? (
+                            <motion.span key="done" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
+                              <CheckCircle size={16} /> ¡Descarga iniciada!
+                            </motion.span>
+                          ) : isDownloading ? (
+                            <motion.span key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
+                              <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}>
+                                <Download size={16} />
+                              </motion.div>
+                              Preparando...
+                            </motion.span>
+                          ) : (
+                            <motion.span key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
+                              <Download size={16} /> Descargar APK Directa
+                            </motion.span>
+                          )}
+                        </AnimatePresence>
+                      </button>
+                    </div>
 
                     {/* Safety note */}
-                    <p className="text-center text-[10px] opacity-25 leading-relaxed">
-                      Al instalar, activa <span className="opacity-50 font-bold">"Fuentes desconocidas"</span> en Ajustes de tu Android.<br />
-                      Es normal para APKs externas al Play Store.
+                    <p className="text-center text-[9px] opacity-25 leading-relaxed">
+                      Si optas por instalar la APK directa, recuerda activar <span className="opacity-50 font-bold">"Fuentes desconocidas"</span> en los ajustes de tu Android.
                     </p>
                   </div>
                 </motion.div>
@@ -428,9 +478,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                 className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-4"
               >
                 {[
-                  { q: '¿Por qué no está en Play Store?', a: 'Google cobra tarifas y restringe apps venezolanas. Distribuimos directamente para llegar a más usuarios.' },
-                  { q: '¿Cómo sé que es segura?', a: 'Nuestro código es público en GitHub. Puedes verificar que la APK es idéntica a lo que compilamos.' },
-                  { q: '¿Qué hago si Android la bloquea?', a: 'Ve a Ajustes → Seguridad → Fuentes desconocidas y actívala. Es un paso estándar para APKs externas.' },
+                  { q: '¿Por qué instalar desde Google Play?', a: 'Es la opción recomendada. Google se encarga de analizar e instalar la app de forma totalmente automática y segura.' },
+                  { q: '¿Es idéntica la APK al Store?', a: 'Sí. El código del cual se compila tanto la APK como la versión enviada a Google Play es el mismo en nuestro GitHub.' },
+                  { q: '¿Qué es Play Protect?', a: 'Es el servicio de protección integrada de Google que analiza de forma continua el comportamiento de la aplicación.' },
                 ].map((faq, i) => (
                   <div key={i} className="p-5 bg-black/5 dark:bg-black/5 dark:bg-white/5 border border-black/10 dark:border-black/10 dark:border-white/10 rounded-2xl space-y-2 hover:border-primary/20 transition-colors">
                     <p className="text-xs font-black opacity-70">{faq.q}</p>
@@ -457,13 +507,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
               <p className="text-lg md:text-xl font-medium opacity-40 max-w-2xl mx-auto mb-12">
                 Únete a los miles de venezolanos que ya usan Konvierte para gestionar sus pagos y consultar el dólar cada día.
               </p>
-              <div className="flex justify-center items-center">
+              <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.rmaneiro.konvierte"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-10 py-5 rounded-[2rem] text-xs font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-2xl border border-primary text-primary hover:bg-primary/10 bg-background"
+                >
+                  Obtener en Google Play
+                </a>
                 <button
                   onClick={handleDownload}
-                  className="px-16 py-6 rounded-[2rem] text-sm font-black uppercase tracking-[0.25em] hover:opacity-90 transition-all active:scale-95 shadow-2xl shadow-primary/30 flex items-center gap-3"
+                  className="px-10 py-5 rounded-[2rem] text-xs font-black uppercase tracking-[0.2em] hover:opacity-90 transition-all active:scale-95 shadow-2xl shadow-primary/30 flex items-center gap-3 text-white"
                   style={{ background: 'linear-gradient(135deg, #10B981, #059669)' }}
                 >
-                  <Download size={20} /> Descargar App Gratis
+                  <Download size={16} /> Descargar APK Gratis
                 </button>
               </div>
             </motion.div>
@@ -650,8 +708,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
               </div>
 
               <div className="flex gap-8 text-[10px] font-black uppercase tracking-[0.2em] opacity-40">
-                <a href="#" className="hover:text-primary transition-colors">Términos</a>
-                <a href="#" className="hover:text-primary transition-colors">Privacidad</a>
+                <NavLink to="/terms" className="hover:text-primary transition-colors">Términos</NavLink>
+                <NavLink to="/privacy" className="hover:text-primary transition-colors">Privacidad</NavLink>
                 <a href="#" className="hover:text-primary transition-colors">Contacto</a>
               </div>
 

@@ -146,7 +146,11 @@ const DevelopersPage: React.FC = () => {
         </div>
       </section>
 
-      <footer className="py-20 px-6 border-t border-white/5 text-center">
+      <footer className="py-20 px-6 border-t border-white/5 text-center bg-surface/5 backdrop-blur-md">
+          <div className="flex justify-center gap-8 text-[10px] font-black uppercase tracking-[0.2em] opacity-40 mb-6">
+            <NavLink to="/terms" className="hover:text-primary transition-colors">Términos</NavLink>
+            <NavLink to="/privacy" className="hover:text-primary transition-colors">Privacidad</NavLink>
+          </div>
           <p className="text-[10px] font-bold opacity-20 text-main uppercase tracking-[0.5em]">
             &copy; {new Date().getFullYear()} Konvierte Digital
           </p>
