@@ -23,10 +23,12 @@ async function sync() {
     console.log('🔄 Iniciando sincronización manual hacia Supabase...');
 
     try {
-        const [bcvRates, binanceBuy, binanceSell] = await Promise.all([
+        const [bcvRates, binanceBuy, binanceSell, binanceCopBuy, binanceCopSell] = await Promise.all([
             getBcvRates(),
             getBinanceRate('BUY'),
-            getBinanceRate('SELL')
+            getBinanceRate('SELL'),
+            getBinanceRate('BUY', 'COP'),
+            getBinanceRate('SELL', 'COP')
         ]);
 
         if (bcvRates && bcvRates.length > 0) {
@@ -58,6 +60,28 @@ async function sync() {
                 price: binanceSell.price,
                 currency: 'USDT',
                 source: 'Binance P2P (Venta)',
+                created_at: timestamp,
+                date_rate: new Date().toISOString().split('T')[0]
+            });
+        }
+
+        if (binanceCopBuy) {
+            console.log(`📌 Binance COP Compra: ${binanceCopBuy.price} COP.`);
+            rows.push({
+                price: binanceCopBuy.price,
+                currency: 'COP',
+                source: 'Binance P2P COP (Compra)',
+                created_at: timestamp,
+                date_rate: new Date().toISOString().split('T')[0]
+            });
+        }
+
+        if (binanceCopSell) {
+            console.log(`📌 Binance COP Venta: ${binanceCopSell.price} COP.`);
+            rows.push({
+                price: binanceCopSell.price,
+                currency: 'COP',
+                source: 'Binance P2P COP (Venta)',
                 created_at: timestamp,
                 date_rate: new Date().toISOString().split('T')[0]
             });

@@ -84,7 +84,7 @@
     },
     {
       "source": "/docs/api/cop",
-      "destination": "/api/rate?currency=COP"
+      "destination": "/api/cop"
     },
     {
       "source": "/docs/api/historicos/dolares",
@@ -100,7 +100,7 @@
     },
     {
       "source": "/docs/api/historicos/pesos",
-      "destination": "/api/historicos/query?currency=COP"
+      "destination": "/api/historicos/cop"
     },
     {
       "source": "/docs/api/:path*",

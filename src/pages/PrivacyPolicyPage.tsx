@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Shield, Eye, Lock, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Shield, Eye, ExternalLink, CheckCircle, Megaphone } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 
 const PrivacyPolicyPage: React.FC = () => {
@@ -43,73 +43,72 @@ const PrivacyPolicyPage: React.FC = () => {
               Política de <span className="text-primary italic">Privacidad</span>
             </motion.h1>
             <p className="text-sm opacity-50 font-medium">
-              Última actualización: 17 de Julio de 2026
+              Última actualización: 21 de julio de 2026
             </p>
           </div>
 
           {/* Legal Text */}
           <div className="space-y-10 text-sm md:text-base font-medium leading-relaxed opacity-80 bg-surface/20 border border-border p-8 md:p-12 rounded-[2.5rem] backdrop-blur-xl">
-            <div className="space-y-4">
-              <h2 className="text-xl font-black uppercase tracking-wider text-primary flex items-center gap-3">
-                <Eye size={20} /> 1. Transparencia y Privacidad
-              </h2>
-              <p>
-                En <strong>Konvierte</strong> nos tomamos la privacidad del usuario con absoluta seriedad. Esta Política de Privacidad describe cómo se gestiona y protege la información en nuestra aplicación móvil y sitio web oficial. Al utilizar nuestros servicios, aceptas las prácticas descritas en este documento.
-              </p>
-            </div>
+            <p className="text-base md:text-lg opacity-90 border-b border-border pb-6">
+              En <strong>Konvierte</strong>, accesible desde la aplicación móvil Konvierte, una de nuestras principales prioridades es la privacidad de nuestros usuarios. Este documento de Política de Privacidad contiene los tipos de información que se recopilan y registran en Konvierte y cómo los utilizamos.
+            </p>
 
             <div className="space-y-4">
               <h2 className="text-xl font-black uppercase tracking-wider text-primary flex items-center gap-3">
-                <Lock size={20} /> 2. Recopilación de Datos
+                <Eye size={20} /> 1. Información que Recopilamos
               </h2>
               <p>
-                <strong>Konvierte no recopila, almacena, comparte ni vende ningún tipo de información personal</strong>. 
+                Nuestra aplicación <strong>Konvierte</strong> no requiere que los usuarios se registren ni proporcionen datos personales de identificación (como nombre completo, dirección física o número de teléfono) para su funcionamiento básico.
               </p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li><strong>Sin Registro:</strong> No requerimos la creación de cuentas de usuario, correos electrónicos, contraseñas ni perfiles para usar la calculadora de divisas y presupuestos.</li>
-                <li><strong>Almacenamiento Local:</strong> Toda la información ingresada por el usuario (como presupuestos, fichas de pago móvil o ajustes personales) se almacena de forma local y exclusiva en el almacenamiento interno de tu dispositivo móvil a través de tecnologías de bases de datos seguras (como SQLite o Preferences locales).</li>
-                <li><strong>Cero Transmisiones Financieras:</strong> No tenemos acceso a tus cuentas bancarias, credenciales de pago ni información financiera. Las fichas de pago generadas son plantillas de texto e imágenes locales creadas exclusivamente para facilitar tus operaciones de pago móvil del día a día.</li>
+              <ul className="list-disc pl-6 space-y-3">
+                <li>
+                  <strong>Datos de Red y Conectividad:</strong> La aplicación utiliza acceso a internet para consultar los tipos de cambio de divisas en tiempo real.
+                </li>
+                <li>
+                  <strong>Preferencias Locales:</strong> Guardamos configuraciones simples de forma local en tu dispositivo (como tus monedas favoritas o el historial de conversiones recientes) para mejorar la experiencia del usuario. Esta información no se sube a servidores externos.
+                </li>
               </ul>
             </div>
 
             <div className="space-y-4">
               <h2 className="text-xl font-black uppercase tracking-wider text-primary flex items-center gap-3">
-                <RefreshCw size={20} /> 3. Permisos Requeridos por la Aplicación
+                <Megaphone size={20} /> 2. Anuncios (Google AdMob)
               </h2>
               <p>
-                Nuestra aplicación solicita permisos mínimos para garantizar un correcto funcionamiento técnico:
-              </p>
-              <ul className="list-disc pl-6 space-y-2">
-                <li><strong>Acceso a Internet (INTERNET):</strong> Utilizado exclusivamente para sincronizar periódicamente las tasas de cambio de divisas oficiales (BCV) y promedios cripto (Binance P2P) a través de nuestra API pública.</li>
-                <li><strong>Almacenamiento (WRITE_EXTERNAL_STORAGE):</strong> Utilizado bajo la autorización expresa del usuario al exportar presupuestos en formato de archivos PDF o compartir fichas de pago de forma externa.</li>
-              </ul>
-            </div>
-
-            <div className="space-y-4">
-              <h2 className="text-xl font-black uppercase tracking-wider text-primary flex items-center gap-3">
-                4. Cookies y Análisis en la Web
-              </h2>
-              <p>
-                Nuestro sitio web puede utilizar cookies técnicas necesarias para mantener preferencias básicas de la interfaz (como la selección de tema claro/oscuro). No utilizamos rastreadores invasivos de comportamiento ni tecnologías de segmentación comercial.
+                Konvierte puede mostrar anuncios proporcionados por Google AdMob. Google AdMob puede utilizar identificadores de dispositivos y cookies para personalizar los anuncios y analizar el rendimiento del tráfico de anuncios. Puedes gestionar las preferencias de personalización en la configuración de Google de tu dispositivo Android.
               </p>
             </div>
 
             <div className="space-y-4">
               <h2 className="text-xl font-black uppercase tracking-wider text-primary flex items-center gap-3">
-                5. Cambios a esta Política
+                <ExternalLink size={20} /> 3. Enlaces a Sitios de Terceros
               </h2>
               <p>
-                Nos reservamos el derecho de modificar esta política en cualquier momento para adaptarla a futuras actualizaciones de la aplicación o requerimientos de las tiendas de aplicaciones (como Google Play Store). Se aconseja revisar esta página frecuentemente para constatar el compromiso inalterable de Konvierte con la privacidad total de sus usuarios.
+                Nuestra aplicación puede contener enlaces a otros sitios o servicios de terceros. Si haces clic en un enlace de un tercero, serás redirigido a ese sitio. Te recomendamos revisar la política de privacidad de cada sitio que visites.
               </p>
             </div>
 
-            <div className="pt-6 border-t border-border flex flex-col md:flex-row items-center justify-between gap-6 opacity-60">
-              <p className="text-xs">
-                © {new Date().getFullYear()} Konvierte Digital. Todos los derechos reservados.
+            <div className="space-y-4">
+              <h2 className="text-xl font-black uppercase tracking-wider text-primary flex items-center gap-3">
+                <CheckCircle size={20} /> 4. Consentimiento
+              </h2>
+              <p>
+                Al utilizar nuestra aplicación, aceptas nuestra Política de Privacidad y sus términos.
               </p>
-              <p className="text-xs font-mono">
-                Soporte: rmaneiro28@gmail.com
+            </div>
+
+            <div className="pt-6 border-t border-border space-y-4">
+              <p className="text-sm opacity-90">
+                Si tienes alguna pregunta o sugerencia sobre nuestra Política de Privacidad, no dudes en contactarnos a través del correo de soporte proporcionado en la Google Play Store.
               </p>
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6 opacity-60 pt-4">
+                <p className="text-xs">
+                  © {new Date().getFullYear()} Konvierte. Todos los derechos reservados.
+                </p>
+                <p className="text-xs font-mono">
+                  Soporte: Correo en Google Play Store
+                </p>
+              </div>
             </div>
           </div>
         </div>
