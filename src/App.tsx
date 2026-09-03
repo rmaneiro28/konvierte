@@ -12,6 +12,7 @@ import DevelopersPage from './pages/DevelopersPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsPage from './pages/TermsPage';
 
+import CalculatorPage from './pages/CalculatorPage';
 
 function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -59,6 +60,7 @@ function App() {
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/developers" element={<DevelopersPage />} />
           <Route path="/docs" element={<ApiTestPage />} />
+          <Route path="/calculadora" element={<CalculatorPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="*" element={<NotFoundPage />} />

@@ -107,13 +107,16 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                 <NavLink to="/features" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Características</NavLink>
                 <NavLink to="/developers" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Desarrolladores</NavLink>
                 <NavLink to="/docs" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">API Docs</NavLink>
+                <NavLink to="/calculadora" className="text-[10px] font-black uppercase tracking-widest text-primary hover:opacity-80 transition-opacity">Calculadora Web</NavLink>
                 <a href="#team" className="text-[10px] font-black uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity">Equipo</a>
-                <button
-                  onClick={handleDownload}
+                <a
+                  href="https://play.google.com/store/apps/details?id=com.konvierte.app"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="px-6 py-2.5 bg-primary text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary/90 transition-all active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-2"
                 >
-                  <Download size={14} /> Descargar
-                </button>
+                  <Download size={14} /> Consíguelo en Google Play
+                </a>
                 <button
                   onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
                   className="w-10 h-10 rounded-xl bg-surface border border-border flex items-center justify-center hover:bg-primary/10 transition-colors shadow-sm"
@@ -158,6 +161,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                     <NavLink to="/features" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-black uppercase tracking-widest opacity-70">Características</NavLink>
                     <NavLink to="/developers" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-black uppercase tracking-widest opacity-70">Desarrolladores</NavLink>
                     <NavLink to="/docs" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-black uppercase tracking-widest opacity-70">API Docs</NavLink>
+                    <NavLink to="/calculadora" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-black uppercase tracking-widest text-primary">Calculadora Web</NavLink>
                     <a href="#team" onClick={() => setIsMobileMenuOpen(false)} className="text-sm font-black uppercase tracking-widest opacity-70">Equipo</a>
                   </div>
                 </motion.div>
@@ -193,24 +197,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
-                  <div className="px-8 py-4.5 rounded-[2rem] text-sm font-black uppercase tracking-[0.15em] border border-primary/30 text-primary/80 bg-background/50 backdrop-blur-md flex flex-col items-center justify-center gap-1 shadow-[0_20px_50px_rgba(16,185,129,0.1)] w-full sm:w-auto min-w-[280px]">
-                    <span className="text-[9px] font-extrabold text-primary uppercase tracking-[0.2em] flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse" />
-                      Próximamente en Play Store
-                    </span>
-                    <span className="text-base font-black font-mono tracking-widest text-main">
-                      {String(timeLeft.days).padStart(2, '0')}d : {String(timeLeft.hours).padStart(2, '0')}h : {String(timeLeft.minutes).padStart(2, '0')}m : {String(timeLeft.seconds).padStart(2, '0')}s
-                    </span>
-                  </div>
-                  <button
-                    onClick={handleDownload}
-                    disabled={isDownloading}
-                    className="w-full sm:w-auto px-8 py-6 rounded-[2rem] text-sm font-black uppercase tracking-[0.15em] transition-all active:scale-95 shadow-[0_20px_50px_rgba(16,185,129,0.35)] flex items-center justify-center gap-3 relative overflow-hidden group/hero disabled:opacity-70"
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.konvierte.app"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto px-8 py-6 rounded-[2rem] text-sm font-black uppercase tracking-[0.15em] transition-all active:scale-95 shadow-[0_20px_50px_rgba(16,185,129,0.35)] flex items-center justify-center gap-3 relative overflow-hidden group/hero"
                     style={{ background: 'linear-gradient(135deg, #10B981, #059669)' }}
                   >
                     <div className="absolute inset-0 bg-black/10 dark:bg-white/10 translate-x-[-100%] group-hover/hero:translate-x-[100%] transition-transform duration-700 skew-x-12" />
-                    {downloadDone ? <><CheckCircle size={18} /> ¡Descarga iniciada!</> : isDownloading ? <><Download size={18} className="animate-bounce" /> Preparando...</> : <><Download size={18} /> Descargar APK Gratis</>}
-                  </button>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Google_Play_2022_logo.svg" alt="Google Play" className="w-5 h-5 filter brightness-0 invert" /> Descargar en Google Play
+                  </a>
+                  
+                  <NavLink
+                    to="/calculadora"
+                    className="w-full sm:w-auto px-8 py-6 rounded-[2rem] text-sm font-black uppercase tracking-[0.15em] border border-primary/30 text-primary/80 bg-background/50 backdrop-blur-md flex items-center justify-center gap-3 shadow-[0_20px_50px_rgba(16,185,129,0.1)] hover:bg-primary/10 transition-colors"
+                  >
+                    <Zap size={18} className="text-yellow-500" /> Usar Calculadora Web
+                  </NavLink>
                 </div>
 
                 <div className="flex items-center justify-center lg:justify-start gap-8 pt-8 opacity-40">
@@ -326,13 +329,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
               >
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 border border-primary/30 rounded-full mb-6">
                   <Smartphone size={14} className="text-primary" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">Próximamente en Google Play Store</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-primary">Ya disponible en Google Play Store</span>
                 </div>
                 <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-tight mb-6">
-                  Descarga la app,<br /><span className="text-primary italic">como prefieras.</span>
+                  Obtén la app,<br /><span className="text-primary italic">totalmente gratis.</span>
                 </h2>
                 <p className="text-lg opacity-50 max-w-2xl mx-auto">
-                  Instálala directamente desde Google Play Store de forma segura o descarga el archivo APK de manera directa.
+                  Instálala directamente desde Google Play Store de forma segura y disfruta de la mejor experiencia móvil, o utiliza nuestra versión web si lo prefieres.
                 </p>
               </motion.div>
 
@@ -345,10 +348,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
                   className="space-y-5"
                 >
                   {[
-                    { icon: Shield, color: 'text-primary', bg: 'bg-primary/10 border-primary/20', title: 'Próximamente en Google Play Store', desc: 'Pronto estará verificada por Play Protect para asegurar una instalación 100% segura y libre de malware.' },
+                    { icon: Shield, color: 'text-primary', bg: 'bg-primary/10 border-primary/20', title: 'Verificada en Google Play Store', desc: 'Analizada y aprobada por Play Protect para asegurar una instalación 100% segura y libre de malware.' },
                     { icon: Lock, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20', title: 'Sin permisos invasivos', desc: 'No pedimos acceso a tu cámara, contactos ni ubicación. Solo lo que necesitas para calcular.' },
                     { icon: Clock, color: 'text-orange-400', bg: 'bg-orange-500/10 border-orange-500/20', title: 'Funciona sin internet', desc: 'Las conversiones básicas funcionan offline. Las tasas se sincronizan cuando tienes conexión.' },
-                    { icon: Award, color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/20', title: 'Actualizaciones frecuentes', desc: 'El equipo lanza mejoras constantemente. Cada versión nueva está en esta misma página y en Google Play.' },
+                    { icon: Award, color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/20', title: 'Actualizaciones automáticas', desc: 'El equipo lanza mejoras constantemente. Obtén siempre la última versión directo desde Google Play.' },
                   ].map((item, i) => (
                     <motion.div
                       key={i}
@@ -424,47 +427,24 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
 
                     {/* Action Buttons */}
                     <div className="space-y-3">
-                      <div className="w-full py-3 rounded-xl border border-primary/30 text-primary/80 bg-background/50 backdrop-blur-md flex flex-col items-center justify-center gap-0.5">
-                        <span className="text-[9px] font-extrabold text-primary uppercase tracking-[0.15em] flex items-center gap-1.5">
-                          <span className="w-1.5 h-1.5 rounded-full bg-yellow-500 animate-pulse" />
-                          Próximamente en Play Store
-                        </span>
-                        <span className="text-sm font-black font-mono tracking-widest text-main">
-                          {String(timeLeft.days).padStart(2, '0')}d : {String(timeLeft.hours).padStart(2, '0')}h : {String(timeLeft.minutes).padStart(2, '0')}m : {String(timeLeft.seconds).padStart(2, '0')}s
-                        </span>
-                      </div>
-
-                      <button
-                        onClick={handleDownload}
-                        disabled={isDownloading}
-                        className="w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.15em] transition-all active:scale-95 disabled:opacity-70 flex items-center justify-center gap-2 relative overflow-hidden group/dl"
+                      <a
+                        href="https://play.google.com/store/apps/details?id=com.konvierte.app"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full py-4 rounded-xl font-black text-xs uppercase tracking-[0.15em] transition-all active:scale-95 flex items-center justify-center gap-2 relative overflow-hidden group/dl"
                         style={{ background: 'linear-gradient(135deg, #10B981, #059669)', boxShadow: '0 10px 30px rgba(16,185,129,0.25)' }}
                       >
                         <div className="absolute inset-0 bg-black/10 dark:bg-white/10 translate-x-[-100%] group-hover/dl:translate-x-[100%] transition-transform duration-700 skew-x-12" />
-                        <AnimatePresence mode="wait">
-                          {downloadDone ? (
-                            <motion.span key="done" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
-                              <CheckCircle size={16} /> ¡Descarga iniciada!
-                            </motion.span>
-                          ) : isDownloading ? (
-                            <motion.span key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
-                              <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}>
-                                <Download size={16} />
-                              </motion.div>
-                              Preparando...
-                            </motion.span>
-                          ) : (
-                            <motion.span key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
-                              <Download size={16} /> Descargar APK Directa
-                            </motion.span>
-                          )}
-                        </AnimatePresence>
-                      </button>
+                        <motion.span className="flex items-center gap-2 text-white">
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Google_Play_2022_logo.svg" alt="Google Play" className="w-5 h-5 filter brightness-0 invert" />
+                          Descargar en Google Play
+                        </motion.span>
+                      </a>
                     </div>
 
                     {/* Safety note */}
-                    <p className="text-center text-[9px] opacity-25 leading-relaxed">
-                      Si optas por instalar la APK directa, recuerda activar <span className="opacity-50 font-bold">"Fuentes desconocidas"</span> en los ajustes de tu Android.
+                    <p className="text-center text-[9px] opacity-30 leading-relaxed">
+                      La aplicación más segura y rápida para gestionar tus divisas. Únete a miles de usuarios.
                     </p>
                   </div>
                 </motion.div>
@@ -509,20 +489,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ theme, setTheme }) => {
               </p>
               <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
                 <a
-                  href="https://play.google.com/store/apps/details?id=com.rmaneiro.konvierte"
+                  href="https://play.google.com/store/apps/details?id=com.konvierte.app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-10 py-5 rounded-[2rem] text-xs font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-2xl border border-primary text-primary hover:bg-primary/10 bg-background"
-                >
-                  Obtener en Google Play
-                </a>
-                <button
-                  onClick={handleDownload}
-                  className="px-10 py-5 rounded-[2rem] text-xs font-black uppercase tracking-[0.2em] hover:opacity-90 transition-all active:scale-95 shadow-2xl shadow-primary/30 flex items-center gap-3 text-white"
+                  className="px-10 py-5 rounded-[2rem] text-xs font-black uppercase tracking-[0.2em] transition-all active:scale-95 shadow-2xl border border-primary text-white hover:opacity-90 flex items-center gap-3"
                   style={{ background: 'linear-gradient(135deg, #10B981, #059669)' }}
                 >
-                  <Download size={16} /> Descargar APK Gratis
-                </button>
+                  <img src="https://upload.wikimedia.org/wikipedia/commons/7/7a/Google_Play_2022_logo.svg" alt="Google Play" className="w-5 h-5 filter brightness-0 invert" />
+                  Descargar en Google Play
+                </a>
+                <NavLink
+                  to="/calculadora"
+                  className="px-10 py-5 rounded-[2rem] text-xs font-black uppercase tracking-[0.2em] hover:bg-primary/10 transition-all active:scale-95 shadow-2xl border border-primary text-primary bg-background flex items-center gap-3"
+                >
+                  <Zap size={16} /> Probar Calculadora Web
+                </NavLink>
               </div>
             </motion.div>
           </section>
