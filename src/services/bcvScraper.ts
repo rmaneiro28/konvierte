@@ -29,7 +29,7 @@ export const getBcvRates = async () => {
 
         const extractPrice = (id: string) => {
             const text = $(`${id} .centrado strong`).text().trim();
-            return text ? parseFloat(text.replace(',', '.')) : 0;
+            return text ? parseFloat(text.replace(/\./g, '').replace(',', '.')) : 0;
         };
 
         const currencies = [
