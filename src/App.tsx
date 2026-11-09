@@ -60,7 +60,7 @@ function App() {
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/developers" element={<DevelopersPage />} />
           <Route path="/docs" element={<ApiTestPage />} />
-          <Route path="/calculadora" element={<CalculatorPage />} />
+          <Route path="/calculadora" element={<CalculatorPage theme={theme} setTheme={setTheme} />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsPage />} />
           <Route path="*" element={<NotFoundPage />} />
